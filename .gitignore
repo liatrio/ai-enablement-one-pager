@@ -1,6 +1,9 @@
 # Wrangler local dev artifacts
 cloudflare-api/.wrangler/
 
+# Node
+cloudflare-api/node_modules/
+
 # Python
 __pycache__/
 *.pyc

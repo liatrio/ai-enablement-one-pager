@@ -3,6 +3,9 @@
 // Routes:
 //   GET /              → summary JSON
 //   GET /api/content   → full structured content
+//   POST /api/chat     → AI agent chat
+
+import Anthropic from '@anthropic-ai/sdk';
 //   GET /api/sections  → all sections array
 //   GET /api/sections/:id → single section by id
 //   GET /api/stats     → key metrics
@@ -229,6 +232,65 @@ function json(data, status = 200) {
   });
 }
 
+// ── Chat agent ────────────────────────────────────────────────────────────────
+
+const CHAT_SYSTEM_PROMPT = `You are a knowledgeable, energetic conversationalist representing Liatrio's perspective on enterprise AI transformation. You are NOT a sales bot or a FAQ system — you are a genuine thought partner.
+
+Your core thesis: AI is the new internet. In 1995, companies that dismissed the web as a toy lost a decade. The ones that embraced it as the new fundamental infrastructure — not a feature, not a productivity tool, but a complete rewiring of how work gets done — those are the companies that defined the next era. The exact same thing is happening right now with AI. Most enterprises are treating it like a spell-checker upgrade. A handful are treating it like the internet, and they are going to be unrecognizable in five years.
+
+This isn't hype. You have the receipts. Liatrio is embedded inside Boeing and Natera right now, running Claude across regulated engineering teams, and the results are not incremental — they are orders-of-magnitude different. This is what a paradigm shift looks like from the inside.
+
+Key facts you know cold:
+- Boeing: 8× faster delivery on the first Claude-native sprint. A workflow that took 5 business days with multiple team handoffs now runs in 15 minutes with zero handoffs. Three product teams through a multi-day Flashbuild — production features in two days. Claude Code approval pending for H2 2026. Next plays: AI onboarding agent (eliminates ~40 ServiceNow tickets per project), FFU/TMR compliance generator (47-day ATO prep → hours), SRE reasoning agent.
+- Natera: 80+ engineering teams in scope. FDA-regulated clinical genomics software. Engineers running Spec-Driven Development workflows on regulated repos. An engineer ran a 14-step clinical dry-test completely unprompted. Another extended the MR review pipeline to her own project within days of seeing it. Adoption is organic — people are going further than what Liatrio even prescribed.
+- Method: Claude Certification Academy (CCA) built in 3 days from a blank document, based on Anthropic's open source materials. 50+ Liatrio engineers in the first Forge training cohort. The core methodology is Spec-Driven Development (SDD) — specs first, then Claude writes code against them. Engagements span 200–500+ engineers.
+- The real differentiator: Other consultants will set up Bedrock for you and leave. Liatrio builds the flywheel — certification, SDD methodology, OpenTelemetry instrumentation so leadership can see adoption in real time, agentic SDLC orchestration. The goal is that the client org runs Claude themselves at scale, not that they depend on Liatrio forever.
+
+Tone and approach:
+- Direct and substantive. Have opinions. It's okay to say "most companies are getting this wrong."
+- Excited about what's happening — not in a hype way, in a "we're watching history" way.
+- Not corporate, not salesy. Like talking to someone who's genuinely in the work and wants to share what they're seeing.
+- When someone asks about AI strategy or adoption, give them something real to think about. Don't hedge everything into mush.
+- Contrarian where the data supports it.
+- Keep responses conversational — 2 to 4 paragraphs max unless they explicitly want depth. Use line breaks. No bullet-point dumps unless it genuinely serves clarity.
+- You can use tools to pull fresh section details or story data if someone asks something specific.`;
+
+const CHAT_TOOLS = [
+  {
+    name: "get_section",
+    description: "Get the full content for a specific section of the Liatrio one-pager. Use when a visitor asks about a specific client (Boeing, Natera), the methodology, or wants chapter details.",
+    input_schema: {
+      type: "object",
+      properties: {
+        section_id: {
+          type: "string",
+          enum: ["hero", "context", "boeing", "natera", "method", "cta"],
+          description: "The section to retrieve."
+        }
+      },
+      required: ["section_id"]
+    }
+  },
+  {
+    name: "get_stats",
+    description: "Get the key headline metrics. Use when the conversation turns to quantitative results or scale of impact.",
+    input_schema: {
+      type: "object",
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: "get_stories",
+    description: "Get additional client stories added dynamically. Use when a visitor asks about other clients or newer engagements.",
+    input_schema: {
+      type: "object",
+      properties: {},
+      required: []
+    }
+  }
+];
+
 // ── Story helpers (KV-backed) ─────────────────────────────────────────────────
 
 async function getStories(env) {
@@ -268,6 +330,7 @@ export default {
           section: "/api/sections/:id",
           stats: "/api/stats",
           stories: "/api/stories",
+          chat: "POST /api/chat",
           add_story: "POST /api/stories",
           update_story: "PUT /api/stories/:id",
           delete_story: "DELETE /api/stories/:id",
@@ -375,6 +438,95 @@ export default {
       if (filtered.length === stories.length) return json({ error: "Story not found" }, 404);
       await saveStories(env, filtered);
       return json({ ok: true, deleted: deleteMatch[1] });
+    }
+
+    // POST /api/chat
+    if (path === "/api/chat" && request.method === "POST") {
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Invalid JSON body" }, 400);
+      }
+
+      const { messages } = body;
+      if (!Array.isArray(messages) || messages.length === 0) {
+        return json({ error: "messages array required" }, 400);
+      }
+      if (messages.length > 30) {
+        return json({ error: "Conversation too long — start a fresh chat" }, 400);
+      }
+
+      // In-process tool execution (sync for CONTENT, async for KV)
+      function executeTool(name, input) {
+        if (name === "get_section") {
+          return CONTENT.sections.find(s => s.id === input.section_id) || { error: "Section not found" };
+        }
+        if (name === "get_stats") {
+          return { stats: CONTENT.stats };
+        }
+        return { error: "Unknown tool" };
+      }
+
+      try {
+        const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+        let currentMessages = [...messages];
+        let finalText = "";
+
+        for (let i = 0; i < 5; i++) {
+          const response = await client.messages.create({
+            model: "claude-sonnet-4-6",
+            max_tokens: 1024,
+            system: CHAT_SYSTEM_PROMPT,
+            tools: CHAT_TOOLS,
+            messages: currentMessages,
+          });
+
+          if (response.stop_reason === "end_turn") {
+            finalText = response.content
+              .filter(b => b.type === "text")
+              .map(b => b.text)
+              .join("\n");
+            break;
+          }
+
+          if (response.stop_reason === "tool_use") {
+            currentMessages.push({ role: "assistant", content: response.content });
+
+            const toolResults = [];
+            for (const block of response.content) {
+              if (block.type !== "tool_use") continue;
+              let result;
+              if (block.name === "get_stories") {
+                result = { stories: await getStories(env) };
+              } else {
+                result = executeTool(block.name, block.input);
+              }
+              toolResults.push({
+                type: "tool_result",
+                tool_use_id: block.id,
+                content: JSON.stringify(result),
+              });
+            }
+            currentMessages.push({ role: "user", content: toolResults });
+            continue;
+          }
+
+          // Unexpected stop reason — use whatever text was generated
+          finalText = response.content
+            .filter(b => b.type === "text")
+            .map(b => b.text)
+            .join("\n");
+          break;
+        }
+
+        if (!finalText) return json({ error: "No response generated" }, 500);
+        return json({ reply: finalText });
+
+      } catch (err) {
+        console.error("Anthropic API error:", err.message);
+        return json({ error: "AI service temporarily unavailable. Try again in a moment." }, 503);
+      }
     }
 
     return json({ error: "Not found" }, 404);
