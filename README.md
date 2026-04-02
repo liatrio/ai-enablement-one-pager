@@ -2,7 +2,7 @@
 
 A single-page site telling Liatrio's enterprise AI story, backed by a Cloudflare Worker API and an AI chat agent powered by Claude.
 
-**Live:** open `index.html` in a browser — no build step, no framework, no bundler.
+**Live:** open `index.html` in a browser — no build step, no framework, no bundler. The chat widget talks to the already-deployed Worker, so it works out of the box for anyone on this branch. All requests share the same Anthropic API quota.
 
 ---
 
