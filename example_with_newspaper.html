@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aircraft Maintenance Planner - PoC Project Summary</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#24ae1d;--lime:#89df00;--dark:#1a1a2e;--darker:#111122;
+  --white:#fff;--light:#f4f7f4;--text:#2d2d3a;--med:#5a5a6e;--border:#d4ddd4;
+  --blue:#2E75B6;--red:#E8684A;--purple:#7B68A8;--amber:#E6A23C;--cyan:#5DADE2;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--dark);background:#fafbfc;line-height:1.6}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--darker);padding:0 2rem;display:flex;align-items:center;gap:2rem;height:48px;overflow:visible;white-space:nowrap;border-top:3px solid var(--green)}
+nav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:.8rem;font-weight:500;letter-spacing:.02em;transition:color .2s}
+nav a:hover,nav a.active{color:var(--lime)}
+
+/* PORTAL DROPDOWN */
+.portal-dropdown{position:relative}
+.portal-dropdown>a{cursor:pointer;background:#000;color:var(--lime)!important;padding:.35rem .85rem;border-radius:4px;font-size:.78rem;font-weight:600;letter-spacing:.03em;border:1px solid var(--green);transition:background .2s,color .2s,border-color .2s;min-height:44px;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.portal-dropdown>a:hover{background:var(--green);color:#000!important;border-color:var(--green)}
+.portal-dropdown .dropdown-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;background:#000;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:.35rem 0;min-width:190px;white-space:nowrap;z-index:101;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.portal-dropdown:hover .dropdown-menu{display:block}
+.portal-dropdown.open .dropdown-menu{display:block}
+@media(max-width:700px){.portal-dropdown .dropdown-menu{display:block;position:fixed;top:auto;bottom:0;left:0;right:0;border-radius:12px 12px 0 0;padding:.75rem 0 1rem;min-width:100%;transform:translateY(100%);transition:transform .3s ease;pointer-events:none}
+.portal-dropdown.open .dropdown-menu{transform:translateY(0);pointer-events:auto}}
+.dropdown-menu a{display:block;padding:.45rem 1rem;font-size:.78rem;color:rgba(255,255,255,.7)}
+.dropdown-menu a:hover{color:var(--lime);background:rgba(255,255,255,.08)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d0d1a 0%,#1a2a1a 50%,#0d1a0d 100%);color:#fff;padding:5rem 2rem 4rem;text-align:center}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.5rem}
+.hero .subtitle{color:var(--lime);font-size:1.15rem;font-weight:500;opacity:.9}
+.hero .meta{color:rgba(255,255,255,.5);font-size:.95rem;margin-top:.5rem}
+
+/* LAYOUT */
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+section{padding:3rem 0}
+section+section{border-top:1px solid var(--border)}
+
+/* HEADINGS */
+h2{font-size:1.6rem;color:var(--dark);font-weight:700;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-size:1.1rem;color:var(--dark);font-weight:700;margin:1.5rem 0 .75rem}
+.note{font-size:.85rem;color:var(--med);margin-bottom:1.25rem}
+
+/* STAT BOXES */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:2rem}
+.stat-box{background:var(--light);border-radius:8px;padding:1.25rem .75rem;text-align:center}
+.stat-box .num{font-size:2rem;font-weight:700;line-height:1}
+.stat-box .label{font-size:.75rem;color:var(--med);margin-top:.25rem;text-transform:uppercase;letter-spacing:.04em}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin-bottom:1.5rem}
+thead th{background:var(--dark);color:#fff;text-align:left;padding:.6rem .75rem;font-weight:600;font-size:.8rem;letter-spacing:.02em}
+tbody td{padding:.55rem .75rem;border-bottom:1px solid var(--border)}
+tbody tr:nth-child(even){background:var(--light)}
+tbody td:first-child{font-weight:600}
+td.r{text-align:right}td.c{text-align:center}
+
+/* CHARTS */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0 2rem}
+.chart-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:1.25rem}
+.chart-card h4{font-size:.85rem;color:var(--dark);margin-bottom:.75rem;font-weight:600}
+/* MOBILE FAB + CHAT */
+#mobile-fab{display:none}
+#mobile-chat{display:none}
+@media(max-width:700px){
+  .charts,.charts[style]{grid-template-columns:1fr!important}
+  nav{padding:0 .75rem;gap:1rem;overflow-x:auto}
+  #liatrio-egg{display:none}
+  .container{padding:0 1rem}
+  section{padding:2rem 0}
+  .hero{padding:3rem 1rem 2rem}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .team-grid{grid-template-columns:1fr}
+  .pipeline{flex-direction:column}
+  .pipeline .stage{border-radius:0!important}
+  .pipeline .stage+.stage::before{display:none}
+  h2{font-size:1.3rem}
+  #mobile-fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:20px;right:20px;width:52px;height:52px;background:#111;border:2px solid var(--green);border-radius:50%;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4);cursor:pointer;animation:egg-pulse 8s ease-in-out infinite}
+  #mobile-fab svg{width:28px;height:28px}
+  body.newspaper-mode #mobile-fab{display:none}
+  #mobile-chat{display:block;position:fixed;bottom:82px;right:16px;z-index:9999}
+  #mobile-chat.chat-hidden{display:none!important}
+}
+.chat-bubble{background:#fff;border-radius:16px 16px 4px 16px;padding:1rem 1.1rem;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:260px;animation:chat-pop .3s ease-out}
+@keyframes chat-pop{from{opacity:0;transform:translateY(10px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+.chat-avatar{width:24px;height:24px;margin-bottom:.5rem}
+.chat-avatar svg{width:100%;height:100%}
+.chat-msg{font-size:.9rem;color:#1a1a2e;font-weight:500;margin-bottom:.75rem;line-height:1.4}
+.chat-btns{display:flex;gap:.5rem}
+.chat-btns button{flex:1;padding:.45rem .75rem;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+#chat-yes{background:var(--green);color:#fff}
+#chat-yes:hover{background:#1d8a17}
+#chat-no{background:#f0f0f0;color:#555}
+#chat-no:hover{background:#e0e0e0}
+
+/* CALLOUT */
+.callout{background:var(--light);border-left:4px solid var(--green);border-radius:0 6px 6px 0;padding:1rem 1.25rem;margin-bottom:1rem}
+.callout strong{color:var(--dark);display:block;margin-bottom:.25rem}
+.callout p{font-size:.88rem;color:var(--med);margin:0}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-top:1rem}
+.member{display:flex;gap:1rem;align-items:flex-start;background:var(--light);border-radius:8px;padding:1rem;border-left:3px solid var(--green)}
+.member img{width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--border)}
+.member .name{font-weight:700;color:var(--dark);font-size:.95rem}
+.member .focus{font-size:.82rem;color:var(--med);font-style:italic;margin-top:.15rem}
+
+/* PIPELINE */
+.pipeline{display:flex;gap:0;margin:1.5rem 0;flex-wrap:wrap}
+.pipeline .stage{flex:1;min-width:140px;padding:.75rem 1rem;text-align:center;font-size:.82rem;font-weight:600;color:#fff;position:relative}
+.pipeline .stage:nth-child(1){background:var(--dark);border-radius:6px 0 0 6px}
+.pipeline .stage:nth-child(2){background:#1d8a17}
+.pipeline .stage:nth-child(3){background:var(--green)}
+.pipeline .stage:nth-child(4){background:#5cc055}
+.pipeline .stage:nth-child(5){background:var(--lime);border-radius:0 6px 6px 0;color:var(--dark)}
+.pipeline .stage+.stage::before{content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);border:8px solid transparent;border-left:8px solid rgba(0,0,0,.15)}
+
+/* EVENT TOPICS */
+.topic{margin-bottom:.5rem;font-size:.88rem}
+.topic strong{color:var(--dark);font-family:var(--mono);font-size:.82rem}
+.topic span{color:var(--med)}
+
+/* PHASE BLOCKS */
+.phase{margin-bottom:1.75rem}
+.phase-header{display:flex;align-items:baseline;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap}
+.phase-header h3{margin:0;font-size:1.05rem}
+.phase-header .phase-meta{font-size:.82rem;color:var(--med)}
+.phase ul{padding-left:1.25rem;font-size:.88rem;color:var(--dark)}
+.phase li{margin-bottom:.2rem}
+.phase li::marker{color:var(--green)}
+
+/* QUALITY TAKEAWAYS */
+.takeaways{counter-reset:tk}
+.takeaway{counter-increment:tk;padding:.75rem 1rem .75rem 2.75rem;position:relative;font-size:.88rem;margin-bottom:.5rem;background:var(--light);border-radius:6px}
+.takeaway::before{content:counter(tk);position:absolute;left:.75rem;top:.75rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--green);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* FOOTER */
+footer{background:var(--darker);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.8rem;border-top:2px solid var(--green)}
+
+/* ===== EASTER EGG START — "The Daily Deploy" newspaper mode =====
+   DO NOT EDIT this block when updating dashboard metrics.
+   Maintained manually. See generate-project-report skill for details. */
+#liatrio-egg{margin-left:auto;cursor:pointer;width:28px;height:28px;transition:transform .3s;flex-shrink:0;animation:egg-pulse 8s ease-in-out infinite}
+#liatrio-egg:hover{transform:scale(1.15);animation:none}
+@keyframes egg-pulse{
+  0%,85%,100%{filter:none;transform:scale(1)}
+  90%{filter:brightness(1.3) sepia(1) saturate(5) hue-rotate(-15deg);transform:scale(1.2)}
+  95%{filter:brightness(1.5) sepia(1) saturate(6) hue-rotate(-30deg);transform:scale(1.15)}
+}
+@keyframes egg-shake{
+  0%,100%{transform:rotate(0)}
+  10%{transform:rotate(-14deg) scale(1.2)}
+  20%{transform:rotate(12deg) scale(1.2)}
+  30%{transform:rotate(-10deg) scale(1.15)}
+  40%{transform:rotate(8deg) scale(1.15)}
+  50%{transform:rotate(-6deg) scale(1.1)}
+  60%{transform:rotate(4deg) scale(1.1)}
+  70%{transform:rotate(-2deg) scale(1.05)}
+  80%{transform:rotate(1deg)}
+}
+#liatrio-egg.shake{animation:egg-shake .6s ease-in-out}
+body.newspaper-mode #liatrio-egg{animation:none;filter:none}
+
+/* EGG OVERLAY */
+#egg-overlay{position:fixed;inset:0;z-index:10000;pointer-events:none;display:flex;align-items:center;justify-content:center}
+#egg-overlay .egg-logo{width:100px;height:100px;opacity:0;transform:scale(.5);transition:opacity .3s,transform .8s cubic-bezier(.17,.67,.29,1.4)}
+#egg-overlay.expanding .egg-logo{opacity:1;transform:scale(35)}
+#egg-overlay.fading{opacity:0;transition:opacity .4s}
+
+/* NEWSPAPER MODE */
+body.newspaper-mode{background:#f4e8c1!important;font-family:'Lora','Georgia',serif}
+body.newspaper-mode #topnav,body.newspaper-mode .hero,body.newspaper-mode>.container,body.newspaper-mode>footer{display:none!important}
+body.newspaper-mode #newspaper{display:block}
+#newspaper{display:none}
+
+.np-masthead{text-align:center;padding:2.5rem 2rem 1.5rem;border-bottom:4px double #2a1a0a;position:relative;background:#ede0c0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");box-shadow:inset 0 0 40px rgba(42,26,10,.12),inset 0 0 100px rgba(42,26,10,.05),0 1px 3px rgba(0,0,0,.1)}
+.np-date{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:#6b5a3e;margin-bottom:.25rem;font-family:'DM Sans',sans-serif}
+.np-title{font-family:'Playfair Display','Georgia',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;color:#2a1a0a;letter-spacing:.02em;line-height:1}
+.np-tagline{font-style:italic;color:#6b5a3e;font-size:1rem;margin-top:.35rem}
+.np-edition{font-size:.7rem;color:#8b7a5e;margin-top:.25rem;font-family:'DM Sans',sans-serif;letter-spacing:.05em}
+
+.np-back{position:fixed;top:14px;right:20px;z-index:200;cursor:pointer;width:36px;height:36px;border-radius:50%;border:2px solid #2a1a0a;transition:transform .2s;background:#f4e8c1;padding:2px}
+.np-back:hover{transform:scale(1.12)}
+
+/* CAROUSEL */
+.np-carousel-wrap{position:relative;padding:1.5rem 0 1rem}
+.np-carousel{display:flex;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;gap:3rem;padding:1.5rem calc(50vw - min(42vw,400px)) 1rem;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.np-carousel::-webkit-scrollbar{display:none}
+.np-card{scroll-snap-align:center;width:min(84vw,800px);flex-shrink:0;background:transparent;border:none;padding:2.5rem 2.5rem;position:relative;isolation:isolate;overflow:hidden}
+.np-card::before{content:'';position:absolute;inset:-4px;background:#faf3e0;z-index:-1;filter:url(#paper-rough);box-shadow:3px 4px 16px rgba(0,0,0,.12)}
+
+/* DOG EARS */
+.np-dog-ear{position:absolute;top:0;cursor:pointer;z-index:10;transition:transform .15s,opacity .15s;opacity:.7}
+.np-dog-ear:hover{transform:scale(1.2);opacity:1}
+.np-dog-ear-next{right:0;background:linear-gradient(225deg,#d4c4a0 50%,transparent 50%);box-shadow:-1px 1px 3px rgba(0,0,0,.1)}
+.np-dog-ear-prev{left:0;background:linear-gradient(315deg,#d4c4a0 50%,transparent 50%);box-shadow:1px 1px 3px rgba(0,0,0,.1)}
+.np-headline{font-family:'Playfair Display','Georgia',serif;font-size:1.55rem;font-weight:900;color:#2a1a0a;line-height:1.15;margin-bottom:.5rem;border-bottom:2px solid #2a1a0a;padding-bottom:.5rem}
+.np-subhead{font-size:.85rem;font-style:italic;color:#6b5a3e;margin-bottom:.75rem}
+.np-byline{font-size:.72rem;color:#8b7a5e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;font-family:'DM Sans',sans-serif}
+.np-body{column-count:2;column-gap:1.5rem;column-rule:1px solid #d4c9a8;font-size:.88rem;line-height:1.75;color:#3a2f1a}
+.np-body p{margin-bottom:.75rem;text-align:justify;hyphens:auto}
+.np-body p:first-child::first-letter{float:left;font-family:'Playfair Display',serif;font-size:3.2rem;line-height:.85;padding:.05rem .45rem 0 0;color:#2a1a0a;font-weight:900}
+.np-stat{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05em;color:#2a1a0a}
+@media(max-width:600px){.np-body{column-count:1}.np-body p{break-before:auto!important}.np-card{width:92vw;padding:1.5rem 1.25rem}.np-carousel{padding:1rem 4vw}.np-sports-banner{margin:0 -1.25rem 1rem}}
+
+.np-controls{display:flex;align-items:center;justify-content:center;gap:1rem;padding:.5rem 0 1rem}
+.np-arrow{width:40px;height:40px;border-radius:50%;border:2px solid #2a1a0a;background:transparent;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#2a1a0a;transition:background .2s,color .2s;font-family:serif}
+.np-arrow:hover{background:#2a1a0a;color:#f4e8c1}
+.np-dots{display:flex;gap:.4rem}
+.np-dot{width:8px;height:8px;border-radius:50%;background:#c9b98a;transition:background .3s;cursor:pointer}
+.np-dot.active{background:#2a1a0a}
+
+.np-footer{text-align:center;padding:1.5rem;font-size:.75rem;color:#8b7a5e;border-top:2px solid #2a1a0a;font-family:'DM Sans',sans-serif;letter-spacing:.03em;background:#ede0c0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");box-shadow:inset 0 0 40px rgba(42,26,10,.12),inset 0 0 100px rgba(42,26,10,.05)}
+
+/* NEWSPAPER STAFF PROFILES */
+.np-staff{list-style:none;padding:0;margin:0}
+.np-staff li{display:flex;gap:1rem;align-items:flex-start;padding:.85rem 0;border-bottom:1px solid #d4c9a8}
+.np-staff li:last-child{border-bottom:none}
+.np-staff img{width:52px;height:52px;border-radius:50%;flex-shrink:0;border:2px solid #2a1a0a;filter:sepia(.8) saturate(.6) contrast(1.1) brightness(.95)}
+.np-staff .np-staff-name{font-family:'Playfair Display',serif;font-weight:900;font-size:.95rem;color:#2a1a0a;margin-bottom:.15rem}
+.np-staff .np-staff-beat{font-size:.82rem;line-height:1.5;color:#3a2f1a}
+
+/* NEWSPAPER FRONT PAGE */
+.np-front{text-align:center}
+.np-front .np-headline{font-size:clamp(1.4rem,3.5vw,1.9rem);text-align:center;border-bottom:3px solid #2a1a0a;padding-bottom:.6rem;margin-bottom:.3rem}
+.np-front .np-subhead{text-align:center;margin-bottom:.25rem}
+.np-front .np-byline{margin-bottom:1rem}
+/* NEWSPAPER TABLE OF CONTENTS */
+.np-toc{margin-top:1rem;padding-top:.75rem;border-top:1px solid #c9b98a}
+.np-toc-header{font-family:'Playfair Display',serif;font-weight:900;font-size:.8rem;color:#2a1a0a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.np-toc a{display:flex;align-items:baseline;gap:0;text-decoration:none;color:#3a2f1a;padding:.15rem 0;font-size:.78rem;transition:color .2s}
+.np-toc a:hover{color:#8b4a2a}
+.np-toc-page{font-family:'Playfair Display',serif;font-weight:900;font-size:.82rem;white-space:nowrap}
+.np-toc-dots{flex:1;border-bottom:1px dotted #c9b98a;margin:0 .4rem;min-width:1rem;position:relative;top:-.15rem}
+.np-toc-label{font-style:italic;color:#6b5a3e;white-space:nowrap;font-size:.72rem}
+
+/* SPORTS PAGE */
+.np-sports{border-top:4px solid #2a1a0a!important}
+.np-sports-banner{background:#2a1a0a;color:#faf3e0;text-align:center;padding:.25rem;font-family:'Playfair Display',serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;margin:0 -2.5rem 1rem}
+.np-box-score{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.78rem;margin:.75rem 0}
+.np-box-score th{border-bottom:2px solid #2a1a0a;padding:.3rem .5rem;text-align:right;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:#a89878}
+.np-box-score th:first-child{text-align:left}
+.np-box-score td{padding:.25rem .5rem;text-align:right;border-bottom:1px solid #d4c9a8;color:#2a1a0a}
+.np-box-score td:first-child{text-align:left;font-weight:700}
+.np-box-score tr:last-child td{border-bottom:2px solid #2a1a0a;font-weight:700}
+.sports-field{position:relative;height:55px;background:#1a4a0a;border:2px solid rgba(255,255,255,.6);overflow:hidden;border-radius:2px;margin:1rem 0}
+.sports-field canvas{display:block;width:100%;height:100%}
+.sports-caption{text-align:center;font-size:.65rem;color:#6b5a3e;font-style:italic;font-family:'DM Sans',sans-serif}
+
+.np-chart-inset{float:right;width:48%;max-width:300px;margin:0 0 .75rem 1.25rem;padding:.5rem;background:#f0e6c8;border:1px solid #c9b98a}
+.np-chart-caption{font-size:.72rem;color:#6b5a3e;font-style:italic;margin-top:.35rem;line-height:1.4;text-align:center}
+@media(max-width:600px){.np-chart-inset{float:none;width:100%;max-width:none;margin:0 0 1rem 0}}
+.np-divider{border:none;border-top:1px solid #c9b98a;margin:.75rem 0}
+.np-front-footer{font-size:.78rem;color:#6b5a3e;font-style:italic;text-align:center}
+
+/* NEWSPAPER BY-THE-NUMBERS CARD */
+.np-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+.np-stat-box{background:#f0e6c8;border:1px solid #c9b98a;padding:.65rem .4rem;text-align:center}
+.np-stat-box .np-stat-num{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:900;color:#2a1a0a;line-height:1.1}
+.np-stat-box .np-stat-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:#6b5a3e;margin-top:.15rem;font-family:'DM Sans',sans-serif}
+@media(max-width:600px){.np-stats-grid{grid-template-columns:repeat(2,1fr)}}
+.np-bars{margin:.75rem 0 .4rem}
+.np-bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;font-size:.78rem;color:#3a2f1a}
+.np-bar-label{width:80px;text-align:right;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.72rem;flex-shrink:0}
+.np-bar-track{flex:1;height:18px;background:#e8dcc0;border:1px solid #c9b98a;position:relative}
+.np-bar-fill{height:100%;transition:width .8s ease}
+.np-bar-val{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:'Playfair Display',serif;font-weight:900;font-size:.72rem;color:#2a1a0a}
+
+/* ===== EASTER EGG 2 START — Spec Tetris ===== */
+
+/* Long-press / double-click hint on metric cells */
+#metrics tbody td:nth-child(2){cursor:pointer;transition:box-shadow .3s,background .3s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#metrics tbody td:nth-child(2):hover{box-shadow:0 0 8px rgba(36,174,29,.35);background:rgba(36,174,29,.04)}
+@keyframes metric-glow{0%,100%{box-shadow:0 0 6px rgba(36,174,29,.2)}50%{box-shadow:0 0 14px rgba(36,174,29,.45)}}
+#metrics tbody td:nth-child(2).metric-hint{animation:metric-glow 1.2s ease-in-out infinite}
+
+/* Long-press radial progress ring (mobile) */
+.lp-ring{position:absolute;inset:-4px;border-radius:6px;pointer-events:none;z-index:5}
+.lp-ring::before{content:'';position:absolute;inset:0;border-radius:6px;border:2px solid transparent;background:conic-gradient(var(--green) var(--lp,0%),transparent var(--lp,0%)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:lp-fill 1.5s linear forwards}
+@keyframes lp-fill{to{--lp:100%}}
+@property --lp{syntax:'<percentage>';inherits:false;initial-value:0%}
+
+/* Tetris mode — hide dashboard, show game */
+body.tetris-mode #topnav,body.tetris-mode .hero,body.tetris-mode>.container,body.tetris-mode>footer,body.tetris-mode #mobile-fab,body.tetris-mode #mobile-chat{display:none!important}
+body.tetris-mode #tetris-game{display:flex}
+body.tetris-mode{background:#0a0a1a!important;overflow:hidden}
+
+/* Tetris game container */
+#tetris-game{display:none;position:fixed;inset:0;z-index:9000;flex-direction:column;align-items:center;justify-content:center;background:#0a0a1a;font-family:var(--mono)}
+#tetris-game .tg-back{position:fixed;top:14px;right:20px;z-index:9001;cursor:pointer;width:36px;height:36px;border-radius:50%;border:2px solid var(--green);background:#111;padding:2px;transition:transform .2s}
+#tetris-game .tg-back:hover{transform:scale(1.12)}
+#tetris-game .tg-wrap{display:flex;gap:1.5rem;align-items:flex-start}
+#tetris-canvas{border:2px solid var(--green);background:#111122;image-rendering:pixelated}
+
+/* HUD */
+.tg-hud{color:var(--lime);font-size:.85rem;min-width:120px}
+.tg-hud div{margin-bottom:.75rem}
+.tg-hud .tg-label{font-size:.65rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em}
+.tg-hud .tg-val{font-size:1.4rem;font-weight:700}
+.tg-preview{border:1px solid rgba(255,255,255,.15);background:#111122;margin-top:.25rem}
+
+/* Controls hint */
+.tg-controls{color:rgba(255,255,255,.3);font-size:.7rem;text-align:center;margin-top:1rem;line-height:1.6}
+
+/* Mobile touch controls */
+.tg-touch{display:none;position:fixed;bottom:0;left:0;right:0;z-index:9002;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(10,10,26,.85);backdrop-filter:blur(4px);gap:8px;flex-direction:column;align-items:center}
+body.tetris-mode .tg-touch{display:flex}
+@media(min-width:701px){body.tetris-mode .tg-touch{display:none}}
+.tg-touch-row{display:flex;gap:10px}
+.tg-touch button{width:56px;height:56px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:1.3rem;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.tg-touch button:active{background:rgba(36,174,29,.3);border-color:var(--green)}
+.tg-touch .tg-drop-btn{width:100%;max-width:250px;height:44px;font-size:.9rem;font-weight:600;letter-spacing:.05em}
+
+/* Game over overlay */
+.tg-gameover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,26,.85);color:var(--lime);z-index:9003}
+.tg-gameover h2{font-size:2rem;font-weight:700;margin-bottom:.5rem;font-family:var(--mono)}
+.tg-gameover .tg-final{font-size:1.1rem;color:rgba(255,255,255,.6);margin-bottom:1.5rem}
+.tg-gameover button{background:var(--green);color:#fff;border:none;padding:.75rem 2rem;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;font-family:var(--mono)}
+.tg-gameover button:hover{background:#1d8a17}
+
+/* Shake on hard drop */
+@keyframes tg-shake-kf{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,2px)}}
+#tetris-canvas.tg-shake{animation:tg-shake-kf .15s linear}
+
+/* Scrolling SDD ticker */
+.tg-ticker{color:#24ae1d;font-family:var(--mono);font-size:.7rem;opacity:.4;overflow:hidden;white-space:nowrap;margin-top:.75rem;max-width:240px}
+.tg-ticker span{display:inline-block;animation:tg-scroll 30s linear infinite}
+@keyframes tg-scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+/* ===== EASTER EGG 2 END ===== */
+</style>
+</head>
+<body>
+<!-- ===== EASTER EGG: SVG filter for newspaper torn edges ===== -->
+<svg style="position:absolute;width:0;height:0" aria-hidden="true"><defs><filter id="paper-rough" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
+
+<nav id="topnav">
+  <div class="portal-dropdown">
+    <a href="javascript:void(0)" role="button">Launch App &#9662;</a>
+    <div class="dropdown-menu">
+      <a href="http://172.168.56.64/operations/" target="_blank">Operations Portal</a>
+      <a href="http://172.168.56.64/dashboard/" target="_blank">Dashboard Portal</a>
+      <a href="http://172.168.56.64/maintenance/" target="_blank">Maintenance Portal</a>
+      <a href="http://172.168.56.64/audit/" target="_blank">Audit Portal</a>
+      <a href="http://172.168.56.64/procurement/" target="_blank">Procurement Portal</a>
+      <a href="http://172.168.56.64/graphql" target="_blank">GraphQL Gateway</a>
+      <a href="http://172.168.56.64/grafana" target="_blank">Grafana</a>
+    </div>
+  </div>
+  <a href="#metrics">Metrics</a>
+  <a href="#team">Team</a>
+  <a href="#specs">Specs</a>
+  <a href="#quality">Quality</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#codebase">Codebase</a>
+  <a href="#cicd">CI/CD</a>
+  <a href="#features">Features</a>
+  <a href="#testing">Testing</a>
+  <svg id="liatrio-egg" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/><path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/></svg>
+</nav>
+
+<div class="hero">
+  <h1>Aircraft Maintenance Planner</h1>
+  <div class="subtitle">Full Project Summary</div>
+  <div class="meta">December 22, 2025 – March 26, 2026 &nbsp;|&nbsp; 95 Days</div>
+</div>
+
+<div class="container">
+
+<!-- CHARTS -->
+<section>
+  <div class="charts">
+    <div class="chart-card">
+      <h4>Velocity by Phase (Specs & Spec PRs)</h4>
+      <canvas id="velocityChart"></canvas>
+      <p class="note" style="margin-top:.75rem;margin-bottom:0">Specs authored vs spec-related PRs merged (excludes fix, dependabot, and non-spec PRs). Specs and PRs track close to 1:1. Phase 1 wrote ahead (39 specs, 19 PRs). Phase 2 closed the gap (40 specs, 29 PRs). v0.0.3 executed at scale: 23 specs, 21 spec PRs. Current Iteration brought 30 specs with 34 spec PRs — implementation leading for the first time as the onboarding portal hit peak velocity.</p>
+    </div>
+    <div class="chart-card">
+      <h4>Fix Rate by Phase (lower = cleaner)</h4>
+      <canvas id="fixRateChart"></canvas>
+      <p class="note" style="margin-top:.75rem;margin-bottom:0">Fix commits on main divided by merged PRs (or specs) per phase. Fixes/PR dropped from 1.22 to 0.13 across four phases — each phase shipped progressively less rework per unit of output. Current Iteration hit the lowest fix rate ever: 0.13 fixes/PR and 0.17 fixes/spec. The onboarding portal work shipped exceptionally clean.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM METRICS -->
+<section id="metrics">
+  <h2>Team Metrics</h2>
+  <p class="note">Main-branch git log. PRs from squash-merge messages. Active days = unique commit dates on main. AI-paired days = days with at least one Claude Co-authored-by trailer (lower bound — not all Claude-assisted work gets trailers).</p>
+  <table>
+    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Elapsed Time</td><td>95 days (Dec 22 – Mar 26)</td></tr>
+      <tr><td>Active Development Days</td><td>66 / 95 (69%)</td></tr>
+      <tr><td>Total Commits (main)</td><td>779</td></tr>
+      <tr><td>Merged PRs</td><td>145 (PR #5 – #353)</td></tr>
+      <tr><td>Contributors</td><td>7 humans + dependabot</td></tr>
+      <tr><td>Avg Commits / Active Day</td><td>11.8</td></tr>
+      <tr><td>Releases</td><td>3 (v0.0.1, v0.0.2, v0.0.3)</td></tr>
+      <tr><td>AI Models Used</td><td>Opus 4.5 (primary), Opus 4.6, Sonnet 4.5, Sonnet 4.6</td></tr>
+      <tr><td>AI-Paired Dev Days</td><td>32 / 66 active days (48%)</td></tr>
+      <tr><td>Peak AI Day</td><td>Mar 22: 16 Claude co-authored commits</td></tr>
+      <tr><td>SDD Zero-Fix Rate</td><td>76 / 90 specs with PRs (84%) needed no follow-up fixes</td></tr>
+      <tr><td>Specs as Backlog</td><td>60% zero-fix rate (18/30) — handoff PRs now span all 4 phases; pattern scales with team</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- THE TEAM -->
+<section id="team">
+  <h2>The Team</h2>
+  <p class="note">Identities from git shortlog, deduplicated. Dependabot excluded.</p>
+  <div class="stat-row">
+    <div class="stat-box"><div class="num" style="color:var(--dark)">7</div><div class="label">Engineers</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--green)">132</div><div class="label">Specs Authored</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--green)">145</div><div class="label">PRs Merged</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--amber)">66</div><div class="label">Active Days</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--dark)">6</div><div class="label">Domains Built</div></div>
+  </div>
+  <div class="team-grid">
+    <div class="member">
+      <img src="https://github.com/brettsherwood.png" alt="Brett Sherwood">
+      <div><div class="name">Brett Sherwood</div><div class="focus">Aircraft domain, multi-portal monorepo, Playwright sharding, K6 load testing, subpath routing, predictive maintenance, scenario modeling, Gateway API migration</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/casey-ramirez.png" alt="Casey Ramirez">
+      <div><div class="name">Casey Ramirez</div><div class="focus">Squawk workflow, facility & maintenance CRUD, vendor analytics, OAuth SSO, topic consolidation, NLP contract analytics, OEM ETL, LLP cycle tracking, synthetic seed data</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/kelleecuellar.png" alt="Kellee Cuellar">
+      <div><div class="name">Kellee Cuellar</div><div class="focus">Maintenance cost estimation & reconciliation, parts provenance model, unit cost display, accessible table rows, cost resolver optimization, scenario baselines</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/drewkhoury.png" alt="Andrew Khoury">
+      <div><div class="name">Andrew Khoury</div><div class="focus">Theme switcher, interactive fleet info panel</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/gmk-liatrio.png" alt="Greg Kitchen">
+      <div><div class="name">Greg Kitchen</div><div class="focus">Azure deployment, Tilt/K8s consolidation, GraalVM builds, fleet view, audit trail, procurement PWA, observability, Delta Lake, C4 architecture diagrams, part lifecycle history</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/ericsmith-tn.png" alt="Eric Smith">
+      <div><div class="name">Eric Smith</div><div class="focus">Terraform infrastructure implementation, sbox CI/CD deployment pipeline, AKS module upgrades</div></div>
+    </div>
+    <div class="member">
+      <img src="https://github.com/mo-snow-zingo.png" alt="Morgan Snow">
+      <div><div class="name">Morgan Snow</div><div class="focus">Initial Terraform refactoring from Bicep</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMIT TYPES & DORA -->
+<section>
+  <div class="charts" style="grid-template-columns:1fr 1fr">
+    <div>
+      <h3>Commit Type Breakdown</h3>
+      <p class="note">Conventional commit prefixes, all branches. Non-conventional excluded.</p>
+      <table>
+        <thead><tr><th>Type</th><th class="c">Count</th><th class="c">%</th></tr></thead>
+        <tbody>
+          <tr><td>feat</td><td class="c">468</td><td class="c">34%</td></tr>
+          <tr><td>fix</td><td class="c">458</td><td class="c">34%</td></tr>
+          <tr><td>docs</td><td class="c">198</td><td class="c">15%</td></tr>
+          <tr><td>chore</td><td class="c">110</td><td class="c">8%</td></tr>
+          <tr><td>refactor</td><td class="c">53</td><td class="c">4%</td></tr>
+          <tr><td>test</td><td class="c">47</td><td class="c">3%</td></tr>
+          <tr><td>ci</td><td class="c">16</td><td class="c">1%</td></tr>
+          <tr><td>perf</td><td class="c">4</td><td class="c">&lt;1%</td></tr>
+          <tr><td>build</td><td class="c">9</td><td class="c">1%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>DORA-Aligned Indicators</h3>
+      <p class="note">DORA-inspired, not precise. No production telemetry. Deployment frequency from commit velocity; lead time from PR merges; failure rate from fix: ratio (34%); MTTR measures iteration speed only.</p>
+      <table>
+        <thead><tr><th>Indicator</th><th>Assessment</th></tr></thead>
+        <tbody>
+          <tr><td>Deployment Frequency</td><td>High: 11.8 commits/day on active days, 3 tagged releases in 95 days</td></tr>
+          <tr><td>Lead Time for Changes</td><td>Low: same-day PR merges common throughout</td></tr>
+          <tr><td>Change Failure Rate</td><td>Moderate: 34% fix-prefixed (expected for rapid PoC iteration)</td></tr>
+          <tr><td>Mean Time to Recovery</td><td>Low: fixes land same-day or next-day</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SPEC-DRIVEN DEVELOPMENT -->
+<section id="specs">
+  <h2>Spec-Driven Development</h2>
+  <p class="note">132 specs (~1.4/day). Counted from docs/specs/ directories by naming prefix.</p>
+
+  <table>
+    <thead><tr><th>Category</th><th class="c">Count</th><th class="c">%</th><th>What It Signals</th></tr></thead>
+    <tbody>
+      <tr><td>Feature (FR-*/ME-*)</td><td class="c">83</td><td class="c">63%</td><td>Continuous domain expansion, user-facing value — onboarding portal added 25 FR specs</td></tr>
+      <tr><td>Technical (TR-*)</td><td class="c">31</td><td class="c">23%</td><td>Platform hardening, quality & architecture</td></tr>
+      <tr><td>Infrastructure (INF-*)</td><td class="c">12</td><td class="c">9%</td><td>Production readiness, SWA CI/CD, emulator profiles</td></tr>
+      <tr><td>Foundational (##-spec)</td><td class="c">6</td><td class="c">5%</td><td>Early scaffold, bootstrapping done in first weeks</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Product Operating Model: Specs as Backlog</h3>
+  <p class="note" style="margin-bottom:.75rem">30 PRs followed a specs-as-backlog pattern: one engineer authored the spec, then a different engineer picked it up and implemented it. Compared against 52 solo PRs (same person authored and implemented). The backlog pattern emerged in Phase 2, scaled in Phase 3, and accelerated in Current Iteration (8 → 17 → 30 handoff PRs).</p>
+  <table>
+    <thead><tr><th></th><th class="c">Specs as Backlog (30)</th><th class="c">Solo (52)</th></tr></thead>
+    <tbody>
+      <tr><td>Avg commits / PR</td><td class="c">12.1</td><td class="c">8.8</td></tr>
+      <tr><td>Avg fixes / PR</td><td class="c">1.5</td><td class="c">1.9</td></tr>
+      <tr><td>Zero-fix rate</td><td class="c">60%</td><td class="c">63%</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Specs-as-backlog PRs remain larger in scope (38% more commits per PR). In the Current Iteration, all 5 fix incidents traced back to backlog specs — driving backlog zero-fix below solo for the first time. Both groups converge around 60% as sample sizes grow.</p>
+
+  <h3>Feature Specs by Domain (22 Areas)</h3>
+  <table>
+    <thead><tr><th>Domain</th><th class="c">Specs</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>File Data Import (FDI)</td><td class="c">8</td><td>Aircraft/engine upload mapping, validation report, manual entry, fleet review table, file error handling</td></tr>
+      <tr><td>Onboarding Workflow (OB)</td><td class="c">7</td><td>Profile intake, adaptive step map, session persistence, backward navigation, progress indicator, quick start</td></tr>
+      <tr><td>Squawk (SQ)</td><td class="c">12</td><td>Create squawk, multi-page workflow, problem category</td></tr>
+      <tr><td>Parts (PT)</td><td class="c">11</td><td>Create/update, details page, provenance model, LLP cycle tracking, lifecycle history</td></tr>
+      <tr><td>SB/AD Compliance (SBAD)</td><td class="c">4</td><td>Reference search, engine association, compliance status grid, disassociation workflow</td></tr>
+      <tr><td>EFPAC (LLP Engine)</td><td class="c">3</td><td>LLP bulk upload & position matching, module structure manual entry, multi-power rating utilization</td></tr>
+      <tr><td>Aircraft (AC)</td><td class="c">6</td><td>Add/edit aircraft, details page, flight hour tracking</td></tr>
+      <tr><td>Maintenance Events (ME)</td><td class="c">6</td><td>Event management, status sync, predictive events, LLP potential events</td></tr>
+      <tr><td>Facility (FC)</td><td class="c">4</td><td>Add/edit facility, cross-domain refs</td></tr>
+      <tr><td>UX (UI/Theme)</td><td class="c">4</td><td>Theme overhaul, clickable rows, cost display, dark mode</td></tr>
+      <tr><td>Maintenance Cost (MC)</td><td class="c">3</td><td>Cost estimation, PBH flight-hour cost, cost reconciliation</td></tr>
+      <tr><td>Auth/Audit (AU)</td><td class="c">3</td><td>OAuth, audit trail, username/password auth</td></tr>
+      <tr><td>Fleet View (FV)</td><td class="c">2</td><td>Aircraft distribution, facility filter</td></tr>
+      <tr><td>Vendors (VA)</td><td class="c">2</td><td>Analytics dashboard, domain extraction</td></tr>
+      <tr><td>Scenario Modeling (SM)</td><td class="c">2</td><td>Cost projections, baseline comparison & facility dashboard</td></tr>
+      <tr><td>Engine Ownership (OL)</td><td class="c">1</td><td>Engine ownership classification stage</td></tr>
+      <tr><td>Shop Visit (SV)</td><td class="c">1</td><td>Shop visit history file upload & validation</td></tr>
+      <tr><td>Contract Analytics</td><td class="c">1</td><td>NLP contract classification</td></tr>
+      <tr><td>Data Seeding (DS)</td><td class="c">1</td><td>Multi-domain ingestion pipeline</td></tr>
+      <tr><td>ETL</td><td class="c">1</td><td>OEM transformer demonstrator</td></tr>
+      <tr><td>Procurement (PO)</td><td class="c">1</td><td>PWA procurement workflow</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Technical Specs by Concern</h3>
+  <table>
+    <thead><tr><th>Concern</th><th class="c">Specs</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Testing & Quality</td><td class="c">8</td><td>Playwright refactor, vitest scaffolding, visual regression, seed data generator</td></tr>
+      <tr><td>Architecture</td><td class="c">7</td><td>Topic consolidation, multi-portal, selective startup, ref pattern, polymorphic deserializer</td></tr>
+      <tr><td>Build & Performance</td><td class="c">5</td><td>GraalVM native builds, Docker layer caching, Delta Lake infrastructure</td></tr>
+      <tr><td>CI/CD & Deployment</td><td class="c">3</td><td>GitHub CI, K6 load testing, contract classifier CI</td></tr>
+      <tr><td>Security & Auth</td><td class="c">5</td><td>OPA authorization, cross-portal SSO, facility code validation</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<!-- QUALITY ACROSS PHASES -->
+<section id="quality">
+  <h2>Spec-Driven Development: Quality Across Phases</h2>
+
+  <table>
+    <thead><tr><th></th><th class="c">Phase 1: Foundation</th><th class="c">Phase 2: Initial Features</th><th class="c">Phase 3: v0.0.3</th><th class="c">Current Iteration</th></tr></thead>
+    <tbody>
+      <tr><td>Duration</td><td class="c">29 days</td><td class="c">24 days</td><td class="c">19 days</td><td class="c">22 days (ongoing)</td></tr>
+      <tr><td>Active days</td><td class="c">14</td><td class="c">19</td><td class="c">18</td><td class="c">20</td></tr>
+      <tr><td>Commits</td><td class="c">225</td><td class="c">91</td><td class="c">250</td><td class="c">213</td></tr>
+      <tr><td>Merged PRs</td><td class="c">21</td><td class="c">41</td><td class="c">46</td><td class="c">38</td></tr>
+      <tr><td>Specs authored</td><td class="c">39</td><td class="c">40</td><td class="c">23</td><td class="c">30</td></tr>
+      <tr><td>Spec mix</td><td class="c">80% FR, 5% TR</td><td class="c">34% FR, 54% TR</td><td class="c">57% FR, 26% TR</td><td class="c">83% FR, 10% TR, 7% INF</td></tr>
+      <tr><td>Fix commits (traced)</td><td class="c">28</td><td class="c">37</td><td class="c">13</td><td class="c">5</td></tr>
+      <tr><td>Fix PRs</td><td class="c">1</td><td class="c">5</td><td class="c">14</td><td class="c">4</td></tr>
+      <tr><td>Direct-push fixes</td><td class="c">26</td><td class="c">32</td><td class="c">10</td><td class="c">1</td></tr>
+      <tr><td>Fixes per spec</td><td class="c">0.70</td><td class="c">0.97</td><td class="c">0.57</td><td class="c">0.17</td></tr>
+      <tr><td>Fixes per merged PR</td><td class="c">1.22</td><td class="c">0.95</td><td class="c">0.28</td><td class="c">0.13</td></tr>
+      <tr><td>Fix source</td><td class="c">93% direct push</td><td class="c">86% direct push</td><td class="c">42% direct push</td><td class="c">20% direct push</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Phase Analysis</h3>
+  <p><strong style="color:var(--dark)">Phase 1: Build fast, fix in prod</strong></p>
+  <p class="note" style="margin-bottom:1rem">The team wrote 40 specs in 14 active days and shipped 23 PRs. The fix profile is dominated by a single spec: INF-01 (Azure deployment) accounts for 16 of 28 fixes (57%). These were direct pushes to main (region mismatches, SASL credentials, load balancer timeouts, Cosmos init containers). All first-contact-with-Azure problems that no spec could have predicted. The 32 feature specs generated only 2 follow-up fixes total. Feature spec quality was high from day one.</p>
+
+  <p><strong style="color:var(--dark)">Phase 2: More specs, more infra surface area</strong></p>
+  <p class="note" style="margin-bottom:1rem">The spec mix flipped: 54% TR (technical refactoring) vs 34% FR. The team was hardening the platform: multi-portal monorepo, topic consolidation, GraalVM, OPA auth, K6 load testing. INF-01 continued bleeding (10 more fixes), INF-04 appeared as a new fix source (7 fixes for portal subpath routing), and FR-AU-01 (authentication) generated 4 fixes as OAuth touched every portal. But the per-PR fix rate improved (0.95 vs 1.22 in Phase 1) despite the higher absolute count. The team was merging more PRs with proportionally fewer fixes per PR.</p>
+
+  <p><strong style="color:var(--dark)">Phase 3: v0.0.3 — Highest throughput, lowest fix rate per PR</strong></p>
+  <p class="note" style="margin-bottom:1rem">Phase 3 was the most productive: 250 commits, 46 merged PRs, and 23 specs in 19 days. The fix-per-PR ratio hit its lowest at 0.28. The process matured significantly: 14 of 23 fix-related changes went through PRs (vs only 1 of 27 in Phase 1). Most direct-push fixes were dashboard cosmetics or dependency compatibility patches, not spec failures. New capabilities shipped cleanly: scenario modeling, Delta Lake, Gateway API migration, LLP cycle tracking, parts provenance, and Terraform infrastructure all landed with minimal follow-up fixes.</p>
+
+  <p><strong style="color:var(--dark)">Current Iteration: Onboarding Portal — Domain pivot, near-zero fixes</strong></p>
+  <p class="note" style="margin-bottom:1.5rem">The team pivoted entirely to the onboarding portal: 213 commits, 38 merged PRs, and 30 specs in 22 days. The fix-per-PR ratio dropped to 0.13 — an all-time low. Only 1 direct-push fix landed (a dashboard date string). All 4 fix PRs traced back to backlog specs (stepper state management, SWA lockfile sync, shared library build warnings) — none were feature regressions. The specs-as-backlog pattern dominated: Greg authored the multi-stage form scaffold and OB workflow specs, while Brett, Casey, and Kellee picked them up for implementation. 83% of specs are feature work.</p>
+
+  <h3>Fix Decay Curve</h3>
+  <table>
+    <thead><tr><th>Spec Category</th><th class="c">Phase 1</th><th class="c">Phase 2</th><th class="c">Phase 3</th><th class="c">Current</th><th>Trend</th></tr></thead>
+    <tbody>
+      <tr><td>INF-*</td><td class="c">17</td><td class="c">21</td><td class="c">4</td><td class="c">1</td><td>Near-zero: SWA lockfile fix only — infra fully stabilized</td></tr>
+      <tr><td>TR-*</td><td class="c">3</td><td class="c">5</td><td class="c">2</td><td class="c">1</td><td>Declining: one shared-library build warning fix</td></tr>
+      <tr><td>FR-*</td><td class="c">2</td><td class="c">8</td><td class="c">1</td><td class="c">2</td><td>Low: stepper state edge cases, not feature regressions</td></tr>
+      <tr><td>SETUP/Compat</td><td class="c">4</td><td class="c">0</td><td class="c">2</td><td class="c">0</td><td>Zero: no dependency compat issues this iteration</td></tr>
+      <tr><td>Dashboard/Other</td><td class="c">2</td><td class="c">3</td><td class="c">4</td><td class="c">1</td><td>One date-string cosmetic fix — direct push</td></tr>
+    </tbody>
+  </table>
+
+  <h3>What This Says About Spec Quality</h3>
+  <div class="takeaways">
+    <div class="takeaway">Feature specs are consistently high quality. Across 83 FR-* specs and 4 phases, only 13 fix commits trace back to feature work. That's 0.16 fixes per feature spec.</div>
+    <div class="takeaway">Infrastructure fixes have decayed to near-zero. INF-* fixes: 17 → 21 → 4 → 1. First-contact Azure churn is fully behind the team.</div>
+    <div class="takeaway">The process has fully matured. Phase 1: 93% direct-push fixes. Phase 2: 86%. Phase 3: 42%. Current: 20%. Only 1 of 5 fix incidents was a direct push.</div>
+    <div class="takeaway">Fix rate per PR keeps dropping. 1.22 → 0.95 → 0.28 → 0.13 across phases. Each phase ships progressively cleaner work per unit of output.</div>
+    <div class="takeaway">Phase 3 was the highest-throughput tagged release. 250 commits and 46 PRs in 19 days — yet the fix rate per PR was the lowest of any tagged release at 0.28. More output, fewer defects per unit.</div>
+    <div class="takeaway">Current Iteration achieved the lowest fix rate in project history: 0.13 fixes/PR. 213 commits, 30 specs, and 38 PRs with almost zero rework — the onboarding portal shipped exceptionally clean.</div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <h2>Architecture: From Zero to Production</h2>
+  <div class="callout"><strong>Backend Domains: 0 → 6</strong><p>Aircraft (8081), Maintenance (8082), Facility (8083), Fleet (8084), Parts (8085), Vendors (8086). Each with Quarkus + SmallRye GraphQL + Cosmos DB + Kafka messaging. Fleet is aggregation-only (no persistence).</p></div>
+  <div class="callout"><strong>Frontend: 0 → 7 Portals + 2 Shared Libraries</strong><p>operations-portal, maintenance-portal, dashboard-portal, audit-portal, procurement-portal (PWA), onboarding-portal (Azure SWA), @aircraft-maintenance/shared npm workspace, onboarding-shared component library, e2e-tests cross-portal smoke suite.</p></div>
+  <div class="callout"><strong>Orchestration Services: 0 → 5</strong><p>File Ingestion (Python watchdog), Cosmos Change Feed Function (Azure Functions), Audit Change Feed Function, OEM Transformer (ETL pipeline), Contract Classifier (NLP-based).</p></div>
+  <div class="callout"><strong>Infrastructure: 0 → Full Local + Cloud</strong><p>Kind + Tilt local K8s, Dual EventHub emulators, Apollo Router federated gateway, Envoy Gateway API (migrated from ingress-nginx), OAuth/OIDC server (5 test users), OPA authorization (GraphQL field-level RBAC), OTEL + Prometheus + Grafana observability, Azure AKS deployment with Bicep + Terraform IaC, Delta Lake lakehouse infrastructure.</p></div>
+</section>
+
+<!-- CODEBASE -->
+<section id="codebase">
+  <h2>Codebase Metrics</h2>
+  <p class="note">Raw wc -l, excluding build artifacts.</p>
+  <div class="charts" style="grid-template-columns:1fr 1fr">
+    <div>
+      <h3>Source Code</h3>
+      <table>
+        <thead><tr><th>Artifact</th><th class="r">Lines</th></tr></thead>
+        <tbody>
+          <tr><td>Java source</td><td class="r">29,984</td></tr>
+          <tr><td>TypeScript/TSX</td><td class="r">73,574</td></tr>
+          <tr><td>Python</td><td class="r">2,800</td></tr>
+          <tr><td>GraphQL schemas</td><td class="r">967</td></tr>
+          <tr><td>OPA Rego policies</td><td class="r">302</td></tr>
+          <tr><td>K6 load test scripts</td><td class="r">1,707</td></tr>
+          <tr><td>Bicep/Terraform IaC</td><td class="r">1,800</td></tr>
+          <tr><td style="font-weight:700">Total source</td><td class="r" style="font-weight:700">~107,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Infrastructure Artifacts</h3>
+      <p class="note">File pattern globbing. GraphQL types from schema.graphql. ADRs from docs/.</p>
+      <table>
+        <thead><tr><th>Infrastructure</th><th>Count</th></tr></thead>
+        <tbody>
+          <tr><td>Dockerfiles</td><td>27</td></tr>
+          <tr><td>K8s YAML manifests</td><td>98</td></tr>
+          <tr><td>GitHub Actions workflows</td><td>25</td></tr>
+          <tr><td>Avro schemas (.avsc)</td><td>19</td></tr>
+          <tr><td>GraphQL types</td><td>87</td></tr>
+          <tr><td>Makefile targets</td><td>29</td></tr>
+          <tr><td>ADRs</td><td>20</td></tr>
+          <tr><td>Convention docs</td><td>12</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CI/CD -->
+<section id="cicd">
+  <h2>CI/CD Pipeline</h2>
+  <p class="note">22 GitHub Actions workflows: domain CI, frontend CI, orchestration, Playwright sharding, smoke tests, K6, seed data, infra deploy, AKS, Terraform, dashboard deploy, badges.</p>
+  <div class="pipeline">
+    <div class="stage">CI Tests</div>
+    <div class="stage">Build & Push</div>
+    <div class="stage">Deploy AKS</div>
+    <div class="stage">Deploy Functions</div>
+    <div class="stage">Smoke Tests</div>
+  </div>
+
+  <h3>Event-Driven Architecture</h3>
+  <p class="note">19 Avro event types across 5 consolidated topics + 1 extension emulator:</p>
+  <div style="margin:.75rem 0 1rem">
+    <div class="topic"><strong>aircraft-events</strong> <span>AircraftIngestion, AircraftCreated, AircraftUpdated</span></div>
+    <div class="topic"><strong>facility-events</strong> <span>FacilityIngestion, FacilityCreated, FacilityUpdated</span></div>
+    <div class="topic"><strong>maintenance-events</strong> <span>MaintenanceEventIngestion, MaintenanceEventCreated, MaintenanceStatusChanged, MaintenanceEventTemplateIngestion, ContractIngestion</span></div>
+    <div class="topic"><strong>part-events</strong> <span>PartIngestion, PartCreated, PartUpdated, PartSupplierIngestion, PartSupplierPricingIngestion, ProcurementOrderIngestion</span></div>
+    <div class="topic"><strong>vendor-events</strong> <span>SupplierIngestion, SupplierCreated</span></div>
+  </div>
+  <p class="note">Cross-domain ref mesh: Aircraft ↔ Maintenance ↔ Parts ↔ Vendors, Aircraft ↔ Facility, Fleet reads all.</p>
+
+  <h3>GitHub Actions Stats</h3>
+  <p class="note">Aggregate data from all workflow runs since Dec 23, 2025.</p>
+  <table>
+    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Total workflow runs</td><td class="c">2,954</td></tr>
+      <tr><td>Avg runs per day</td><td class="c">31.1</td></tr>
+      <tr><td>Success rate</td><td class="c">79.2%</td></tr>
+      <tr><td>Domain CI runs</td><td class="c">1,022</td></tr>
+      <tr><td>Frontend CI runs</td><td class="c">610</td></tr>
+      <tr><td>CD pipeline runs (build + deploy)</td><td class="c">394</td></tr>
+      <tr><td>Avro &amp; Event Processor CI runs</td><td class="c">292</td></tr>
+      <tr><td>Primary trigger</td><td class="c">PR (46%)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FEATURES DELIVERED -->
+<section id="features">
+  <h2>Features Delivered</h2>
+  <p class="note">Phase boundaries from git tags v0.0.1 and v0.0.2. Phase labels subjective.</p>
+
+  <div class="phase">
+    <div class="phase-header"><h3>Phase 1: Foundation (v0.0.1)</h3><span class="phase-meta">Dec 22 – Jan 20 &nbsp;|&nbsp; 225 commits &nbsp;|&nbsp; 21 PRs</span></div>
+    <ul>
+      <li>6 domain services bootstrapped with GraphQL federation</li>
+      <li>File ingestion pipeline with Avro serialization</li>
+      <li>Aircraft/Facility/Parts CRUD with detail pages</li>
+      <li>Squawk multi-page workflow (create + diagnose + allocate)</li>
+      <li>Fleet view with facility filter and attention indicators</li>
+      <li>Maintenance event management with cross-domain refs</li>
+      <li>Cosmos change feed monitoring (Azure Function)</li>
+      <li>Azure AKS deployment pipeline</li>
+      <li>UI theme overhaul ("Smart Fleet Management")</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header"><h3>Phase 2: Initial Features (v0.0.2)</h3><span class="phase-meta">Jan 20 – Feb 13 &nbsp;|&nbsp; 91 commits &nbsp;|&nbsp; 41 PRs</span></div>
+    <ul>
+      <li>Vendors domain (supplier analytics, pricing comparison)</li>
+      <li>Multi-portal monorepo (1 app → 5 portals + shared)</li>
+      <li>Domain topic consolidation (7 → 5 topics, dual emulator)</li>
+      <li>Procurement Portal PWA (offline-capable)</li>
+      <li>Immutable audit trail (change feed + audit portal)</li>
+      <li>OAuth/OIDC authentication with RBAC</li>
+      <li>OPA GraphQL field-level authorization</li>
+      <li>Predictive maintenance events with confidence tracking</li>
+      <li>Parts inventory & demand forecasting</li>
+      <li>OEM ETL demonstrator</li>
+      <li>K6 load testing infrastructure</li>
+      <li>Playwright CSS visibility assertions</li>
+      <li>TanStack Table migration (7 tables)</li>
+      <li>Clickable table rows with keyboard a11y</li>
+      <li>Theme switcher (Default + Airline X)</li>
+      <li>Selective domain startup (make up &lt;domain&gt;)</li>
+      <li>Tilt/K8s consolidation (removed Docker Compose)</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header"><h3>Phase 3: v0.0.3 — Scale &amp; Native</h3><span class="phase-meta">Feb 13 – Mar 4 &nbsp;|&nbsp; 250 commits &nbsp;|&nbsp; 46 PRs</span></div>
+    <ul>
+      <li>Scenario modeling with cost projections and baseline comparison (FR-SM-01/02)</li>
+      <li>Gateway API migration from ingress-nginx to Envoy Gateway (INF-10)</li>
+      <li>Delta Lake lakehouse infrastructure (TR-15)</li>
+      <li>Parts provenance model with lifecycle tracking (FR-PT-07/08/09)</li>
+      <li>LLP cycle tracking and potential events page (FR-PT-10, ME-01/02)</li>
+      <li>Part lifecycle history tab (FR-PT-11)</li>
+      <li>Terraform infrastructure transition from Bicep (INF-08)</li>
+      <li>Sbox CI/CD deployment pipeline (INF-09)</li>
+      <li>GraalVM native image builds for all domains (TR-12/13/14)</li>
+      <li>Cross-portal OAuth SSO (TR-17)</li>
+      <li>Maintenance cost estimation & reconciliation (FR-MC-01/02/03)</li>
+      <li>Flight hour & cycle tracking (FR-AC-09)</li>
+      <li>Synthetic seed data generator (nlpaug-based)</li>
+      <li>Portal routing consolidation (INF-05/06)</li>
+      <li>Contract classifier CI pipeline (TR-18)</li>
+      <li>C4 architecture diagrams with Structurizr Lite (TR-16)</li>
+      <li>Performance: eliminated 3x DB amplification in cost resolvers</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header"><h3>Current Iteration: Onboarding Portal</h3><span class="phase-meta">Mar 5 – Mar 26 &nbsp;|&nbsp; 213 commits &nbsp;|&nbsp; 38 PRs</span></div>
+    <ul>
+      <li>Onboarding portal scaffolded with Azure Static Web Apps (SWA) CLI emulator (INF-11, INF-12)</li>
+      <li>Multi-stage form scaffold with graph navigation and phase progress bar (TR-19)</li>
+      <li>Onboarding shared MUI component library (TR-20)</li>
+      <li>Profile intake stage (FR-OB-01)</li>
+      <li>Adaptive step map with branching rules and onboarding plan (FR-OB-02)</li>
+      <li>Session persistence with resume interstitial and TTL expiry (FR-OB-04)</li>
+      <li>Backward navigation, review flagging, and layout separation (FR-OB-05)</li>
+      <li>Live progress indicator with milestone celebrations (FR-OB-06)</li>
+      <li>Quick Start path for low data readiness (FR-OB-07)</li>
+      <li>Workflow state schema alignment with PRD Rev 4 (FR-OB-08)</li>
+      <li>Aircraft file upload & column mapping (FR-FDI-01)</li>
+      <li>Engine file upload, XML parser, and validation (FR-FDI-02)</li>
+      <li>Validation report & actions (FR-FDI-03)</li>
+      <li>Small fleet manual entry (FR-FDI-04)</li>
+      <li>Interactive fleet review table (FR-FDI-05)</li>
+      <li>File-level error handling enhancements (FR-FDI-07)</li>
+      <li>Fleet summary stage (FR-FDI-08)</li>
+      <li>SB/AD reference search, engine association, compliance status, disassociation (FR-SBAD-01/02/03/04)</li>
+      <li>LLP bulk upload & position matching, module structure manual entry, multi-power rating (FR-EFPAC-05-01/02/03)</li>
+      <li>Engine ownership classification stage (FR-OL-01)</li>
+      <li>Shop visit history file upload & validation (FR-SV-01)</li>
+      <li>Dark mode for onboarding portal (FR-UX-04)</li>
+      <li>Boeing 737-800 3D aircraft canvas viewer in operations portal (FR-UX-05)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TESTING -->
+<section id="testing">
+  <h2>Testing & Quality</h2>
+  <ul style="padding-left:1.25rem;font-size:.9rem">
+    <li>Playwright mocked tests per portal (CI-safe, dynamically sharded)</li>
+    <li>Playwright integration tests (require K8s)</li>
+    <li>Cross-portal smoke tests (e2e-tests workspace)</li>
+    <li>Vitest unit tests (audit-portal, procurement-portal)</li>
+    <li>JUnit tests per domain (./mvnw test)</li>
+    <li>K6 load/stress/smoke scenarios</li>
+    <li>Visual regression baselines (CSS visibility assertions)</li>
+    <li>Post-deployment smoke tests on AKS</li>
+  </ul>
+
+  <h3 style="margin-top:2rem">Project Timeline</h3>
+  <p class="note">From git tags. Current iteration has no tagged release.</p>
+  <table>
+    <thead><tr><th>Phase</th><th>Dates</th><th class="c">Duration</th><th class="c">Commits</th><th class="c">PRs</th></tr></thead>
+    <tbody>
+      <tr><td>v0.0.1: Foundation</td><td>Dec 22 – Jan 20</td><td class="c">29 days</td><td class="c">225</td><td class="c">21</td></tr>
+      <tr><td>v0.0.2: Initial Features</td><td>Jan 20 – Feb 13</td><td class="c">24 days</td><td class="c">91</td><td class="c">41</td></tr>
+      <tr><td>v0.0.3: Scale &amp; Native</td><td>Feb 13 – Mar 4</td><td class="c">19 days</td><td class="c">250</td><td class="c">46</td></tr>
+      <tr><td>Current Iteration (Onboarding Portal)</td><td>Mar 5 – Mar 26</td><td class="c">22 days</td><td class="c">213</td><td class="c">38</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div>
+
+<div id="egg-overlay"><svg class="egg-logo" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/><path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/></svg></div>
+
+<!-- Mobile FAB + chat bubble for easter egg -->
+<div id="mobile-fab">
+  <svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/><path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/></svg>
+</div>
+<div id="mobile-chat" class="chat-hidden">
+  <div class="chat-bubble">
+    <div class="chat-avatar"><svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/><path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/></svg></div>
+    <div class="chat-msg">Read the Daily Deploy edition?</div>
+    <div class="chat-btns"><button id="chat-yes">Yes</button><button id="chat-no">No thanks</button></div>
+  </div>
+</div>
+
+<!-- ===== EASTER EGG HTML START — "The Daily Deploy" newspaper ===== -->
+<div id="newspaper">
+  <img class="np-back" src="https://github.com/liatrio.png" alt="Back to dashboard" title="Back to dashboard">
+
+  <div class="np-masthead">
+    <div class="np-date">Liatrio, California &mdash; Friday, March 27, 2026</div>
+    <h1 class="np-title">The Daily Deploy</h1>
+    <div class="np-tagline">&ldquo;All The Code That&rsquo;s Fit To Ship&rdquo;</div>
+    <div class="np-edition">Special Edition &mdash; Aircraft Maintenance Planner Project Summary</div>
+  </div>
+
+  <div class="np-carousel-wrap">
+    <div class="np-carousel" id="npCarousel">
+
+      <div class="np-card">
+        <h2 class="np-headline">FIX RATES PLUNGE 77% AS TEAM HITS STRIDE</h2>
+        <div class="np-subhead">Quality curve bends sharply downward across three tagged releases</div>
+        <div class="np-byline">Data Desk &bull; March 6, 2026</div>
+
+        <div class="np-chart-inset">
+          <canvas id="npFixChart" height="180"></canvas>
+          <div class="np-chart-caption">Fixes per PR by phase. 145 PRs total.</div>
+        </div>
+
+        <div class="np-body">
+          <p>A seven-person engineering team set out to prove that modern delivery practices &mdash; spec-driven development, domain-driven design, AI-paired programming &mdash; could produce a production-grade proof of concept at a pace that defies convention. Seventy-three days and three tagged releases later, the results speak for themselves.</p>
+          <p>From an empty repository to a federated aircraft maintenance system with six bounded domains, six portals, and a full CI/CD pipeline on Azure. The fix rate tells the quality story: it dropped 89% from the first phase to the current iteration. The pages that follow have the details.</p>
+        </div>
+
+        <div class="np-toc">
+          <div class="np-toc-header">See It Live &mdash; Turn To:</div>
+          <a href="http://172.168.56.64/operations/" target="_blank"><span class="np-toc-page">Operations</span><span class="np-toc-dots"></span><span class="np-toc-label">Fleet &amp; Facilities</span></a>
+          <a href="http://172.168.56.64/dashboard/" target="_blank"><span class="np-toc-page">Dashboard</span><span class="np-toc-dots"></span><span class="np-toc-label">Cross-Domain View</span></a>
+          <a href="http://172.168.56.64/maintenance/" target="_blank"><span class="np-toc-page">Maintenance</span><span class="np-toc-dots"></span><span class="np-toc-label">Events &amp; Squawk</span></a>
+          <a href="http://172.168.56.64/audit/" target="_blank"><span class="np-toc-page">Audit</span><span class="np-toc-dots"></span><span class="np-toc-label">Immutable Trail</span></a>
+          <a href="http://172.168.56.64/procurement/" target="_blank"><span class="np-toc-page">Procurement</span><span class="np-toc-dots"></span><span class="np-toc-label">PWA Orders</span></a>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">SEVEN ENGINEERS SHIP 132 SPECS IN 95 DAYS</h2>
+        <div class="np-subhead">Team delivers fully federated aircraft maintenance system from scratch</div>
+        <div class="np-byline">The Greenfield Team &bull; Aircraft Maintenance Division</div>
+        <div class="np-body">
+          <p>In what industry observers are calling a remarkable demonstration of modern software delivery, a seven-person engineering team has shipped a proof-of-concept aircraft maintenance planning system from an empty repository in just 95 calendar days. The project logged <span class="np-stat">779 commits</span> across <span class="np-stat">145 merged pull requests</span>, maintaining a pace of 11.8 commits per active development day.</p>
+          <p>The PoC comprises six domain-driven microservices, six customer-facing portals, and a comprehensive CI/CD pipeline deploying to Azure Kubernetes Service. An AI-paired development model saw Claude Code integrated into <span class="np-stat">48%</span> of active development days, with a peak of 16 co-authored commits on March 22nd.</p>
+          <p>Three tagged releases shipped on schedule. The latest, v0.0.3, introduced scenario modeling, Delta Lake infrastructure, Gateway API migration, and Terraform IaC &mdash; the most productive phase yet with 250 commits and 46 PRs in 19 days.</p>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">THE TEAM BEHIND THE MACHINE</h2>
+        <div class="np-subhead">Seven engineers, sixteen domains, zero excuses</div>
+        <div class="np-byline">Staff Profiles</div>
+        <ul class="np-staff">
+          <li>
+            <img src="https://github.com/brettsherwood.png" alt="Brett Sherwood">
+            <div><div class="np-staff-name">Brett Sherwood</div><div class="np-staff-beat">Led aircraft domain buildout, architected the multi-portal monorepo, and implemented dynamic Playwright sharding with K6 load testing. Introduced confidence-scored predictive maintenance forecasting.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/casey-ramirez.png" alt="Casey Ramirez">
+            <div><div class="np-staff-name">Casey Ramirez</div><div class="np-staff-beat">Delivered squawk workflow, vendor analytics, OAuth integration, and NLP-based contract classification. Consolidated EventHub topics from seven to five.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/kelleecuellar.png" alt="Kellee Cuellar">
+            <div><div class="np-staff-name">Kellee Cuellar</div><div class="np-staff-beat">Shipped maintenance cost estimation engine and eliminated a 3x database amplification bug in cost resolvers. Brought keyboard-accessible navigation to every data table.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/drewkhoury.png" alt="Andrew Khoury">
+            <div><div class="np-staff-name">Andrew Khoury</div><div class="np-staff-beat">Built theme switcher supporting multiple airline brands and created the interactive fleet information panel for spatial aircraft management.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/gmk-liatrio.png" alt="Greg Kitchen">
+            <div><div class="np-staff-name">Greg Kitchen</div><div class="np-staff-beat">Handled Azure deployment, Tilt/K8s consolidation, GraalVM native builds, immutable audit trail, procurement PWA, Delta Lake infrastructure, C4 architecture diagrams, and the full observability stack.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/ericsmith-tn.png" alt="Eric Smith">
+            <div><div class="np-staff-name">Eric Smith</div><div class="np-staff-beat">Led the Terraform infrastructure transition from Bicep, implemented the sbox CI/CD deployment pipeline, and handled AKS module upgrades across environments.</div></div>
+          </li>
+          <li>
+            <img src="https://github.com/mo-snow-zingo.png" alt="Morgan Snow">
+            <div><div class="np-staff-name">Morgan Snow</div><div class="np-staff-beat">Kicked off the initial refactoring from Bicep to Terraform, establishing the foundation for multi-environment infrastructure management.</div></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">SPEC-DRIVEN DEVELOPMENT YIELDS 84% ZERO-FIX RATE</h2>
+        <div class="np-subhead">Structured specifications prove their worth across 132 deliverables</div>
+        <div class="np-byline">Process &amp; Methodology Desk</div>
+        <div class="np-body">
+          <p>Of the 132 specifications shipped, the vast majority required zero follow-up fixes &mdash; an <span class="np-stat">84% clean-ship rate</span> that challenges conventional assumptions about rapid prototyping quality.</p>
+          <p>Feature specs dominate at 63% of the total, followed by technical refactoring at 23%. The spec mix evolved across phases: Phase 1 was 80% feature work, Phase 2 flipped to 54% technical hardening, Phase 3 returned to 57% features with a new infrastructure emphasis (17% INF), and the Current Iteration is 83% feature work as the onboarding portal drives a pure feature sprint.</p>
+          <p>A &ldquo;specs as backlog&rdquo; operating model has scaled to 30 handoff PRs across all phases. The two groups now converge around 60%: backlog at <span class="np-stat">60% zero-fix rate</span>, solo at 63% — up from the 46–53% range where both started in Phases 2 and 3.</p>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">FIX RATES PLUMMET 89% AS PROCESS MATURES</h2>
+        <div class="np-subhead">From 1.22 to 0.13 fixes per PR across four phases</div>
+        <div class="np-byline">Quality &amp; Analysis Bureau</div>
+        <div class="np-body">
+          <p>The project&rsquo;s fix-per-PR ratio dropped from <span class="np-stat">1.22</span> in Phase 1 to <span class="np-stat">0.13</span> in the Current Iteration &mdash; an 89% reduction that tracks the team&rsquo;s growing command of the platform and its conventions.</p>
+          <p>Infrastructure spec INF-01 generated the most first-contact fixes, a pattern consistent with Azure deployment challenges that no specification could have predicted. Feature specs, by contrast, showed dramatically improving quality with each phase.</p>
+          <p>The clearest signal of maturity: direct-push fixes to main dropped from 93% in Phase 1 to 86% in Phase 2 to 42% in Phase 3 to just 20% in the Current Iteration. The team steadily shifted from pushing fixes directly to main to routing every change through a pull request.</p>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">FROM ZERO TO SIX DOMAINS IN FIVE WEEKS</h2>
+        <div class="np-subhead">Federated GraphQL architecture enables independent domain evolution</div>
+        <div class="np-byline">Architecture Desk</div>
+        <div class="np-body">
+          <p>The system rose from an empty repository to six fully operational domain services: Aircraft, Maintenance, Facility, Fleet, Parts, and Vendors. Each runs as an independent Quarkus subgraph behind an Apollo Router federation gateway, with its own Cosmos DB database.</p>
+          <p>A dual EventHub emulator pattern handles <span class="np-stat">19 Avro event types</span> across five consolidated topics, with cross-domain references maintaining eventual consistency through a fully meshed subscription graph.</p>
+          <p>Each domain owns its Cosmos DB database and GraphQL schema, communicating only through Avro-serialized events. The pattern enforces true bounded contexts &mdash; no shared databases, no synchronous coupling, no shortcuts.</p>
+          <p style="break-before:column"><span style="float:right;margin:0 0 .5rem .75rem;text-align:center"><img id="xkcdImg" width="150" height="140" style="display:block" alt="xkcd-style comic"><em style="font-size:.55rem;color:#8a7a5a;display:block;margin-top:2px">Fig. 1: An architect, mid-epiphany</em></span>The frontend evolved from a single React application into six specialized portals with a shared component library, each deployable independently via nginx subpath routing on AKS. The procurement portal ships as a Progressive Web App with offline capability.</p>
+          <p>Open Policy Agent enforces role-based access at the gateway, while an immutable audit trail captures every mutation through Cosmos change feed functions writing to Azure Table Storage. Observability spans the full stack with OpenTelemetry, Prometheus, and Grafana dashboards tracking request latency, error rates, and domain health.</p>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">FOUR PHASES TELL THE STORY OF A PROJECT</h2>
+        <div class="np-subhead">Foundation, features, scale, and the onboarding frontier</div>
+        <div class="np-byline">Project Chronology Desk</div>
+        <div class="np-body">
+          <p>Phase 1 laid the foundation in 29 days: six domain services bootstrapped, file ingestion pipeline operational, core CRUD complete, plus the full squawk multi-page workflow. The fleet view, maintenance events, and Azure deployment pipeline all shipped in this burst of <span class="np-stat">225 commits</span> across 21 PRs.</p>
+          <p>Phase 2 shifted to platform hardening over 24 days. The vendors domain, multi-portal monorepo, topic consolidation, procurement PWA, audit trail, OAuth, OPA authorization, and predictive maintenance all landed. The spec mix told the story &mdash; 54% technical, 34% feature. TanStack tables, theme switching, and selective startup rounded out <span class="np-stat">41 merged PRs</span>.</p>
+          <p>Phase 3 was the most productive tagged release: <span class="np-stat">250 commits</span> and 46 PRs in 19 days. Scenario modeling, Delta Lake lakehouse infrastructure, Gateway API migration, Terraform IaC transition, parts provenance and lifecycle history, LLP cycle tracking, cross-portal SSO, and C4 architecture diagrams all shipped.</p>
+          <p>The Current Iteration added the onboarding portal in 22 days: <span class="np-stat">213 commits</span> and 38 PRs. A full multi-step applicant workflow, Azure Static Web Apps deployment, shop visit file upload, EFPAC processing, and a second shared library &mdash; all at the lowest fix rate in project history: 0.13 fixes per PR.</p>
+        </div>
+      </div>
+
+      <div class="np-card">
+        <h2 class="np-headline">25 WORKFLOWS POWER THE DELIVERY PIPELINE</h2>
+        <div class="np-subhead">Five-stage CI/CD runs from commit to smoke test in a single push</div>
+        <div class="np-byline">Continuous Delivery Correspondent</div>
+        <div style="margin:.75rem 0;background:#f0e6c8;border:1px solid #c9b98a;border-radius:2px;padding:.25rem">
+          <canvas id="ciSketchCanvas" height="80"></canvas>
+          <div class="sports-caption">Artist&rsquo;s rendition of a CI/CD pipeline (not to scale)</div>
+        </div>
+
+        <div class="np-body">
+          <p>The project&rsquo;s GitHub Actions pipeline orchestrates <span class="np-stat">25 workflows</span> through a five-stage delivery process: CI tests, container image builds, AKS deployment, Azure Function deployment, and post-deployment smoke tests. Each stage gates the next.</p>
+          <p>Individual domain CI workflows run in parallel. Playwright end-to-end tests use dynamic sharding to distribute execution across multiple runners. K6 load testing validates performance under synthetic traffic including stress and spike scenarios.</p>
+          <p>DORA-aligned indicators suggest high deployment frequency at 11.8 commits per active day, low lead time with same-day PR merges, and low mean time to recovery with fixes landing same-day or next-day throughout the project timeline.</p>
+          <p>In aggregate, the pipeline has executed <span class="np-stat">2,954 workflow runs</span> since December 23rd, averaging 31.1 runs per day with a 79% success rate. Domain CI accounts for 1,022 of those runs, frontend CI for 610, and the CD pipeline (build, deploy, smoke) for 394. Pull requests trigger 46% of all runs, confirming the branch-gated model is doing its job.</p>
+        </div>
+      </div>
+
+      <div class="np-card np-front">
+        <h2 class="np-headline">BY THE NUMBERS: A PROJECT IN FULL</h2>
+        <div class="np-subhead">The complete ledger of what seven engineers built in 95 days</div>
+        <div class="np-byline">Accounting &amp; Records Department</div>
+
+        <div class="np-stats-grid">
+          <div class="np-stat-box"><div class="np-stat-num">95</div><div class="np-stat-label">Days</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">779</div><div class="np-stat-label">Commits</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">145</div><div class="np-stat-label">PRs Merged</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">132</div><div class="np-stat-label">Specs</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">6</div><div class="np-stat-label">Domains</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">6</div><div class="np-stat-label">Portals</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">107K</div><div class="np-stat-label">Lines of Code</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">84%</div><div class="np-stat-label">Zero-Fix Rate</div></div>
+        </div>
+
+        <hr class="np-divider">
+
+        <div class="np-bars">
+          <div class="np-bar-row"><span class="np-bar-label">AI Days</span><div class="np-bar-track"><div class="np-bar-fill" style="width:48%;background:#5a4a2a"></div><span class="np-bar-val">48%</span></div></div>
+          <div class="np-bar-row"><span class="np-bar-label">Zero-Fix</span><div class="np-bar-track"><div class="np-bar-fill" style="width:84%;background:#7a6a3a"></div><span class="np-bar-val">84%</span></div></div>
+          <div class="np-bar-row"><span class="np-bar-label">Backlog</span><div class="np-bar-track"><div class="np-bar-fill" style="width:60%;background:#4a6a2a"></div><span class="np-bar-val">60%</span></div></div>
+        </div>
+
+        <hr class="np-divider">
+
+        <div class="np-bars">
+          <div class="np-bar-row"><span class="np-bar-label">Fixes / PR</span><div class="np-bar-track"><div class="np-bar-fill" style="width:81%;background:#8b4a2a"></div><span class="np-bar-val">Phase 1: 1.22</span></div></div>
+          <div class="np-bar-row"><span class="np-bar-label"></span><div class="np-bar-track"><div class="np-bar-fill" style="width:63%;background:#8b4a2a"></div><span class="np-bar-val">Phase 2: 0.95</span></div></div>
+          <div class="np-bar-row"><span class="np-bar-label"></span><div class="np-bar-track"><div class="np-bar-fill" style="width:19%;background:#4a6a2a"></div><span class="np-bar-val">Phase 3: 0.28</span></div></div>
+          <div class="np-bar-row"><span class="np-bar-label"></span><div class="np-bar-track"><div class="np-bar-fill" style="width:9%;background:#2a6a4a"></div><span class="np-bar-val">Current: 0.13</span></div></div>
+        </div>
+
+        <hr class="np-divider">
+        <div class="np-front-footer">25 GitHub Actions workflows &nbsp;&bull;&nbsp; 27 Dockerfiles &nbsp;&bull;&nbsp; 98 K8s manifests &nbsp;&bull;&nbsp; 19 Avro schemas &nbsp;&bull;&nbsp; 20 ADRs</div>
+      </div>
+
+      <div class="np-card np-sports">
+        <div class="np-sports-banner">Sports Final &bull; Late Edition</div>
+        <h2 class="np-headline">107,000 YARDS RUSHED IN RECORD 95-DAY SEASON</h2>
+        <div class="np-subhead">Greenfield Seven post historic numbers in expansion debut; TypeScript leads all rushers</div>
+        <div class="np-byline">Sports Desk &bull; Final Score</div>
+
+        <table class="np-box-score">
+          <thead><tr><th>Player</th><th>YDS</th><th>ATT</th><th>AVG</th><th>TD</th></tr></thead>
+          <tbody>
+            <tr><td>TypeScript</td><td>73,574</td><td>6 portals</td><td>12,262</td><td>69%</td></tr>
+            <tr><td>Java</td><td>29,984</td><td>6 domains</td><td>4,997</td><td>28%</td></tr>
+            <tr><td>Python</td><td>2,800</td><td>3 services</td><td>933</td><td>3%</td></tr>
+            <tr><td>TOTAL</td><td>107,000</td><td>15</td><td>7,133</td><td>100%</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sports-field">
+          <canvas id="sportsCanvas"></canvas>
+        </div>
+        <div class="sports-caption">Live replay: 107,000-yard touchdown drive (artist&rsquo;s rendition)</div>
+
+        <div class="np-body" style="margin-top:.75rem">
+          <p>The Greenfield Seven shattered every expansion-team record in their 95-day season, rushing for a combined <span class="np-stat">107,000 yards</span> of proof-of-concept code. TypeScript led all rushers with 73,574 yards across six portal formations, while Java anchored the offensive line with 29,984 yards powering six domain trenches.</p>
+          <p>The defense held strong &mdash; fix rates plummeted from 1.22 per drive in the first quarter to just <span class="np-stat">0.13</span> by season&rsquo;s end. Head coach Spec-Driven Development credited the playbook: &ldquo;84% of our drives ended in touchdowns with zero turnovers. That&rsquo;s what happens when you script every play before the snap.&rdquo;</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="np-controls">
+      <button class="np-arrow" id="npPrev">&#8592;</button>
+      <div class="np-dots" id="npDots"></div>
+      <button class="np-arrow" id="npNext">&#8594;</button>
+    </div>
+  </div>
+
+  <div class="np-footer">The Daily Deploy &mdash; A Liatrio Publication &mdash; &copy; 2026 &mdash; Printed with ink from merged pull requests</div>
+</div>
+<!-- ===== EASTER EGG HTML END ===== -->
+
+<!-- ===== EASTER EGG 2 HTML START — Spec Tetris ===== -->
+<div id="tetris-game">
+  <img class="tg-back" src="https://github.com/liatrio.png" alt="Back to dashboard" title="Back to dashboard">
+  <div class="tg-wrap">
+    <div class="tg-hud">
+      <div><div class="tg-label">Score</div><div class="tg-val" id="tg-score">0</div></div>
+      <div><div class="tg-label">Level</div><div class="tg-val" id="tg-level">1</div></div>
+      <div><div class="tg-label">Lines</div><div class="tg-val" id="tg-lines">0</div></div>
+      <div><div class="tg-label">Next</div><canvas class="tg-preview" id="tg-preview" width="80" height="80"></canvas></div>
+    </div>
+    <canvas id="tetris-canvas" width="240" height="480"></canvas>
+  </div>
+  <div class="tg-controls">
+    <span class="tg-controls-desktop">&larr;&darr;&rarr; Move &nbsp; &uarr; Rotate &nbsp; Space Drop &nbsp; P Pause &nbsp; Esc Exit</span>
+  </div>
+  <div class="tg-ticker"><span>Spec Authored &rarr; Reviewed &rarr; Implemented &rarr; Zero Fixes &nbsp;&bull;&nbsp; 84% Zero-Fix Rate &nbsp;&bull;&nbsp; 132 Specs, 145 PRs, 0 Regrets &nbsp;&bull;&nbsp; Write the spec before you write the code &nbsp;&bull;&nbsp;</span></div>
+  <div class="tg-touch">
+    <div class="tg-touch-row">
+      <button id="tg-left">&larr;</button>
+      <button id="tg-down">&darr;</button>
+      <button id="tg-right">&rarr;</button>
+      <button id="tg-rotate">&circlearrowright;</button>
+    </div>
+    <button class="tg-drop-btn" id="tg-drop">DROP</button>
+  </div>
+</div>
+<!-- ===== EASTER EGG 2 HTML END ===== -->
+
+<footer>Aircraft Maintenance Planner PoC &nbsp;|&nbsp; December 2025 – March 2026 &nbsp;|&nbsp; 7 Engineers, 132 Specs, 145 PRs</footer>
+
+<script>
+/* Mobile-friendly portal dropdown toggle */
+document.querySelector('.portal-dropdown>a').addEventListener('click',function(e){e.preventDefault();this.parentElement.classList.toggle('open');});
+document.addEventListener('click',function(e){const dd=document.querySelector('.portal-dropdown');if(!dd.contains(e.target))dd.classList.remove('open');});
+
+const navy='#1a1a2e',green='#24ae1d',lime='#89df00',red='#E8684A',purple='#7B68A8';
+Chart.defaults.font.family="'DM Sans',system-ui,sans-serif";
+Chart.defaults.font.size=12;
+
+// Velocity chart
+new Chart(document.getElementById('velocityChart'),{
+  type:'bar',
+  data:{
+    labels:['v0.0.1','v0.0.2','v0.0.3','Current'],
+    datasets:[
+      {label:'Specs',data:[39,40,23,30],backgroundColor:'#24ae1d',borderRadius:3},
+      {label:'Spec PRs',data:[19,29,21,34],backgroundColor:'#89df00',borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,padding:8}},
+      tooltip:{callbacks:{title:t=>t[0].label.replace('\n',' ')}}},
+    scales:{
+      y:{beginAtZero:true,grid:{color:'#e5e7eb'},ticks:{font:{size:11}}},
+      x:{grid:{display:false},ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// Fix rate chart
+new Chart(document.getElementById('fixRateChart'),{
+  type:'bar',
+  data:{
+    labels:['v0.0.1','v0.0.2','v0.0.3','Current'],
+    datasets:[
+      {label:'Fixes / PR',data:[1.22,0.95,0.28,0.13],backgroundColor:'#E8684A',borderRadius:3},
+      {label:'Fixes / Spec',data:[0.70,0.97,0.57,0.17],backgroundColor:'#1a1a2e',borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,padding:8}}},
+    scales:{
+      y:{beginAtZero:true,max:1.5,grid:{color:'#e5e7eb'},ticks:{font:{size:11}}},
+      x:{grid:{display:false},ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// ===== EASTER EGG JS START — newspaper mode, carousel, sketches =====
+const egg=document.getElementById('liatrio-egg');
+const eggOverlay=document.getElementById('egg-overlay');
+let newspaperMode=false;
+
+egg.addEventListener('click',()=>{
+  egg.classList.add('shake');
+  setTimeout(()=>{
+    egg.classList.remove('shake');
+    if(!newspaperMode){
+      eggOverlay.classList.add('expanding');
+      setTimeout(()=>{
+        document.body.classList.add('newspaper-mode');
+        eggOverlay.classList.remove('expanding');
+        newspaperMode=true;
+        requestAnimationFrame(()=>{window.scrollTo(0,0);initCarousel();renderNpCharts();});
+      },900);
+    } else {
+      document.body.classList.remove('newspaper-mode');
+      window.scrollTo(0,0);
+      newspaperMode=false;
+    }
+  },600);
+});
+
+document.querySelector('.np-back').addEventListener('click',()=>{
+  document.body.classList.remove('newspaper-mode');
+  newspaperMode=false;
+  window.scrollTo(0,0);
+});
+
+// Mobile FAB + chat bubble
+const mobileFab=document.getElementById('mobile-fab');
+const mobileChat=document.getElementById('mobile-chat');
+function enterNewspaper(){
+  mobileChat.classList.add('chat-hidden');
+  eggOverlay.classList.add('expanding');
+  setTimeout(()=>{
+    document.body.classList.add('newspaper-mode');
+    eggOverlay.classList.remove('expanding');
+    newspaperMode=true;
+    requestAnimationFrame(()=>{window.scrollTo(0,0);initCarousel();renderNpCharts();});
+  },900);
+}
+mobileFab.addEventListener('click',()=>{
+  if(newspaperMode)return;
+  mobileChat.classList.remove('chat-hidden');
+});
+document.getElementById('chat-yes').addEventListener('click',()=>{enterNewspaper();});
+document.getElementById('chat-no').addEventListener('click',()=>{mobileChat.classList.add('chat-hidden');});
+
+function initCarousel(){
+  const carousel=document.getElementById('npCarousel');
+  const cards=carousel.querySelectorAll('.np-card');
+  const dotsC=document.getElementById('npDots');
+  let cur=0;
+
+  // Add dog ears
+  cards.forEach((card,i)=>{
+    card.querySelectorAll('.np-dog-ear').forEach(e=>e.remove());
+    function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+    if(i>0){
+      const prev=document.createElement('div');
+      prev.className='np-dog-ear np-dog-ear-prev';
+      prev.title='Previous';
+      const ps=rnd(30,50);
+      prev.style.cssText=`width:${ps}px;height:${rnd(28,48)}px;transform:rotate(${rnd(-4,4)}deg)`;
+      prev.onclick=(e)=>{e.stopPropagation();goTo(i-1);};
+      card.appendChild(prev);
+    }
+    if(i<cards.length-1){
+      const next=document.createElement('div');
+      next.className='np-dog-ear np-dog-ear-next';
+      next.title='Next';
+      const ns=rnd(30,50);
+      next.style.cssText=`width:${ns}px;height:${rnd(28,48)}px;transform:rotate(${rnd(-4,4)}deg)`;
+      next.onclick=(e)=>{e.stopPropagation();goTo(i+1);};
+      card.appendChild(next);
+    }
+  });
+
+  dotsC.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='np-dot'+(i===0?' active':'');
+    d.onclick=()=>goTo(i);
+    dotsC.appendChild(d);
+  });
+
+  function goTo(i){
+    cur=i;
+    cards[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+    updateDots();
+  }
+  function updateDots(){
+    dotsC.querySelectorAll('.np-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  }
+
+  document.getElementById('npPrev').onclick=()=>goTo(Math.max(0,cur-1));
+  document.getElementById('npNext').onclick=()=>goTo(Math.min(cards.length-1,cur+1));
+
+  let scrollTimer;
+  carousel.addEventListener('scroll',()=>{
+    clearTimeout(scrollTimer);
+    scrollTimer=setTimeout(()=>{
+      const sl=carousel.scrollLeft;
+      const cw=cards[0].offsetWidth+32;
+      const ni=Math.round(sl/cw);
+      if(ni!==cur&&ni>=0&&ni<cards.length){cur=ni;updateDots();}
+    },100);
+  });
+
+  // keyboard nav
+  document.addEventListener('keydown',(e)=>{
+    if(!newspaperMode)return;
+    if(e.key==='ArrowLeft')goTo(Math.max(0,cur-1));
+    if(e.key==='ArrowRight')goTo(Math.min(cards.length-1,cur+1));
+    if(e.key==='Escape'){document.body.classList.remove('newspaper-mode');newspaperMode=false;window.scrollTo(0,0);}
+  });
+}
+
+// Newspaper charts
+let npChartsRendered=false;
+function renderNpCharts(){
+  if(npChartsRendered)return;
+  npChartsRendered=true;
+  const sepia='#2a1a0a',rust='#8b4a2a';
+  const npGrid={color:'#d4c9a8'};
+  const npTick={color:sepia,font:{size:11,family:"'DM Sans',sans-serif"}};
+
+  new Chart(document.getElementById('npFixChart'),{
+    type:'line',
+    data:{
+      labels:['v0.0.1','v0.0.2','v0.0.3','Current'],
+      datasets:[
+        {label:'Fixes / PR',data:[1.22,0.95,0.28,0.13],borderColor:rust,backgroundColor:rust+'33',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:rust,borderWidth:2},
+        {label:'Fixes / Spec',data:[0.70,0.97,0.57,0.17],borderColor:sepia,backgroundColor:sepia+'22',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:sepia,borderWidth:2}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:1.5,grid:npGrid,ticks:npTick},x:{grid:{display:false},ticks:npTick}}}
+  });
+
+  // xkcd domain comic — draw offscreen, inject as <img> (canvas doesn't paint inside CSS columns)
+  const xkImg=document.getElementById('xkcdImg');
+  if(xkImg){
+    const xk=document.createElement('canvas');xk.width=150;xk.height=140;
+    const xc=xk.getContext('2d');
+    xc.strokeStyle='#2a1a0a';xc.fillStyle='#2a1a0a';xc.lineWidth=1.5;xc.lineCap='round';
+    function wL(x1,y1,x2,y2){
+      xc.beginPath();xc.moveTo(x1,y1);
+      for(let i=1;i<=6;i++){const t=i/6;xc.lineTo(x1+(x2-x1)*t+(Math.random()-.5)*2,y1+(y2-y1)*t+(Math.random()-.5)*2);}
+      xc.stroke();
+    }
+    // Stick figure bottom-left
+    const fx=35,fy=105;
+    // Head
+    xc.beginPath();xc.arc(fx,fy-28,7,0,Math.PI*2);xc.stroke();
+    // Eyes looking up-right
+    xc.fillRect(fx-1,fy-32,1.5,1.5);xc.fillRect(fx+3,fy-32,1.5,1.5);
+    // Body
+    wL(fx,fy-21,fx,fy);
+    // Legs
+    wL(fx,fy,fx-10,fy+18);wL(fx,fy,fx+10,fy+18);
+    // Left arm holds book
+    wL(fx,fy-12,fx-14,fy-2);
+    // Right arm to chin
+    wL(fx,fy-12,fx+8,fy-18);wL(fx+8,fy-18,fx+4,fy-25);
+
+    // Book (bigger, legible)
+    xc.lineWidth=1.5;
+    xc.strokeRect(fx-22,fy-6,14,16);
+    xc.lineWidth=1;wL(fx-15,fy-6,fx-15,fy+10);
+    xc.font='bold 7px DM Sans,sans-serif';xc.fillText('DDD',fx-21,fy+6);
+
+    // Thought dots
+    xc.lineWidth=1.2;
+    xc.beginPath();xc.arc(fx+12,fy-40,2,0,Math.PI*2);xc.stroke();
+    xc.beginPath();xc.arc(fx+22,fy-48,3,0,Math.PI*2);xc.stroke();
+
+    // Thought bubble — single lumpy cloud outline
+    const bx=88,by=32;
+    xc.beginPath();
+    xc.moveTo(bx-40,by+5);
+    xc.arc(bx-30,by-10,18,Math.PI,1.55*Math.PI);
+    xc.arc(bx-5,by-16,16,1.15*Math.PI,1.75*Math.PI);
+    xc.arc(bx+22,by-14,15,1.2*Math.PI,1.85*Math.PI);
+    xc.arc(bx+40,by-2,14,-.35*Math.PI,.45*Math.PI);
+    xc.arc(bx+28,by+16,14,.05*Math.PI,.65*Math.PI);
+    xc.arc(bx,by+20,16,.15*Math.PI,.75*Math.PI);
+    xc.arc(bx-25,by+16,15,.2*Math.PI,.85*Math.PI);
+    xc.arc(bx-40,by+5,10,.4*Math.PI,1.1*Math.PI);
+    xc.closePath();
+    xc.save();xc.fillStyle='#faf3e0';xc.fill();xc.restore();
+    xc.stroke();
+
+    // Text inside bubble — 3 short lines
+    xc.font='7.5px Lora,serif';xc.textAlign='center';
+    xc.fillText('is a "bounded',bx,by-10);
+    xc.fillText('context" just a',bx,by+1);
+    xc.fillText('folder w/ opinions?',bx,by+12);
+
+    xkImg.src=xk.toDataURL();
+  }
+
+  // CI sketch
+  const ci=document.getElementById('ciSketchCanvas');
+  if(ci){
+    const cr=ci.parentElement.getBoundingClientRect();
+    ci.width=cr.width-10;ci.height=80;
+    const cc=ci.getContext('2d');
+    // Wobbly line helper
+    function wLine(x1,y1,x2,y2){
+      cc.beginPath();cc.moveTo(x1,y1);
+      const steps=8;
+      for(let i=1;i<=steps;i++){
+        const t=i/steps;
+        cc.lineTo(x1+(x2-x1)*t+(Math.random()-.5)*3, y1+(y2-y1)*t+(Math.random()-.5)*3);
+      }
+      cc.stroke();
+    }
+    function wRect(x,y,w,h){wLine(x,y,x+w,y);wLine(x+w,y,x+w,y+h);wLine(x+w,y+h,x,y+h);wLine(x,y+h,x,y);}
+    function arrow(x1,y1,x2,y2){
+      wLine(x1,y1,x2,y2);
+      const a=Math.atan2(y2-y1,x2-x1);
+      wLine(x2,y2,x2-8*Math.cos(a-.4),y2-8*Math.sin(a-.4));
+      wLine(x2,y2,x2-8*Math.cos(a+.4),y2-8*Math.sin(a+.4));
+    }
+    cc.strokeStyle='#2a1a0a';cc.lineWidth=1.5;cc.lineCap='round';
+    cc.font='bold 9px DM Sans,sans-serif';cc.fillStyle='#2a1a0a';cc.textAlign='center';
+
+    const w=ci.width, stages=['TESTS','BUILD','DEPLOY','SMOKE'];
+    const bw=60,bh=26,gap=(w-bw*4-60)/3,sx=30,sy=38;
+
+    // Stick figure typing
+    cc.beginPath();cc.arc(14,sy-8,5,0,Math.PI*2);cc.stroke();
+    wLine(14,sy-3,14,sy+10);wLine(14,sy+10,8,sy+22);wLine(14,sy+10,20,sy+22);
+    wLine(14,sy+2,22,sy-2);wLine(14,sy+2,6,sy-2);
+    cc.font='7px DM Sans,sans-serif';cc.fillText('git push',14,sy+32);
+
+    // Pipeline boxes
+    stages.forEach((s,i)=>{
+      const bx=sx+i*(bw+gap), by=sy-bh/2;
+      cc.fillStyle='#f0e6c8';cc.fillRect(bx,by,bw,bh);
+      cc.fillStyle='#2a1a0a';cc.strokeStyle='#2a1a0a';
+      wRect(bx,by,bw,bh);
+      cc.font='bold 9px DM Sans,sans-serif';
+      cc.fillText(s,bx+bw/2,sy+4);
+
+      // Arrows between boxes
+      if(i>0) arrow(sx+(i-1)*(bw+gap)+bw+2,sy, bx-2,sy);
+    });
+    // Arrow from stick figure to first box
+    arrow(23,sy,sx-2,sy);
+
+    // Funny annotations
+    cc.font='italic 7px DM Sans,sans-serif';cc.fillStyle='#8b6a3a';
+    cc.fillText('pray here',sx+bw/2,sy-22);
+    cc.fillText('↓',sx+bw/2,sy-17);
+    cc.fillText('☕ wait...',sx+1*(bw+gap)+bw/2,sy+26);
+    cc.fillText('"the cloud"',sx+2*(bw+gap)+bw/2,sy-22);
+
+    // Cloud doodle over DEPLOY
+    const cx=sx+2*(bw+gap)+bw/2;
+    cc.strokeStyle='#8b6a3a';cc.lineWidth=1;
+    cc.beginPath();cc.arc(cx-8,sy-28,5,Math.PI,0);cc.arc(cx+2,sy-30,7,Math.PI,0);cc.arc(cx+10,sy-28,5,Math.PI,0);cc.stroke();
+
+    // Checkmark at end
+    const ex=sx+4*(bw+gap)+bw+12;
+    cc.strokeStyle='#4a6a2a';cc.lineWidth=2.5;
+    wLine(ex,sy,ex+5,sy+8);wLine(ex+5,sy+8,ex+15,sy-8);
+    cc.font='italic 7px DM Sans,sans-serif';cc.fillStyle='#4a6a2a';
+    cc.fillText('ship it!',ex+7,sy+20);
+
+    // Fire emoji-style scribble near BUILD
+    cc.fillStyle='#8b4a2a';cc.font='11px serif';
+    cc.fillText('🔥',sx+1*(bw+gap)+bw-2,sy-18);
+  }
+
+  // Sports field animation
+  const sc=document.getElementById('sportsCanvas');
+  if(sc){
+    const r=sc.parentElement.getBoundingClientRect();
+    sc.width=r.width;sc.height=r.height;
+    const cx=sc.getContext('2d');
+    let rx=-20,fr=0,sAnim;
+    function drawField(){
+      cx.clearRect(0,0,sc.width,sc.height);
+      // Yard lines
+      cx.strokeStyle='rgba(255,255,255,.25)';cx.lineWidth=1;
+      for(let i=0;i<sc.width;i+=Math.max(20,sc.width/20)){cx.beginPath();cx.moveTo(i,0);cx.lineTo(i,sc.height);cx.stroke();}
+      // Yard numbers
+      cx.fillStyle='rgba(255,255,255,.15)';cx.font='bold 18px sans-serif';cx.textAlign='center';
+      for(let i=1;i<10;i++){cx.fillText(i*10,sc.width*i/10,sc.height/2+6);}
+      // Stick figure
+      const y=sc.height/2-2;
+      cx.strokeStyle='#fff';cx.lineWidth=2;cx.lineCap='round';
+      // Head
+      cx.beginPath();cx.arc(rx+5,y-10,4,0,Math.PI*2);cx.stroke();
+      // Body
+      cx.beginPath();cx.moveTo(rx+5,y-6);cx.lineTo(rx+5,y+5);cx.stroke();
+      // Arms (one forward with football)
+      cx.beginPath();cx.moveTo(rx-1,y);cx.lineTo(rx+5,y-2);cx.lineTo(rx+13,y-5);cx.stroke();
+      // Football
+      cx.fillStyle='#8b4513';cx.beginPath();cx.ellipse(rx+15,y-6,4,2.5,-.3,0,Math.PI*2);cx.fill();
+      cx.strokeStyle='#fff';cx.lineWidth=.5;cx.beginPath();cx.moveTo(rx+13,y-6);cx.lineTo(rx+17,y-6);cx.stroke();
+      // Legs (running)
+      const la=Math.sin(fr*.6)*10;
+      cx.strokeStyle='#fff';cx.lineWidth=2;
+      cx.beginPath();cx.moveTo(rx+5,y+5);cx.lineTo(rx+5-la,y+18);cx.stroke();
+      cx.beginPath();cx.moveTo(rx+5,y+5);cx.lineTo(rx+5+la,y+18);cx.stroke();
+      // Speed lines
+      cx.strokeStyle='rgba(255,255,255,.3)';cx.lineWidth=1;
+      for(let s=0;s<3;s++){const sy=y-8+s*8;cx.beginPath();cx.moveTo(rx-8-s*6,sy);cx.lineTo(rx-18-s*4,sy);cx.stroke();}
+      rx+=2.5;fr++;
+      if(rx>sc.width+30)rx=-30;
+      sAnim=requestAnimationFrame(drawField);
+    }
+    drawField();
+  }
+}
+// ===== EASTER EGG JS END =====
+
+// ===== EASTER EGG 2 JS START — Spec Tetris =====
+(function(){
+  const COLS=10,ROWS=20,BLK=24,PREV_BLK=16;
+  const canvas=document.getElementById('tetris-canvas');
+  const ctx=canvas.getContext('2d');
+  const pvCanvas=document.getElementById('tg-preview');
+  const pvCtx=pvCanvas.getContext('2d');
+  const scoreEl=document.getElementById('tg-score');
+  const levelEl=document.getElementById('tg-level');
+  const linesEl=document.getElementById('tg-lines');
+
+  // Spec-themed colors: I=FR(blue), O=TR(amber), T=INF(green), S=SDD(red), Z=PR(purple), J=QA(cyan), L=ADR(lime)
+  const COLORS=['','#2E75B6','#E6A23C','#24ae1d','#E8684A','#7B68A8','#5DADE2','#89df00'];
+  const NAMES=['','FR','TR','INF','SDD','CI','DDD','ADR'];
+
+  // Tetromino shapes (id matches COLORS index)
+  const SHAPES=[
+    null,
+    [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], // I
+    [[2,2],[2,2]],                                // O
+    [[0,3,0],[3,3,3],[0,0,0]],                    // T
+    [[0,4,4],[4,4,0],[0,0,0]],                    // S
+    [[5,5,0],[0,5,5],[0,0,0]],                    // Z
+    [[6,0,0],[6,6,6],[0,0,0]],                    // J
+    [[0,0,7],[7,7,7],[0,0,0]]                     // L
+  ];
+
+  let board,piece,nextPiece,px,py,score,lines,level,gameOver,paused,tetrisMode=false;
+  let dropInterval,dropTimer,animId;
+  let flashCells=[],floatingTexts=[];
+
+  function createBoard(){return Array.from({length:ROWS},()=>new Array(COLS).fill(0));}
+
+  function rotate(matrix){
+    const N=matrix.length;
+    const r=Array.from({length:N},()=>new Array(N).fill(0));
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++)r[x][N-1-y]=matrix[y][x];
+    return r;
+  }
+
+  function collides(b,p,cx,cy){
+    for(let y=0;y<p.length;y++)for(let x=0;x<p[y].length;x++){
+      if(!p[y][x])continue;
+      const nx=cx+x,ny=cy+y;
+      if(nx<0||nx>=COLS||ny>=ROWS)return true;
+      if(ny>=0&&b[ny][nx])return true;
+    }
+    return false;
+  }
+
+  function merge(b,p,cx,cy){
+    for(let y=0;y<p.length;y++)for(let x=0;x<p[y].length;x++){
+      if(p[y][x]&&cy+y>=0)b[cy+y][cx+x]=p[y][x];
+    }
+  }
+
+  function clearLines(){
+    let cleared=0;
+    const clearedYs=[];
+    for(let y=ROWS-1;y>=0;y--){
+      if(board[y].every(c=>c)){clearedYs.push(y);board.splice(y,1);board.unshift(new Array(COLS).fill(0));cleared++;y++;}
+    }
+    if(cleared){
+      const pts=[0,100,300,500,800];
+      score+=pts[cleared]*level;
+      lines+=cleared;
+      level=Math.floor(lines/10)+1;
+      dropInterval=Math.max(100,1000-((level-1)*80));
+      scoreEl.textContent=score;
+      levelEl.textContent=level;
+      linesEl.textContent=lines;
+      // Floating SDD text
+      const now=performance.now();
+      const msgs1=["SHIPPED!","MERGED!","LGTM!","DEPLOYED!"];
+      const msg=cleared===4?"ZERO-FIX RATE!":cleared===3?"TRIPLE SPEC!":cleared===2?"DOUBLE SPEC!":msgs1[Math.floor(Math.random()*msgs1.length)];
+      const midY=clearedYs[Math.floor(clearedYs.length/2)];
+      floatingTexts.push({text:msg,x:COLS*BLK/2,y:midY*BLK,t:now,dur:1500});
+    }
+  }
+
+  function randomPiece(){return Math.floor(Math.random()*7)+1;}
+
+  function spawnPiece(){
+    const id=nextPiece||randomPiece();
+    nextPiece=randomPiece();
+    piece=SHAPES[id].map(r=>[...r]);
+    px=Math.floor((COLS-piece[0].length)/2);
+    py=-1;
+    drawPreview();
+    if(collides(board,piece,px,py)){gameOver=true;showGameOver();}
+  }
+
+  function drawBlock(c,x,y,size,color,colorId){
+    c.fillStyle=color;
+    c.fillRect(x*size,y*size,size-1,size-1);
+    c.fillStyle='rgba(255,255,255,.15)';
+    c.fillRect(x*size,y*size,size-1,2);
+    c.fillRect(x*size,y*size,2,size-1);
+    if(colorId&&size>=14){
+      const label=NAMES[colorId];
+      if(label){
+        c.save();
+        c.font='bold '+(size<=16?'7':'9')+'px monospace';
+        c.textAlign='center';c.textBaseline='middle';
+        c.fillStyle='rgba(0,0,0,.35)';
+        c.fillText(label,x*size+size/2+.5,y*size+size/2+.5);
+        c.fillStyle='rgba(255,255,255,.85)';
+        c.fillText(label,x*size+size/2,y*size+size/2);
+        c.restore();
+      }
+    }
+  }
+
+  function addFlashCells(p,cx,cy){
+    const now=performance.now();
+    for(let y=0;y<p.length;y++)for(let x=0;x<p[y].length;x++){
+      if(p[y][x]&&cy+y>=0)flashCells.push({x:cx+x,y:cy+y,t:now});
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.04)';
+    for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*BLK,0);ctx.lineTo(x*BLK,ROWS*BLK);ctx.stroke();}
+    for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*BLK);ctx.lineTo(COLS*BLK,y*BLK);ctx.stroke();}
+    // Board
+    for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){if(board[y][x])drawBlock(ctx,x,y,BLK,COLORS[board[y][x]],board[y][x]);}
+    // Ghost piece
+    if(piece&&!gameOver){
+      let gy=py;
+      while(!collides(board,piece,px,gy+1))gy++;
+      ctx.globalAlpha=.2;
+      for(let y=0;y<piece.length;y++)for(let x=0;x<piece[y].length;x++){
+        if(piece[y][x]&&gy+y>=0)drawBlock(ctx,px+x,gy+y,BLK,COLORS[piece[y][x]],piece[y][x]);
+      }
+      ctx.globalAlpha=1;
+      // Active piece
+      for(let y=0;y<piece.length;y++)for(let x=0;x<piece[y].length;x++){
+        if(piece[y][x]&&py+y>=0)drawBlock(ctx,px+x,py+y,BLK,COLORS[piece[y][x]],piece[y][x]);
+      }
+    }
+    // Flash cells (landing / line clear)
+    const now=performance.now();
+    flashCells=flashCells.filter(f=>{
+      const age=now-f.t;if(age>150)return false;
+      ctx.globalAlpha=1-(age/150);
+      ctx.fillStyle='#fff';
+      ctx.fillRect(f.x*BLK,f.y*BLK,BLK-1,BLK-1);
+      ctx.globalAlpha=1;
+      return true;
+    });
+    // Floating texts (line clear messages)
+    floatingTexts=floatingTexts.filter(f=>{
+      const age=now-f.t;if(age>f.dur)return false;
+      const progress=age/f.dur;
+      ctx.save();
+      ctx.globalAlpha=1-progress;
+      ctx.font='bold 16px monospace';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='#000';
+      ctx.fillText(f.text,f.x+1,f.y-(progress*60)+1);
+      ctx.fillStyle='#24ae1d';
+      ctx.fillText(f.text,f.x,f.y-(progress*60));
+      ctx.restore();
+      return true;
+    });
+  }
+
+  function drawPreview(){
+    pvCtx.clearRect(0,0,pvCanvas.width,pvCanvas.height);
+    if(!nextPiece)return;
+    const s=SHAPES[nextPiece];
+    const ox=Math.floor((5-s[0].length)/2);
+    const oy=Math.floor((5-s.length)/2);
+    for(let y=0;y<s.length;y++)for(let x=0;x<s[y].length;x++){
+      if(s[y][x])drawBlock(pvCtx,ox+x,oy+y,PREV_BLK,COLORS[s[y][x]],s[y][x]);
+    }
+  }
+
+  function drop(){
+    if(gameOver||paused)return;
+    if(!collides(board,piece,px,py+1)){py++;}
+    else{addFlashCells(piece,px,py);merge(board,piece,px,py);clearLines();spawnPiece();}
+    draw();
+  }
+
+  function hardDrop(){
+    if(gameOver||paused)return;
+    while(!collides(board,piece,px,py+1))py++;
+    addFlashCells(piece,px,py);merge(board,piece,px,py);clearLines();spawnPiece();draw();
+    canvas.classList.add('tg-shake');setTimeout(()=>canvas.classList.remove('tg-shake'),150);
+  }
+
+  function moveLeft(){if(!gameOver&&!paused&&!collides(board,piece,px-1,py)){px--;draw();}}
+  function moveRight(){if(!gameOver&&!paused&&!collides(board,piece,px+1,py)){px++;draw();}}
+  function softDrop(){if(!gameOver&&!paused)drop();}
+  function rotatePiece(){
+    if(gameOver||paused)return;
+    const r=rotate(piece);
+    // Wall kick: try 0, -1, +1, -2, +2
+    for(const kick of [0,-1,1,-2,2]){
+      if(!collides(board,r,px+kick,py)){piece=r;px+=kick;draw();return;}
+    }
+  }
+
+  let lastDrop=0;
+  function gameLoop(ts){
+    if(!tetrisMode){animId=null;return;}
+    if(!paused&&!gameOver){
+      if(ts-lastDrop>dropInterval){lastDrop=ts;drop();}
+    }
+    if(flashCells.length||floatingTexts.length)draw();
+    animId=requestAnimationFrame(gameLoop);
+  }
+
+  function startGame(){
+    board=createBoard();score=0;lines=0;level=1;gameOver=false;paused=false;flashCells=[];floatingTexts=[];
+    dropInterval=1000;lastDrop=0;nextPiece=null;
+    scoreEl.textContent='0';levelEl.textContent='1';linesEl.textContent='0';
+    const goEl=document.querySelector('.tg-gameover');
+    if(goEl)goEl.remove();
+    spawnPiece();draw();
+    if(!animId)animId=requestAnimationFrame(gameLoop);
+  }
+
+  function showGameOver(){
+    const div=document.createElement('div');
+    div.className='tg-gameover';
+    div.innerHTML='<h2>GAME OVER</h2><div class="tg-final">Score: '+score+' &bull; Level: '+level+' &bull; Lines: '+lines+'</div><button id="tg-restart">Play Again</button>';
+    document.getElementById('tetris-game').appendChild(div);
+    div.querySelector('#tg-restart').addEventListener('click',startGame);
+  }
+
+  function enterTetris(){
+    if(tetrisMode||newspaperMode)return;
+    tetrisMode=true;
+    eggOverlay.classList.add('expanding');
+    setTimeout(()=>{
+      document.body.classList.add('tetris-mode');
+      eggOverlay.classList.remove('expanding');
+      startGame();
+    },900);
+  }
+
+  function exitTetris(){
+    if(!tetrisMode)return;
+    tetrisMode=false;
+    document.body.classList.remove('tetris-mode');
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+    window.scrollTo(0,0);
+  }
+
+  // Back button
+  document.querySelector('#tetris-game .tg-back').addEventListener('click',exitTetris);
+
+  // Keyboard controls
+  document.addEventListener('keydown',e=>{
+    if(!tetrisMode)return;
+    switch(e.key){
+      case'ArrowLeft':e.preventDefault();moveLeft();break;
+      case'ArrowRight':e.preventDefault();moveRight();break;
+      case'ArrowDown':e.preventDefault();softDrop();break;
+      case'ArrowUp':e.preventDefault();rotatePiece();break;
+      case' ':e.preventDefault();hardDrop();break;
+      case'Escape':exitTetris();break;
+      case'p':case'P':paused=!paused;break;
+    }
+  });
+
+  // Mobile touch controls with DAS (auto-repeat)
+  function bindTouch(id,fn){
+    const btn=document.getElementById(id);
+    let iv=null;
+    function start(e){e.preventDefault();fn();iv=setInterval(fn,100);}
+    function stop(){if(iv){clearInterval(iv);iv=null;}}
+    btn.addEventListener('pointerdown',start);
+    btn.addEventListener('pointerup',stop);
+    btn.addEventListener('pointerleave',stop);
+    btn.addEventListener('pointercancel',stop);
+  }
+  bindTouch('tg-left',moveLeft);
+  bindTouch('tg-right',moveRight);
+  bindTouch('tg-down',softDrop);
+  document.getElementById('tg-rotate').addEventListener('pointerdown',e=>{e.preventDefault();rotatePiece();});
+  document.getElementById('tg-drop').addEventListener('pointerdown',e=>{e.preventDefault();hardDrop();});
+
+  // Trigger: double-click (desktop) + long-press (mobile) on metric value cells
+  const metricCells=document.querySelectorAll('#metrics tbody td:nth-child(2)');
+  let lpTimer=null,lpRing=null;
+
+  metricCells.forEach(td=>{
+    td.style.position='relative';
+
+    // Desktop: double-click
+    td.addEventListener('dblclick',e=>{
+      e.preventDefault();
+      td.style.background='rgba(36,174,29,.2)';
+      setTimeout(()=>{td.style.background='';enterTetris();},200);
+    });
+
+    // Mobile: long-press 1.5s
+    td.addEventListener('touchstart',e=>{
+      td.classList.add('metric-hint');
+      lpRing=document.createElement('div');
+      lpRing.className='lp-ring';
+      td.appendChild(lpRing);
+      lpTimer=setTimeout(()=>{
+        td.classList.remove('metric-hint');
+        if(lpRing&&lpRing.parentNode)lpRing.remove();
+        lpRing=null;
+        enterTetris();
+      },1500);
+    },{passive:true});
+
+    td.addEventListener('touchend',()=>{
+      clearTimeout(lpTimer);
+      td.classList.remove('metric-hint');
+      if(lpRing&&lpRing.parentNode)lpRing.remove();
+      lpRing=null;
+    });
+    td.addEventListener('touchcancel',()=>{
+      clearTimeout(lpTimer);
+      td.classList.remove('metric-hint');
+      if(lpRing&&lpRing.parentNode)lpRing.remove();
+      lpRing=null;
+    });
+
+    // Suppress context menu during long-press
+    td.addEventListener('contextmenu',e=>{if(lpTimer)e.preventDefault();});
+  });
+})();
+// ===== EASTER EGG 2 JS END =====
+
+// Scroll spy
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('nav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)cur=s.id});
+  navLinks.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+cur)});
+});
+</script>
+</body>
+</html>
