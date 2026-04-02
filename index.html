@@ -3,757 +3,1102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Liatrio AI Enablement - Enterprise Claude Adoption at Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>The AI Daily - Liatrio x Anthropic</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --green: #24ae1d;
-  --lime: #89df00;
-  --dark: #1a1a2e;
-  --darker: #111122;
-  --white: #fff;
-  --light: #f4f7f4;
-  --text: #2d2d3a;
-  --med: #5a5a6e;
-  --border: #d4ddd4;
-  --font: 'DM Sans', system-ui, sans-serif;
+  --parchment: #f4e8c1;
+  --parchment-light: #faf3e0;
+  --parchment-dark: #ede0c0;
+  --ink: #2a1a0a;
+  --ink-light: #3a2f1a;
+  --ink-muted: #6b5a3e;
+  --ink-faint: #8b7a5e;
+  --rule: #c9b98a;
+  --rule-dark: #2a1a0a;
+  --accent: #8b4a2a;
+  --highlight: #f0e6c8;
+  --serif: 'Playfair Display', 'Georgia', serif;
+  --body-serif: 'Lora', 'Georgia', serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
 
 html { scroll-behavior: smooth; }
+
 body {
-  font-family: var(--font);
-  color: var(--dark);
-  background: #fafbfc;
-  line-height: 1.6;
+  font-family: var(--body-serif);
+  color: var(--ink);
+  background: var(--parchment);
+  line-height: 1.7;
+  overflow-x: hidden;
 }
 
-/* NAVIGATION */
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--darker);
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  border-top: 3px solid var(--green);
-}
+/* ====== SCROLL-DRIVEN MOTION SYSTEM ====== */
 
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+/* Elements with data-speed get continuous parallax transforms via JS */
+/* Elements with data-drift get slow ambient floating */
 
-.nav-logo {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, var(--lime), var(--green));
-  border-radius: 50%;
+.story-section {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--darker);
+  padding: 6rem 2rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.nav-title {
-  color: var(--lime);
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+/* Alternating tones */
+.story-section:nth-child(even) {
+  background: var(--parchment-dark);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.1'/%3E%3C/svg%3E");
 }
 
-.nav-links {
+.story-section:nth-child(odd) {
+  background: var(--parchment);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+}
+
+/* Floating decorative ornaments */
+.section-ornament {
+  position: absolute;
+  font-family: var(--serif);
+  color: rgba(42,26,10,.04);
+  font-size: 20vw;
+  font-weight: 900;
+  pointer-events: none;
+  will-change: transform;
+  line-height: 1;
+  user-select: none;
+}
+
+.story-content {
+  max-width: 800px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* ====== MASTHEAD ====== */
+.masthead {
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-}
-
-.nav-links a {
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--lime);
-}
-
-.nav-cta {
-  background: #000;
-  color: var(--lime);
-  padding: 0.35rem 0.85rem;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: 1px solid var(--green);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.nav-cta:hover {
-  background: var(--green);
-  color: #000;
-}
-
-/* HERO SECTION */
-.hero {
-  background: linear-gradient(135deg, #0d0d1a 0%, #1a2a1a 50%, #0d1a0d 100%);
-  color: #fff;
-  padding: 5rem 2rem 4rem;
+  justify-content: center;
   text-align: center;
+  padding: 3rem 2rem;
+  background: var(--parchment-dark);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 80px rgba(42,26,10,.1);
+  border-bottom: 4px double var(--rule-dark);
+  overflow: hidden;
+  position: relative;
 }
 
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.masthead-rule {
+  width: 60%;
+  max-width: 500px;
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 0.75rem auto;
+}
+
+.masthead-date {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
   margin-bottom: 0.5rem;
 }
 
-.hero .subtitle {
-  color: var(--lime);
-  font-size: 1.15rem;
-  font-weight: 500;
-  opacity: 0.9;
+.masthead-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  will-change: transform;
 }
 
-.hero .meta {
-  color: rgba(255,255,255,0.5);
-  font-size: 0.95rem;
+.masthead-tagline {
+  font-family: var(--body-serif);
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 1.1rem;
   margin-top: 0.5rem;
 }
 
-/* LAYOUT */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-section {
-  padding: 3rem 0;
-}
-
-section + section {
-  border-top: 1px solid var(--border);
-}
-
-/* HEADINGS */
-h2 {
-  font-size: 1.6rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.01em;
-}
-
-h3 {
-  font-size: 1.1rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin: 1.5rem 0 0.75rem;
-}
-
-.note {
-  font-size: 0.85rem;
-  color: var(--med);
-  margin-bottom: 1.25rem;
-}
-
-/* STAT BOXES */
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.stat-box {
-  background: var(--light);
-  border-radius: 8px;
-  padding: 1.25rem 0.75rem;
-  text-align: center;
-  border-left: 3px solid var(--green);
-  transition: all 0.2s;
-}
-
-.stat-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(36, 174, 29, 0.15);
-}
-
-.stat-box .num {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--dark);
-}
-
-.stat-box .label {
-  font-size: 0.75rem;
-  color: var(--med);
+.masthead-edition {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
   margin-top: 0.25rem;
+}
+
+.masthead-headline {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-top: 2rem;
+  max-width: 700px;
+  will-change: transform;
+}
+
+.masthead-sub {
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 1rem;
+  margin-top: 0.75rem;
+  max-width: 550px;
+}
+
+.scroll-hint {
+  margin-top: 3rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  animation: hint-bob 2s ease-in-out infinite;
 }
 
-/* CARDS */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+@keyframes hint-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(8px); opacity: 1; }
 }
 
-.card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border-left: 4px solid var(--green);
-  transition: all 0.2s;
+/* ====== ARTICLE STYLES ====== */
+.article-header {
+  border-bottom: 3px solid var(--rule-dark);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--dark);
+.article-section-label {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
   margin-bottom: 0.25rem;
 }
 
-.card-subtitle {
-  font-size: 0.8rem;
-  color: var(--green);
-  font-weight: 600;
+.article-headline {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.article-subhead {
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+.article-body {
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--ink-light);
+}
+
+.article-body p {
+  margin-bottom: 1rem;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.article-body p:first-child::first-letter {
+  float: left;
+  font-family: var(--serif);
+  font-size: 3.4rem;
+  line-height: 0.85;
+  padding: 0.05rem 0.4rem 0 0;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.article-columns {
+  column-count: 2;
+  column-gap: 1.75rem;
+  column-rule: 1px solid var(--rule);
+}
+
+/* ====== STAT INSETS ====== */
+.stat-inset {
+  background: var(--highlight);
+  border: 1px solid var(--rule);
+  padding: 1rem;
+  margin: 1.25rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.5rem 0.25rem;
+}
+
+.stat-num {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.1;
+  will-change: transform;
+}
+
+.stat-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
 }
 
-.card-content {
-  font-size: 0.9rem;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+/* ====== PULLQUOTES ====== */
+.pullquote {
+  border-top: 2px solid var(--rule-dark);
+  border-bottom: 2px solid var(--rule-dark);
+  padding: 1.25rem 0;
+  margin: 1.5rem 0;
+  text-align: center;
+  will-change: transform;
 }
 
-.card-highlight {
-  background: rgba(137, 223, 0, 0.1);
-  border-left: 3px solid var(--lime);
-  border-radius: 0 4px 4px 0;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  color: var(--dark);
-  font-weight: 500;
-  margin-bottom: 1rem;
+.pullquote p {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.4;
 }
 
-/* CALLOUT */
-.callout {
-  background: var(--light);
-  border-left: 4px solid var(--green);
-  border-radius: 0 6px 6px 0;
-  padding: 1rem 1.25rem;
+.pullquote cite {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  font-style: normal;
+  letter-spacing: 0.05em;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* ====== DIVIDERS ====== */
+.np-divider {
+  border: none;
+  border-top: 1px solid var(--rule);
   margin: 1.5rem 0;
 }
 
-.callout strong {
-  color: var(--dark);
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.callout p {
-  font-size: 0.88rem;
-  color: var(--med);
-  margin: 0;
-}
-
-/* FLYWHEEL */
-.flywheel-section {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+/* ====== STORY CARDS ====== */
+.story-card {
+  background: var(--parchment-light);
+  border: 1px solid var(--rule);
   padding: 2rem;
-  margin: 2rem 0;
-  text-align: center;
+  margin: 1.25rem 0;
+  position: relative;
+  will-change: transform;
+  box-shadow: 3px 4px 12px rgba(0,0,0,.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.story-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 5px 8px 24px rgba(0,0,0,.12);
+}
+
+.story-card-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.5rem;
+}
+
+.story-card h3 {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.story-card p {
+  font-size: 0.88rem;
+  color: var(--ink-light);
+  line-height: 1.7;
+}
+
+/* ====== FLYWHEEL ====== */
 .flywheel {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   margin: 1.5rem 0;
 }
 
 .flywheel-step {
-  background: var(--light);
-  border: 2px solid var(--green);
-  border-radius: 8px;
-  padding: 1rem;
-  min-width: 140px;
+  background: var(--highlight);
+  border: 1px solid var(--rule);
+  padding: 0.75rem 1rem;
   text-align: center;
-  position: relative;
+  min-width: 130px;
+  will-change: transform;
+  transition: transform 0.3s ease;
 }
 
-.flywheel-step:not(:last-child)::after {
-  content: "→";
-  position: absolute;
-  right: -1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--green);
-  font-size: 1.5rem;
-  font-weight: bold;
+.flywheel-step:hover {
+  transform: scale(1.05);
 }
 
 .flywheel-step .step-title {
-  font-weight: 700;
-  color: var(--dark);
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--ink);
 }
 
 .flywheel-step .step-desc {
-  font-size: 0.8rem;
-  color: var(--med);
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
 }
 
-/* SPEED STATS */
-.speed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
+.flywheel-arrow {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  color: var(--rule);
 }
 
-.speed-stat {
-  text-align: center;
-  padding: 1.5rem 1rem;
-  background: var(--light);
-  border-radius: 8px;
-  border-top: 3px solid var(--lime);
+/* ====== NEXT STEPS LIST ====== */
+.next-list {
+  list-style: none;
+  padding: 0;
 }
 
-.speed-stat .speed-num {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--green);
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-
-.speed-stat .speed-label {
+.next-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
   font-size: 0.9rem;
-  color: var(--med);
-  font-weight: 500;
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  will-change: transform;
 }
 
-/* FOOTER CTA */
-.footer-cta {
-  background: var(--darker);
-  color: rgba(255,255,255,0.8);
-  padding: 3rem 0;
+.next-list li:last-child { border-bottom: none; }
+
+.next-bullet {
+  font-family: var(--serif);
+  font-weight: 900;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+/* ====== FOOTER ====== */
+.np-footer {
   text-align: center;
-  border-top: 2px solid var(--green);
+  padding: 3rem 2rem;
+  border-top: 4px double var(--rule-dark);
+  background: var(--parchment-dark);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
 }
 
-.footer-cta h3 {
-  color: #fff;
+.footer-headline {
+  font-family: var(--serif);
   font-size: 1.4rem;
-  margin-bottom: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
 }
 
-.footer-cta p {
-  font-size: 1rem;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+.footer-contact {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
 }
 
-.contact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.contact-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 1.5rem;
-  text-align: center;
-}
+.contact-item { text-align: center; }
 
 .contact-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.25rem;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--ink);
 }
 
 .contact-role {
-  font-size: 0.9rem;
-  color: var(--lime);
-  margin-bottom: 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
 }
 
 .contact-email {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 
 .contact-email a {
-  color: var(--lime);
+  color: var(--accent);
   text-decoration: none;
 }
 
-.contact-email a:hover {
-  text-decoration: underline;
+.contact-email a:hover { text-decoration: underline; }
+
+.footer-note {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  margin-top: 2rem;
+  letter-spacing: 0.03em;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  nav {
-    padding: 0 1rem;
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 48px;
+/* ====== PROGRESS BAR ====== */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--ink);
+  z-index: 1000;
+  width: 0%;
+  will-change: width;
+}
+
+/* ====== NAV DOTS ====== */
+.nav-dots {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 100;
+}
+
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.nav-dot.active {
+  background: var(--ink);
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(42,26,10,.3);
+}
+
+.nav-dot:hover { transform: scale(1.4); }
+
+.nav-dot .dot-label {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.nav-dot:hover .dot-label { opacity: 1; }
+
+/* ====== SCROLL-DRIVEN ELEMENT STYLES ====== */
+/* JS applies transforms directly; these set initial invisible state */
+[data-scroll] {
+  will-change: transform, opacity;
+}
+
+/* ====== MOBILE ====== */
+@media (max-width: 700px) {
+  .story-section {
+    padding: 3rem 1.25rem;
+    min-height: 100svh;
   }
 
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    padding: 0.5rem 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    margin-top: 0.5rem;
-  }
-
-  .container {
-    padding: 0 1rem;
-  }
-
-  section {
-    padding: 2rem 0;
-  }
-
-  .hero {
-    padding: 3rem 1rem 2rem;
-  }
-
-  .stat-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .flywheel {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .flywheel-step:not(:last-child)::after {
-    content: "↓";
-    right: 50%;
-    transform: translateX(50%);
-    top: 100%;
-    bottom: -1.5rem;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
+  .article-columns { column-count: 1; }
+  .masthead-title { font-size: clamp(2.5rem, 10vw, 4rem); }
+  .stat-inset { grid-template-columns: repeat(2, 1fr); }
+  .flywheel { flex-direction: column; }
+  .flywheel-arrow { transform: rotate(90deg); }
+  .nav-dots { right: 0.75rem; gap: 0.5rem; }
+  .nav-dot { width: 8px; height: 8px; }
+  .nav-dot .dot-label { display: none; }
+  .footer-contact { flex-direction: column; gap: 1.5rem; }
+  .pullquote p { font-size: 1.1rem; }
+  .section-ornament { font-size: 30vw; }
 }
 </style>
 </head>
 <body>
 
-<!-- NAVIGATION -->
-<nav>
-  <div class="nav-brand">
-    <div class="nav-logo">L</div>
-    <div class="nav-title">liatrio</div>
-  </div>
-  <div class="nav-links">
-    <a href="#overview">Overview</a>
-    <a href="#clients">Clients</a>
-    <a href="#enablement">Enablement</a>
-    <a href="#contact" class="nav-cta">Partner with Us</a>
-  </div>
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Nav dots -->
+<nav class="nav-dots" id="navDots">
+  <div class="nav-dot active" data-section="0"><span class="dot-label">The AI Daily</span></div>
+  <div class="nav-dot" data-section="1"><span class="dot-label">This Is Liatrio</span></div>
+  <div class="nav-dot" data-section="2"><span class="dot-label">Boeing</span></div>
+  <div class="nav-dot" data-section="3"><span class="dot-label">Natera</span></div>
+  <div class="nav-dot" data-section="4"><span class="dot-label">The Gap We Filled</span></div>
+  <div class="nav-dot" data-section="5"><span class="dot-label">Speed & Training</span></div>
+  <div class="nav-dot" data-section="6"><span class="dot-label">Why Partner</span></div>
+  <div class="nav-dot" data-section="7"><span class="dot-label">What's Next</span></div>
 </nav>
 
-<!-- HERO SECTION -->
-<div class="hero">
-  <h1>Enterprise AI Adoption at Scale</h1>
-  <div class="subtitle">Powered by Claude</div>
-  <div class="meta">Enabling 200-500+ engineers across FDA-regulated clinical software to aerospace engineering</div>
-</div>
+<!-- ======== SECTION 0: MASTHEAD ======== -->
+<section class="masthead" id="section-0">
+  <div class="section-ornament" data-speed="0.08" style="top: -10%; left: -5%;">&sect;</div>
+  <div class="section-ornament" data-speed="-0.05" style="bottom: -15%; right: -8%;">&para;</div>
 
-<!-- MAIN CONTENT -->
-<div class="container">
+  <div class="masthead-date" data-scroll data-speed="0.3">April 2026 Edition</div>
+  <hr class="masthead-rule">
+  <h1 class="masthead-title" data-scroll data-speed="0.15">The AI Daily</h1>
+  <div class="masthead-tagline" data-scroll data-speed="0.2">Enterprise Intelligence, Delivered</div>
+  <div class="masthead-edition" data-scroll data-speed="0.25">A Liatrio Publication &bull; Special Anthropic Partnership Edition</div>
+  <hr class="masthead-rule">
 
-  <!-- OVERVIEW SECTION -->
-  <section id="overview">
-    <h2>Scaling Claude Across Enterprise Engineering Organizations</h2>
-    <p class="note">Liatrio is deploying Claude-embedded workflows, building AI fluency programs, and scaling adoption with our proprietary certification program built in just 3 days.</p>
+  <h2 class="masthead-headline" data-scroll data-speed="0.35">Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner</h2>
+  <p class="masthead-sub" data-scroll data-speed="0.4">How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.</p>
 
-    <div class="stat-row">
-      <div class="stat-box">
-        <div class="num">200-500+</div>
-        <div class="label">Engineers Enabled</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">3 Days</div>
-        <div class="label">To Build CCA Program</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">2</div>
-        <div class="label">Major Enterprises</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">80+</div>
-        <div class="label">Teams in Pipeline</div>
-      </div>
-    </div>
-  </section>
+  <div class="scroll-hint">Scroll to read &darr;</div>
+</section>
 
-  <!-- CLIENT STORIES SECTION -->
-  <section id="clients">
-    <h2>Client Success Stories</h2>
-    <p class="note">Real transformations happening right now across aerospace and healthcare industries.</p>
+<!-- ======== SECTION 1: THIS IS LIATRIO ======== -->
+<section class="story-section" id="section-1">
+  <div class="section-ornament" data-speed="-0.06" style="top: 5%; right: -3%;">I</div>
 
-    <div class="card-grid">
-      <!-- Boeing Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">✈️</div>
-          <div>
-            <div class="card-title">Boeing Digital Services</div>
-            <div class="card-subtitle">Enterprise Aerospace & Defense</div>
-          </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services, with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams.</p>
-
-          <p>The flagship result: a legacy Azure provisioning workflow that took 5 business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in 15 minutes with zero handoffs.</p>
-        </div>
-
-        <div class="card-highlight">
-          Claude Code approval in progress as the team's preferred harness for H2 2026
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">5d→15m</div>
-            <div class="label">Provisioning Time</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">3</div>
-            <div class="label">Product Teams</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">8x</div>
-            <div class="label">Faster Delivery</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Natera Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">🧬</div>
-          <div>
-            <div class="card-title">Natera</div>
-            <div class="card-subtitle">Healthcare & Life Sciences</div>
-          </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Engineers are running Spec-Driven Development workflows and automated MR review pipelines across core regulated repos.</p>
-
-          <p>Adoption is organic and accelerating. Engineers are self-directing Claude usage beyond what Liatrio prescribed: one ran a 14-step clinical workflow dry-test unprompted, another extended our MR review pipeline to her own HCLS project within days.</p>
-        </div>
-
-        <div class="card-highlight">
-          Scaling from QCI to 80+ engineering teams across genomics and diagnostics
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">80+</div>
-            <div class="label">Teams in Scope</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">L1-L5</div>
-            <div class="label">AI Fluency</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">4</div>
-            <div class="label">Regulated Repos</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ENABLEMENT SECTION -->
-  <section id="enablement">
-    <h2>Our Claude Certification Academy (CCA)</h2>
-    <p class="note">Built for speed: taking engineers from zero to productive in days, not months.</p>
-
-    <div class="callout">
-      <strong>The Differentiator</strong>
-      <p>We're seeing massive demand for Anthropic Claude services across large enterprises. Rather than wait, we built our own answer. Other partners deploy LLMs on Bedrock - we teach organizations how to actually transform.</p>
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter I</div>
+      <h2 class="article-headline">This Is Liatrio</h2>
+      <div class="article-subhead">AI-forward. Enablement-focused. Best in class at enterprise scale.</div>
     </div>
 
-    <div class="flywheel-section">
-      <h3>Liatrio Enablement Flywheel</h3>
-      <div class="flywheel">
-        <div class="flywheel-step">
-          <div class="step-title">CCA Program</div>
-          <div class="step-desc">Claude Certification Academy</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Forge Training</div>
-          <div class="step-desc">Internal Cohorts</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Certified Engineers</div>
-          <div class="step-desc">Production Ready</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Enterprise Delivery</div>
-          <div class="step-desc">Scaled Adoption</div>
-        </div>
-      </div>
+    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="100">
+      <p>Liatrio is not your traditional technology consultancy. We don't collect badges and certifications in legacy cloud platforms. We don't do staff augmentation. We partner with frontier technology companies that are doing things the right way and want to grow.</p>
+
+      <p>We are AI-forward, focused on the agentic era, and we do this better than anyone else at enterprise scale. Our engineers don't just deploy tools; they drive behavioral transformation. They teach organizations how AI tools fit together so people can build their own solutions to their own problems.</p>
+
+      <p>We're not Accenture. We're not Deloitte. We're not your enterprise deployment partner. If you want Claude to be adopted securely, adopted the right way, with people using it the way it's intended to be used, we are the ones who make that happen.</p>
+
+      <p>You won't get genuine, confirmed enterprise adoption the way you want it without us.</p>
     </div>
 
-    <h3>Speed to Value</h3>
-    <p>Liatrio developed a proprietary Claude Certification Academy (CCA) that takes engineers from zero to productive in days, not months. Built on top of Anthropic's open source materials, tailored to enterprise delivery needs, and deployed internally through our Forge training program.</p>
-
-    <div class="speed-grid">
-      <div class="speed-stat">
-        <div class="speed-num">3</div>
-        <div class="speed-label">Days to Build Program</div>
-      </div>
-      <div class="speed-stat">
-        <div class="speed-num">50+</div>
-        <div class="speed-label">Engineers Upskilled in Month 1</div>
-      </div>
-    </div>
-  </section>
-
-</div>
-
-<!-- FOOTER CTA -->
-<div class="footer-cta" id="contact">
-  <div class="container">
-    <h3>We're doing this. Come along for the ride.</h3>
-    <p>Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to partner with Anthropic on this journey, but either way, we're moving fast.</p>
-
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-name">Daniel Helbling</div>
-        <div class="contact-role">Partnerships</div>
-        <div class="contact-email"><a href="mailto:daniel@liatrio.com">daniel@liatrio.com</a></div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-name">Chris Blackburn</div>
-        <div class="contact-role">CEO</div>
-        <div class="contact-email"><a href="mailto:chris@liatrio.com">chris@liatrio.com</a></div>
-      </div>
+    <div class="pullquote" data-scroll data-type="scale-in" data-delay="200">
+      <p>"We're not implementing Claude. We're driving true behavioral transformation."</p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- SMOOTH SCROLL SCRIPT -->
+<!-- ======== SECTION 2: BOEING ======== -->
+<section class="story-section" id="section-2">
+  <div class="section-ornament" data-speed="0.07" style="top: 10%; left: -5%;">II</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter II &mdash; Client Story</div>
+      <h2 class="article-headline">Boeing Digital Services: AI-Native Engineering at Aerospace Scale</h2>
+      <div class="article-subhead">Spec-driven development, product operating model transformation, and a provisioning workflow reduced from five days to fifteen minutes.</div>
+    </div>
+
+    <div class="stat-inset" data-scroll data-type="fade-up" data-delay="100">
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">5d &rarr; 15m</div>
+        <div class="stat-label">Provisioning Time</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">3+</div>
+        <div class="stat-label">Product Teams</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">132</div>
+        <div class="stat-label">Specs Authored</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">7</div>
+        <div class="stat-label">Engineers</div>
+      </div>
+    </div>
+
+    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="200">
+      <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams.</p>
+
+      <p>The flagship result: a legacy Azure provisioning workflow that took five business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in fifteen minutes with zero handoffs.</p>
+
+      <p>But the transformation goes deeper than speed. We brought a complete product operating model: teams are using Anthropic models to refine and decompose PRDs, engineers pick up specs and run with them, and the entire process is built on a repeatable, scalable methodology. Claude Code approval is in progress as the team's preferred harness for H2 2026.</p>
+
+      <p>The expert domain research has been equally impactful. One Boeing engineer, a ten-year veteran, built an engineering analysis document with Claude that he uses every day. The team is "really blown away" by the depth and quality. This is what happens when you pair deep domain expertise with the right AI tools and the right process.</p>
+    </div>
+
+    <div class="pullquote" data-scroll data-type="scale-in" data-delay="300">
+      <p>"They're using our prompts and processes to refine and decompose PRDs, and now the whole team is picking it up and running."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SECTION 3: NATERA ======== -->
+<section class="story-section" id="section-3">
+  <div class="section-ornament" data-speed="-0.05" style="bottom: 5%; right: -4%;">III</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter III &mdash; Client Story</div>
+      <h2 class="article-headline">Natera: From "I Have No Idea What I'm Doing" to Standing Ovation</h2>
+      <div class="article-subhead">A PM on Windows, alone on an island, becomes the most compelling demo of what enterprise AI enablement actually looks like.</div>
+    </div>
+
+    <div class="stat-inset" data-scroll data-type="fade-up" data-delay="100">
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">80+</div>
+        <div class="stat-label">Teams in Scope</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">200-500</div>
+        <div class="stat-label">Engineers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">L1-L5</div>
+        <div class="stat-label">AI Fluency</div>
+      </div>
+    </div>
+
+    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="200">
+      <p>There was a product manager at Natera running Windows, way off on an island, because nobody on her team was using Windows and all they had access to was Claude Code. She didn't know how to get it set up. She didn't even feel comfortable asking her own team. So she set up a one-on-one with a Liatrio engineer: "Can you help me? I have no idea what I'm doing."</p>
+
+      <p>They worked through the whole thing together. Got Claude Code running in a terminal, in PowerShell, connected to a Jira MCP server so she could read project data. That process was then turned into a repeatable guide shared with the team managing the other Windows users across the organization.</p>
+
+      <p>Days later, she stood up at Natera's company-wide build-and-share and presented a Jira roadmap she built with Claude. She had manipulated project data, generated estimates with confidence ranges for best and worst case delivery scenarios, and presented it to the entire organization. This is a PM who a week earlier couldn't open a terminal.</p>
+
+      <p>That's not tool deployment. That's not configuration. That's a person whose capabilities were fundamentally expanded. And it's happening organically across the organization: engineers are self-directing Claude usage beyond what Liatrio prescribed. One ran a 14-step clinical workflow dry-test unprompted. Another extended an MR review pipeline to her own regulated project within days.</p>
+
+      <p>Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Now the plan is to scale from QCI to 80+ engineering teams across genomics and diagnostics.</p>
+    </div>
+
+    <div class="pullquote" data-scroll data-type="scale-in" data-delay="300">
+      <p>"She didn't feel comfortable asking her own team. A week later, she was demoing a Claude-built roadmap to the entire company."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SECTION 4: THE GAP WE FILLED ======== -->
+<section class="story-section" id="section-4">
+  <div class="section-ornament" data-speed="0.09" style="top: 0%; left: -6%;">IV</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter IV</div>
+      <h2 class="article-headline">We Saw the Gap. We Couldn't Wait.</h2>
+      <div class="article-subhead">Massive enterprise demand for Claude enablement. No official program. So we built one ourselves.</div>
+    </div>
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
+      <p>Across our enterprise clients, the demand for Claude enablement was overwhelming. Teams of 200 to 500 engineers trying to operationalize Claude within their organizations. But the standard path, waiting for official partner access, running through boilerplate self-paced training, wasn't going to cut it at the speed our clients needed.</p>
+
+      <p>So we built our own answer.</p>
+    </div>
+
+    <div class="stat-inset" data-scroll data-type="fade-up" data-delay="200">
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">3</div>
+        <div class="stat-label">Days to Build CCA</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-scroll data-type="count-up">50+</div>
+        <div class="stat-label">Engineers Month 1</div>
+      </div>
+    </div>
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="300">
+      <p>In three days, we built the Claude Certification Academy (CCA), a proprietary training program that takes engineers from zero to productive faster than anything else on the market. Built on top of Anthropic's open-source materials but tailored to enterprise delivery needs and deployed internally through our Forge training program.</p>
+
+      <p>We saw the gap in our own capabilities. We couldn't wait to get access and have people run through boilerplate self-paced training. So we built our own thing, and we're taking it to enterprise customers today. This is not theoretical. This is happening right now.</p>
+    </div>
+
+    <div class="pullquote" data-scroll data-type="scale-in" data-delay="400">
+      <p>"We're doing this with or without you. But we think it only enhances both of us if we do it together."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SECTION 5: SPEED & TRAINING ======== -->
+<section class="story-section" id="section-5">
+  <div class="section-ornament" data-speed="-0.07" style="bottom: 10%; right: -5%;">V</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter V</div>
+      <h2 class="article-headline">Speed of Development. Depth of Enablement.</h2>
+      <div class="article-subhead">What our personalized training looks like, and why it produces results that self-paced programs never will.</div>
+    </div>
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
+      <p>The Liatrio enablement model is not a slide deck and a certification exam. It is an embedded, hands-on transformation program that meets engineers where they are.</p>
+    </div>
+
+    <div class="flywheel" data-scroll data-type="fade-up" data-delay="200">
+      <div class="flywheel-step" data-scroll data-type="slide-up-stagger" data-delay="250">
+        <div class="step-title">CCA Program</div>
+        <div class="step-desc">Claude Certification Academy</div>
+      </div>
+      <div class="flywheel-arrow">&rarr;</div>
+      <div class="flywheel-step" data-scroll data-type="slide-up-stagger" data-delay="350">
+        <div class="step-title">Forge Training</div>
+        <div class="step-desc">Internal Cohorts</div>
+      </div>
+      <div class="flywheel-arrow">&rarr;</div>
+      <div class="flywheel-step" data-scroll data-type="slide-up-stagger" data-delay="450">
+        <div class="step-title">Certified Engineers</div>
+        <div class="step-desc">Production Ready</div>
+      </div>
+      <div class="flywheel-arrow">&rarr;</div>
+      <div class="flywheel-step" data-scroll data-type="slide-up-stagger" data-delay="550">
+        <div class="step-title">Enterprise Delivery</div>
+        <div class="step-desc">Scaled Adoption</div>
+      </div>
+    </div>
+
+    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="300">
+      <p>We don't just set things up and leave. We teach teams how the tools work and how they fit together, so they can build their own things to solve their own problems. That's where the real power comes from. That's where the scale comes from.</p>
+
+      <p>At Boeing, engineers are now independently writing specs and running Spec-Driven Development workflows that we designed with Anthropic's models. At Natera, a PM who couldn't open a terminal is now building project roadmaps with Claude Code and presenting them company-wide.</p>
+
+      <p>We pair this with full observability: OpenTelemetry instrumentation, telemetry collection feeding into Datadog and platforms like Jellyfish, so leadership gets real-time visibility into adoption patterns, usage metrics, and value realization. Rolling out AI successfully means being able to see how it's being adopted and how it's being used.</p>
+
+      <p>The underlying thread in everything we do: we're not just implementing a tool. We're driving behavioral change across entire engineering organizations. People are changing how they work, not just what tools they use.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SECTION 6: WHY PARTNER ======== -->
+<section class="story-section" id="section-6">
+  <div class="section-ornament" data-speed="0.06" style="top: -5%; left: -4%;">VI</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter VI</div>
+      <h2 class="article-headline">Why You Should Care</h2>
+      <div class="article-subhead">We're doing this today. We believe Claude and Liatrio together is the most compelling story in enterprise AI enablement.</div>
+    </div>
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
+      <p>Other partners deploy LLMs on Bedrock. We teach organizations how to actually transform.</p>
+
+      <p>We don't believe just in Claude and the power of AI in the abstract. We believe that Claude and Liatrio together is the most compelling combination for getting this right at enterprise scale. Here is why:</p>
+    </div>
+
+    <div class="story-card" data-scroll data-type="slide-left" data-delay="150">
+      <div class="story-card-label">Differentiation</div>
+      <h3>Not Deployment. Transformation.</h3>
+      <p>We don't install Claude and hand over documentation. We embed with teams, drive adoption from the ground up, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.</p>
+    </div>
+
+    <div class="story-card" data-scroll data-type="slide-right" data-delay="250">
+      <div class="story-card-label">Beyond Engineering</div>
+      <h3>The Whole Organization</h3>
+      <p>There are people doing AI enablement in the engineering space. Fewer are teaching PMs how to use Claude Code, getting non-technical users set up, and expanding the value proposition across entire product organizations. We do both.</p>
+    </div>
+
+    <div class="story-card" data-scroll data-type="slide-left" data-delay="350">
+      <div class="story-card-label">Observability</div>
+      <h3>Measured, Not Hoped</h3>
+      <p>We instrument every engagement with OpenTelemetry. Adoption metrics flow into Datadog, Jellyfish, Honeycomb. Leadership doesn't hope AI is working. They see it. We want a partnership with Honeycomb for this exact reason, and we already use it internally.</p>
+    </div>
+
+    <div class="story-card" data-scroll data-type="slide-right" data-delay="450">
+      <div class="story-card-label">Self-Sustaining</div>
+      <h3>They Build Their Own Things</h3>
+      <p>The real measure of our success is when clients don't need us anymore. When engineers are writing their own specs, building their own MCP servers, extending their own pipelines. That's not a failure of engagement; that's the whole point.</p>
+    </div>
+
+    <div class="pullquote" data-scroll data-type="scale-in" data-delay="500">
+      <p>"Claude is the best tool on the market. Liatrio is the best at enabling that tool for enterprise customers."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SECTION 7: WHAT'S NEXT ======== -->
+<section class="story-section" id="section-7">
+  <div class="section-ornament" data-speed="-0.08" style="top: 5%; right: -6%;">VII</div>
+
+  <div class="story-content">
+    <div class="article-header" data-scroll data-type="slide-right">
+      <div class="article-section-label">Chapter VII</div>
+      <h2 class="article-headline">What's Next</h2>
+      <div class="article-subhead">The pipeline is real. The momentum is building. Here's where we're headed.</div>
+    </div>
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
+      <p>We're not asking Anthropic to take a chance on us. We're asking you to look at what's already in motion and decide if you want to be part of it.</p>
+    </div>
+
+    <ul class="next-list">
+      <li data-scroll data-type="slide-right" data-delay="150">
+        <span class="next-bullet">&bull;</span>
+        <div><strong>Natera Technology Day</strong> &mdash; A two-day technical symposium at Natera, where we'd love to have Anthropic represented alongside us. This is a chance to see enterprise Claude adoption in action, firsthand.</div>
+      </li>
+      <li data-scroll data-type="slide-right" data-delay="250">
+        <span class="next-bullet">&bull;</span>
+        <div><strong>Boeing Executive Series</strong> &mdash; Expanding from product teams to executive stakeholders. The CCA certification and Spec-Driven Development methodology are generating interest at the leadership level.</div>
+      </li>
+      <li data-scroll data-type="slide-right" data-delay="350">
+        <span class="next-bullet">&bull;</span>
+        <div><strong>Co-Branded Enablement</strong> &mdash; We want to do official co-branding around what we're doing at Natera, Boeing, and future enterprise clients. Claude + Liatrio, together.</div>
+      </li>
+      <li data-scroll data-type="slide-right" data-delay="450">
+        <span class="next-bullet">&bull;</span>
+        <div><strong>Expanded Enterprise Pipeline</strong> &mdash; Additional enterprise clients beyond Natera and Boeing are in the pipeline. We can bring Anthropic along for the ride.</div>
+      </li>
+    </ul>
+
+    <hr class="np-divider">
+
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="500" style="margin-top: 1rem;">
+      <p>We're already in conversations with your alliances organization and your go-to-market team. We have the relationships, the methodology, and the results. All that's missing is the official partnership to make this even bigger.</p>
+
+      <p>Let's do this together.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== FOOTER ======== -->
+<footer class="np-footer">
+  <div class="footer-headline" data-scroll data-type="fade-up">Let's Write the Next Chapter Together</div>
+  <p data-scroll data-type="fade-up" data-delay="100" style="font-style: italic; color: var(--ink-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+    Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to make it official.
+  </p>
+
+  <div class="footer-contact" data-scroll data-type="fade-up" data-delay="200">
+    <div class="contact-item">
+      <div class="contact-name">Daniel Helbling</div>
+      <div class="contact-role">Partnerships</div>
+      <div class="contact-email"><a href="mailto:daniel@liatrio.com">daniel@liatrio.com</a></div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-name">Chris Blackburn</div>
+      <div class="contact-role">CEO</div>
+      <div class="contact-email"><a href="mailto:chris@liatrio.com">chris@liatrio.com</a></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Built with Claude Code &bull; Powered by Anthropic &bull; &copy; 2026 Liatrio
+  </div>
+</footer>
+
+<!-- ======== SCROLL ENGINE ======== -->
 <script>
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+(function() {
+  const sections = document.querySelectorAll('.masthead, .story-section');
+  const dots = document.querySelectorAll('.nav-dot');
+  const progressBar = document.getElementById('progressBar');
+  const scrollElements = document.querySelectorAll('[data-scroll]');
+  const ornaments = document.querySelectorAll('.section-ornament');
+  const vh = window.innerHeight;
+
+  // Easing
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
+  // Lerp for smooth continuous motion
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  // Track current smooth values for interpolation
+  const smoothValues = new Map();
+
+  // Get element's progress through viewport: 0 = bottom edge enters, 1 = fully visible/centered
+  function getProgress(el) {
+    const rect = el.getBoundingClientRect();
+    const start = vh + 100;
+    const end = vh * 0.2;
+    return clamp((start - rect.top) / (start - end), 0, 1);
+  }
+
+  // Get continuous scroll factor: how far through viewport (-1 to 1)
+  function getScrollFactor(el) {
+    const rect = el.getBoundingClientRect();
+    return (vh / 2 - (rect.top + rect.height / 2)) / vh;
+  }
+
+  function applyScrollTransforms() {
+    const scrollY = window.scrollY;
+    const total = document.documentElement.scrollHeight - vh;
+
+    // Progress bar
+    progressBar.style.width = (total > 0 ? (scrollY / total) * 100 : 0) + '%';
+
+    // Masthead parallax: title moves up, headline moves up slower
+    const mastheadTitle = document.querySelector('.masthead-title');
+    const mastheadHeadline = document.querySelector('.masthead-headline');
+    if (mastheadTitle) {
+      const f = clamp(scrollY / vh, 0, 1);
+      mastheadTitle.style.transform = `translateY(${f * -80}px) scale(${1 - f * 0.15})`;
+      mastheadTitle.style.opacity = 1 - f * 0.8;
     }
-  });
-});
+    if (mastheadHeadline) {
+      const f = clamp(scrollY / vh, 0, 1);
+      mastheadHeadline.style.transform = `translateY(${f * -40}px)`;
+      mastheadHeadline.style.opacity = 1 - f * 0.6;
+    }
 
-// Add subtle hover animations
-document.addEventListener('DOMContentLoaded', () => {
-  // Animate stats on scroll
-  const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px 0px -50px 0px'
-  };
+    // Scroll hint fade
+    const hint = document.querySelector('.scroll-hint');
+    if (hint) {
+      hint.style.opacity = clamp(1 - scrollY / 200, 0, 1);
+    }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.animation = 'countUp 1s ease-out';
+    // Floating ornaments with continuous parallax
+    ornaments.forEach(orn => {
+      const speed = parseFloat(orn.dataset.speed) || 0.05;
+      const section = orn.closest('section') || orn.closest('.masthead');
+      if (section) {
+        const factor = getScrollFactor(section);
+        const y = factor * vh * speed;
+        const x = Math.sin(factor * Math.PI) * 20 * speed;
+        const rotate = factor * 5;
+        orn.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
       }
     });
-  }, observerOptions);
 
-  document.querySelectorAll('.stat-box .num, .speed-num').forEach(stat => {
-    observer.observe(stat);
-  });
-});
+    // Scroll-driven element animations
+    scrollElements.forEach(el => {
+      const progress = getProgress(el);
+      const type = el.dataset.type || 'fade-up';
+      const delay = parseInt(el.dataset.delay) || 0;
+      const easedProgress = easeOut(clamp((progress - delay / 1000) * 1.5, 0, 1));
 
-// CSS Animation for count up
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes countUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+      // Get or create smooth value
+      const key = el;
+      const current = smoothValues.get(key) || 0;
+      const target = easedProgress;
+      const smooth = lerp(current, target, 0.12);
+      smoothValues.set(key, smooth);
+
+      switch (type) {
+        case 'fade-up':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 60}px)`;
+          break;
+
+        case 'slide-right':
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${(1 - smooth) * -80}px)`;
+          break;
+
+        case 'slide-left':
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${(1 - smooth) * 80}px)`;
+          break;
+
+        case 'scale-in':
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${0.85 + smooth * 0.15})`;
+          break;
+
+        case 'count-up':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 20}px) scale(${0.9 + smooth * 0.1})`;
+          break;
+
+        case 'slide-up-stagger':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 40}px)`;
+          break;
+      }
+
+      // Continuous subtle motion after fully visible (parallax drift)
+      if (smooth > 0.95) {
+        const factor = getScrollFactor(el);
+        const drift = factor * 8;
+        const currentTransform = el.style.transform;
+        // Add a subtle drift on top
+        if (type === 'fade-up' || type === 'slide-up-stagger') {
+          el.style.transform = `translateY(${drift}px)`;
+        }
+      }
+    });
+
+    // Active section for nav dots
+    let activeIdx = 0;
+    sections.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      if (rect.top < vh * 0.5) activeIdx = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
   }
-`;
-document.head.appendChild(style);
 
-console.log('🚀 Professional Liatrio AI Enablement Site Loaded');
+  // RAF loop for smooth continuous animation
+  function loop() {
+    applyScrollTransforms();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Nav dot click
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.dataset.section);
+      sections[idx].scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === ' ') {
+      const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
+      if (current < sections.length - 1) {
+        e.preventDefault();
+        sections[current + 1].scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    if (e.key === 'ArrowUp') {
+      const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
+      if (current > 0) {
+        e.preventDefault();
+        sections[current - 1].scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+
+  // Recalculate on resize
+  window.addEventListener('resize', () => {
+    // vh gets captured in closure; no need to update since we read innerHeight in loop
+  });
+})();
 </script>
 
 </body>
