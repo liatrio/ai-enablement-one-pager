@@ -1,0 +1,7 @@
+# Wrangler local dev artifacts
+cloudflare-api/.wrangler/
+
+# Python
+__pycache__/
+*.pyc
+mcp-server/.venv/
