@@ -49,6 +49,8 @@ body {
   padding: 6rem 2rem;
   position: relative;
   overflow: hidden;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
 }
 
 /* Alternating tones */
@@ -80,6 +82,8 @@ body {
   width: 100%;
   position: relative;
   z-index: 1;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 /* ====== MASTHEAD ====== */
@@ -477,6 +481,25 @@ body {
   letter-spacing: 0.03em;
 }
 
+/* Back to top */
+.back-to-top {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1.5px solid var(--ink);
+  padding: 0.6rem 1.5rem;
+  letter-spacing: 0.05em;
+  transition: background 0.3s, color 0.3s;
+}
+
+.back-to-top:hover {
+  background: var(--ink);
+  color: var(--parchment);
+}
+
 /* ====== PROGRESS BAR ====== */
 .progress-bar {
   position: fixed;
@@ -542,6 +565,137 @@ body {
   will-change: transform, opacity;
 }
 
+/* ====== CALLOUT ZOOM ====== */
+/* Big text that zooms in from large/blurry to crisp as you scroll */
+.callout-zoom {
+  font-family: var(--serif);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.1;
+  padding: 2rem 0;
+  will-change: transform, opacity, filter;
+  color: var(--ink);
+}
+
+.callout-zoom.large {
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+
+.callout-zoom.medium {
+  font-size: clamp(1.4rem, 4vw, 2.5rem);
+}
+
+.callout-zoom em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* Section zoom transition: entire content zooms slightly as section enters */
+.zoom-section .story-content {
+  will-change: transform;
+}
+
+/* ====== CALLOUT VARIANTS ====== */
+
+/* Clip-path wipe reveal: text revealed left-to-right */
+.callout-wipe {
+  font-family: var(--serif);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.15;
+  padding: 2rem 0;
+  will-change: clip-path, opacity;
+  color: var(--ink);
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  clip-path: inset(0 100% 0 0);
+}
+
+.callout-wipe em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* Letter-spacing spread: text starts tight, spreads to natural */
+.callout-spread {
+  font-family: var(--serif);
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.2;
+  padding: 2rem 0;
+  will-change: letter-spacing, opacity;
+  color: var(--ink);
+  font-size: clamp(1.8rem, 5vw, 3.5rem);
+  text-transform: uppercase;
+}
+
+.callout-spread em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+/* Border-draw card: border animates in from corners */
+.border-draw {
+  position: relative;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.border-draw::before,
+.border-draw::after {
+  content: '';
+  position: absolute;
+  border: 2px solid var(--ink);
+  will-change: width, height;
+}
+
+.border-draw::before {
+  top: 0; left: 0;
+  width: var(--bw, 0%); height: var(--bh, 0%);
+  border-right: none; border-bottom: none;
+  transition: none;
+}
+
+.border-draw::after {
+  bottom: 0; right: 0;
+  width: var(--bw, 0%); height: var(--bh, 0%);
+  border-left: none; border-top: none;
+  transition: none;
+}
+
+/* Highlight underline that draws across text */
+.highlight-draw {
+  display: inline;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 3px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  will-change: background-size;
+  padding-bottom: 2px;
+}
+
+/* Z-axis zoom callout: specific items fly toward user */
+.z-callout {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* Stat numbers that pop forward in Z */
+.stat-num[data-scroll] {
+  transform-style: preserve-3d;
+}
+
+/* 3D tilt on story cards */
+.story-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Masthead 3D */
+.masthead {
+  perspective: 800px;
+  perspective-origin: 50% 60%;
+}
+
 /* ====== MOBILE ====== */
 @media (max-width: 700px) {
   .story-section {
@@ -598,8 +752,15 @@ body {
   <div class="scroll-hint">Scroll to read &darr;</div>
 </section>
 
+<!-- Callout: wipe reveal -->
+<section class="story-section" style="min-height: 60vh; background: var(--parchment);">
+  <div class="callout-wipe" data-scroll data-type="wipe-right">
+    Not just another technology partner.
+  </div>
+</section>
+
 <!-- ======== SECTION 1: THIS IS LIATRIO ======== -->
-<section class="story-section" id="section-1">
+<section class="story-section zoom-section" id="section-1">
   <div class="section-ornament" data-speed="-0.06" style="top: 5%; right: -3%;">I</div>
 
   <div class="story-content">
@@ -625,8 +786,15 @@ body {
   </div>
 </section>
 
+<!-- Callout: letter-spacing spread -->
+<section class="story-section" style="min-height: 50vh;">
+  <div class="callout-spread" data-scroll data-type="spread">
+    Here's what we're <em>already</em> doing
+  </div>
+</section>
+
 <!-- ======== SECTION 2: BOEING ======== -->
-<section class="story-section" id="section-2">
+<section class="story-section zoom-section" id="section-2">
   <div class="section-ornament" data-speed="0.07" style="top: 10%; left: -5%;">II</div>
 
   <div class="story-content">
@@ -638,7 +806,7 @@ body {
 
     <div class="stat-inset" data-scroll data-type="fade-up" data-delay="100">
       <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">5d &rarr; 15m</div>
+        <div class="stat-num z-callout" data-scroll data-type="z-pop">5d &rarr; 15m</div>
         <div class="stat-label">Provisioning Time</div>
       </div>
       <div class="stat-item">
@@ -715,8 +883,17 @@ body {
   </div>
 </section>
 
+<!-- Callout: zoom-in with border-draw -->
+<section class="story-section" style="min-height: 60vh;">
+  <div class="border-draw" data-scroll data-type="border-draw">
+    <div class="callout-zoom large" data-scroll data-type="zoom-in" style="padding: 0;">
+      200 to 500 engineers.<br>No playbook.<br><em>So we wrote one.</em>
+    </div>
+  </div>
+</section>
+
 <!-- ======== SECTION 4: THE GAP WE FILLED ======== -->
-<section class="story-section" id="section-4">
+<section class="story-section zoom-section" id="section-4">
   <div class="section-ornament" data-speed="0.09" style="top: 0%; left: -6%;">IV</div>
 
   <div class="story-content">
@@ -734,7 +911,7 @@ body {
 
     <div class="stat-inset" data-scroll data-type="fade-up" data-delay="200">
       <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">3</div>
+        <div class="stat-num z-callout" data-scroll data-type="z-pop">3</div>
         <div class="stat-label">Days to Build CCA</div>
       </div>
       <div class="stat-item">
@@ -804,8 +981,15 @@ body {
   </div>
 </section>
 
+<!-- Callout: zoom-out (different from others) -->
+<section class="story-section" style="min-height: 60vh;">
+  <div class="callout-zoom large" data-scroll data-type="zoom-out">
+    With or without you,<br>we're <em>moving</em>.
+  </div>
+</section>
+
 <!-- ======== SECTION 6: WHY PARTNER ======== -->
-<section class="story-section" id="section-6">
+<section class="story-section zoom-section" id="section-6">
   <div class="section-ornament" data-speed="0.06" style="top: -5%; left: -4%;">VI</div>
 
   <div class="story-content">
@@ -821,27 +1005,27 @@ body {
       <p>We don't believe just in Claude and the power of AI in the abstract. We believe that Claude and Liatrio together is the most compelling combination for getting this right at enterprise scale. Here is why:</p>
     </div>
 
-    <div class="story-card" data-scroll data-type="slide-left" data-delay="150">
+    <div class="story-card" data-scroll data-type="tilt-in-left" data-delay="150">
       <div class="story-card-label">Differentiation</div>
-      <h3>Not Deployment. Transformation.</h3>
+      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">Not Deployment. Transformation.</span></h3>
       <p>We don't install Claude and hand over documentation. We embed with teams, drive adoption from the ground up, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.</p>
     </div>
 
-    <div class="story-card" data-scroll data-type="slide-right" data-delay="250">
+    <div class="story-card" data-scroll data-type="tilt-in-right" data-delay="250">
       <div class="story-card-label">Beyond Engineering</div>
-      <h3>The Whole Organization</h3>
+      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">The Whole Organization</span></h3>
       <p>There are people doing AI enablement in the engineering space. Fewer are teaching PMs how to use Claude Code, getting non-technical users set up, and expanding the value proposition across entire product organizations. We do both.</p>
     </div>
 
-    <div class="story-card" data-scroll data-type="slide-left" data-delay="350">
+    <div class="story-card" data-scroll data-type="tilt-in-left" data-delay="350">
       <div class="story-card-label">Observability</div>
-      <h3>Measured, Not Hoped</h3>
+      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">Measured, Not Hoped</span></h3>
       <p>We instrument every engagement with OpenTelemetry. Adoption metrics flow into Datadog, Jellyfish, Honeycomb. Leadership doesn't hope AI is working. They see it. We want a partnership with Honeycomb for this exact reason, and we already use it internally.</p>
     </div>
 
-    <div class="story-card" data-scroll data-type="slide-right" data-delay="450">
+    <div class="story-card" data-scroll data-type="tilt-in-right" data-delay="450">
       <div class="story-card-label">Self-Sustaining</div>
-      <h3>They Build Their Own Things</h3>
+      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">They Build Their Own Things</span></h3>
       <p>The real measure of our success is when clients don't need us anymore. When engineers are writing their own specs, building their own MCP servers, extending their own pipelines. That's not a failure of engagement; that's the whole point.</p>
     </div>
 
@@ -851,8 +1035,15 @@ body {
   </div>
 </section>
 
+<!-- Callout: wipe from left (different from first wipe) -->
+<section class="story-section" style="min-height: 50vh;">
+  <div class="callout-wipe" data-scroll data-type="wipe-right" style="font-size: clamp(2rem, 6vw, 4rem);">
+    Let's make it <em>official</em>.
+  </div>
+</section>
+
 <!-- ======== SECTION 7: WHAT'S NEXT ======== -->
-<section class="story-section" id="section-7">
+<section class="story-section zoom-section" id="section-7">
   <div class="section-ornament" data-speed="-0.08" style="top: 5%; right: -6%;">VII</div>
 
   <div class="story-content">
@@ -915,6 +1106,10 @@ body {
     </div>
   </div>
 
+  <div style="margin-top: 2rem;">
+    <a href="#section-0" class="back-to-top" onclick="document.getElementById('section-0').scrollIntoView({behavior:'smooth'});return false;">&uarr; Back to Top</a>
+  </div>
+
   <div class="footer-note">
     Built with Claude Code &bull; Powered by Anthropic &bull; &copy; 2026 Liatrio
   </div>
@@ -923,11 +1118,14 @@ body {
 <!-- ======== SCROLL ENGINE ======== -->
 <script>
 (function() {
-  const sections = document.querySelectorAll('.masthead, .story-section');
+  // Only named sections for dot navigation (not interstitial callouts)
+  const allSections = document.querySelectorAll('.masthead, .story-section');
+  const namedSections = document.querySelectorAll('[id^="section-"]');
   const dots = document.querySelectorAll('.nav-dot');
   const progressBar = document.getElementById('progressBar');
   const scrollElements = document.querySelectorAll('[data-scroll]');
   const ornaments = document.querySelectorAll('.section-ornament');
+  const zoomSections = document.querySelectorAll('.zoom-section');
   const vh = window.innerHeight;
 
   // Easing
@@ -940,11 +1138,12 @@ body {
   // Track current smooth values for interpolation
   const smoothValues = new Map();
 
-  // Get element's progress through viewport: 0 = bottom edge enters, 1 = fully visible/centered
+  // Get element's progress through viewport: 0 = bottom edge enters, 1 = fully visible
+  // Triggers faster: element reaches 1.0 when its top hits ~45% down the viewport
   function getProgress(el) {
     const rect = el.getBoundingClientRect();
-    const start = vh + 100;
-    const end = vh * 0.2;
+    const start = vh * 0.95;  // start tracking when top is near bottom of viewport
+    const end = vh * 0.33;    // fully revealed when top hits ~33% down
     return clamp((start - rect.top) / (start - end), 0, 1);
   }
 
@@ -988,9 +1187,8 @@ body {
       if (section) {
         const factor = getScrollFactor(section);
         const y = factor * vh * speed;
-        const x = Math.sin(factor * Math.PI) * 20 * speed;
-        const rotate = factor * 5;
-        orn.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+        const x = Math.sin(factor * Math.PI) * 15 * speed;
+        orn.style.transform = `translate(${x}px, ${y}px)`;
       }
     });
 
@@ -1005,23 +1203,23 @@ body {
       const key = el;
       const current = smoothValues.get(key) || 0;
       const target = easedProgress;
-      const smooth = lerp(current, target, 0.12);
+      const smooth = lerp(current, target, 0.18); // faster interpolation
       smoothValues.set(key, smooth);
 
       switch (type) {
         case 'fade-up':
           el.style.opacity = smooth;
-          el.style.transform = `translateY(${(1 - smooth) * 60}px)`;
+          el.style.transform = `translateY(${(1 - smooth) * 50}px)`;
           break;
 
         case 'slide-right':
           el.style.opacity = smooth;
-          el.style.transform = `translateX(${(1 - smooth) * -80}px)`;
+          el.style.transform = `translateX(${(1 - smooth) * -60}px)`;
           break;
 
         case 'slide-left':
           el.style.opacity = smooth;
-          el.style.transform = `translateX(${(1 - smooth) * 80}px)`;
+          el.style.transform = `translateX(${(1 - smooth) * 60}px)`;
           break;
 
         case 'scale-in':
@@ -1031,30 +1229,123 @@ body {
 
         case 'count-up':
           el.style.opacity = smooth;
-          el.style.transform = `translateY(${(1 - smooth) * 20}px) scale(${0.9 + smooth * 0.1})`;
+          el.style.transform = `translateY(${(1 - smooth) * 15}px) scale(${0.9 + smooth * 0.1})`;
           break;
 
         case 'slide-up-stagger':
           el.style.opacity = smooth;
-          el.style.transform = `translateY(${(1 - smooth) * 40}px)`;
+          el.style.transform = `translateY(${(1 - smooth) * 35}px)`;
           break;
+
+        case 'zoom-in': {
+          const s = 1.6 - smooth * 0.6; // 1.6 -> 1.0
+          const blur = (1 - smooth) * 6;
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${s})`;
+          el.style.filter = `blur(${blur}px)`;
+          break;
+        }
+
+        case 'zoom-out': {
+          const s = 0.5 + smooth * 0.5; // 0.5 -> 1.0
+          const blur = (1 - smooth) * 5;
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${s})`;
+          el.style.filter = `blur(${blur}px)`;
+          break;
+        }
+
+        case 'wipe-right': {
+          // Clip-path reveal left to right
+          const pct = smooth * 100;
+          el.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+          el.style.opacity = 1; // no fade, just wipe
+          break;
+        }
+
+        case 'spread': {
+          // Letter-spacing from tight to natural
+          const spacing = (1 - smooth) * 0.6; // 0.6em -> 0em
+          el.style.letterSpacing = `${spacing}em`;
+          el.style.opacity = smooth;
+          break;
+        }
+
+        case 'border-draw': {
+          // Animate pseudo-element borders via CSS custom properties
+          const pct = smooth * 100;
+          el.style.setProperty('--border-pct', pct + '%');
+          // Use width/height on pseudo-elements via inline styles on the element
+          const before = el.querySelector(':scope')
+          el.style.cssText += `; --bw: ${pct}%; --bh: ${pct}%;`;
+          break;
+        }
+
+        case 'underline-draw': {
+          const pct = smooth * 100;
+          el.style.backgroundSize = `${pct}% 3px`;
+          break;
+        }
+
+        case 'z-pop': {
+          // Flies toward user on Z axis, settles at z=0
+          const z = (1 - smooth) * -200; // starts pushed back, comes forward
+          const s = 0.7 + smooth * 0.3;
+          el.style.opacity = smooth;
+          el.style.transform = `translateZ(${z}px) scale(${s})`;
+          break;
+        }
+
+        case 'tilt-in-left': {
+          // Rotates in from the left side like a page fold
+          const rotY = (1 - smooth) * 35; // 35deg -> 0
+          const x = (1 - smooth) * -40;
+          const z = (1 - smooth) * -80;
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg)`;
+          break;
+        }
+
+        case 'tilt-in-right': {
+          // Rotates in from the right side
+          const rotY = (1 - smooth) * -35;
+          const x = (1 - smooth) * 40;
+          const z = (1 - smooth) * -80;
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg)`;
+          break;
+        }
       }
 
-      // Continuous subtle motion after fully visible (parallax drift)
-      if (smooth > 0.95) {
+      // Continuous subtle parallax drift after fully visible
+      if (smooth > 0.95 && !['zoom-in','zoom-out','wipe-right','spread','border-draw','underline-draw','z-pop','tilt-in-left','tilt-in-right'].includes(type)) {
         const factor = getScrollFactor(el);
-        const drift = factor * 8;
-        const currentTransform = el.style.transform;
-        // Add a subtle drift on top
+        const drift = factor * 6;
         if (type === 'fade-up' || type === 'slide-up-stagger') {
           el.style.transform = `translateY(${drift}px)`;
         }
       }
     });
 
-    // Active section for nav dots
+    // Section 3D: spine fold + depth as sections scroll through
+    zoomSections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const centerOffset = (rect.top + rect.height / 2 - vh / 2) / vh; // -1 to 1
+      const content = section.querySelector('.story-content');
+      if (content) {
+        // Subtle Y-rotation: pages fold away as they leave, fold in as they arrive
+        const rotateY = centerOffset * -4; // max 4deg tilt
+        // Slight Z push based on distance from center
+        const z = -Math.abs(centerOffset) * 30;
+        // Scale down slightly when off-center
+        const scale = 1 - Math.abs(centerOffset) * 0.04;
+        content.style.transform = `rotateY(${rotateY}deg) translateZ(${z}px) scale(${clamp(scale, 0.94, 1)})`;
+      }
+    });
+
+    // Active section for nav dots (only track named sections)
     let activeIdx = 0;
-    sections.forEach((s, i) => {
+    namedSections.forEach((s, i) => {
       const rect = s.getBoundingClientRect();
       if (rect.top < vh * 0.5) activeIdx = i;
     });
@@ -1072,7 +1363,7 @@ body {
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
       const idx = parseInt(dot.dataset.section);
-      sections[idx].scrollIntoView({ behavior: 'smooth' });
+      namedSections[idx].scrollIntoView({ behavior: 'smooth' });
     });
   });
 
@@ -1080,16 +1371,16 @@ body {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === ' ') {
       const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
-      if (current < sections.length - 1) {
+      if (current < namedSections.length - 1) {
         e.preventDefault();
-        sections[current + 1].scrollIntoView({ behavior: 'smooth' });
+        namedSections[current + 1].scrollIntoView({ behavior: 'smooth' });
       }
     }
     if (e.key === 'ArrowUp') {
       const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
       if (current > 0) {
         e.preventDefault();
-        sections[current - 1].scrollIntoView({ behavior: 'smooth' });
+        namedSections[current - 1].scrollIntoView({ behavior: 'smooth' });
       }
     }
   });
