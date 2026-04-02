@@ -183,6 +183,7 @@
       0 0 70px rgba(137,223,0,0.15),
       inset 0 1px 0 rgba(255,255,255,0.1);
   }
+}
 
   /* ===== SECTION 1: HEADER ===== */
   .header {
@@ -575,6 +576,64 @@
     color: #FFFFFF;
     text-shadow: 0 2px 10px rgba(137,223,0,0.1);
   }
+}
+
+/* FLYWHEEL DIAGRAM */
+.flywheel-diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  background: var(--paper-white);
+}
+
+.flywheel-title {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flywheel-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.flywheel-step {
+  background: var(--newspaper-bg);
+  border: 2px solid var(--accent-green);
+  border-radius: 4px;
+  padding: 0.75rem;
+  min-width: 120px;
+  text-align: center;
+  position: relative;
+  font-size: 12px;
+}
+
+.flywheel-step:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-green);
+}
+
+.step-title {
+  font-weight: 700;
+  color: var(--ink-black);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
   /* Flywheel diagram */
   .flywheel {
@@ -1097,6 +1156,9 @@
           <div class="unit">active learners in<br>hands-on cohorts</div>
         </div>
       </div>
+      <p style="font-size: 12px; font-style: italic; margin-top: 1rem; color: var(--ink-light);">
+        Built for Speed: Taking engineers from zero to productive in days, not months
+      </p>
     </div>
   </div>
 
