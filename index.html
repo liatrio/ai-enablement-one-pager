@@ -590,9 +590,13 @@ body {
   color: var(--accent);
 }
 
-/* Section zoom transition: entire content zooms slightly as section enters */
+/* Section 3D depth */
+.zoom-section {
+  transform-style: preserve-3d;
+}
+
 .zoom-section .story-content {
-  will-change: transform;
+  will-change: transform, filter;
 }
 
 /* ====== CALLOUT VARIANTS ====== */
@@ -718,6 +722,16 @@ body {
 </style>
 </head>
 <body>
+
+<!-- SVG filters for ink effects -->
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+  <defs>
+    <filter id="ink-bleed" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="inkDisplace"/>
+    </filter>
+  </defs>
+</svg>
 
 <!-- Progress bar -->
 <div class="progress-bar" id="progressBar"></div>
@@ -1167,6 +1181,12 @@ body {
       const f = clamp(scrollY / vh, 0, 1);
       mastheadTitle.style.transform = `translateY(${f * -80}px) scale(${1 - f * 0.15})`;
       mastheadTitle.style.opacity = 1 - f * 0.8;
+      // Ink-bleed: text distorts slightly as you scroll away, like ink spreading on wet paper
+      const inkDisplace = document.getElementById('inkDisplace');
+      if (inkDisplace) {
+        inkDisplace.setAttribute('scale', f * 4); // 0 -> 4 displacement
+      }
+      mastheadTitle.style.filter = f > 0.01 ? 'url(#ink-bleed)' : 'none';
     }
     if (mastheadHeadline) {
       const f = clamp(scrollY / vh, 0, 1);
@@ -1327,19 +1347,23 @@ body {
       }
     });
 
-    // Section 3D: spine fold + depth as sections scroll through
+    // Section 3D: smooth depth + parallax Z-shift
+    // Approaching sections push back in Z and blur slightly; centered sections are sharp and forward
     zoomSections.forEach(section => {
       const rect = section.getBoundingClientRect();
-      const centerOffset = (rect.top + rect.height / 2 - vh / 2) / vh; // -1 to 1
+      const center = rect.top + rect.height / 2;
+      const centerOffset = (center - vh / 2) / vh; // -1 to 1
+      const distance = Math.abs(centerOffset);
       const content = section.querySelector('.story-content');
       if (content) {
-        // Subtle Y-rotation: pages fold away as they leave, fold in as they arrive
-        const rotateY = centerOffset * -4; // max 4deg tilt
-        // Slight Z push based on distance from center
-        const z = -Math.abs(centerOffset) * 30;
-        // Scale down slightly when off-center
-        const scale = 1 - Math.abs(centerOffset) * 0.04;
-        content.style.transform = `rotateY(${rotateY}deg) translateZ(${z}px) scale(${clamp(scale, 0.94, 1)})`;
+        // Z-depth: centered = 0, off-screen = pushed back
+        const z = -distance * 60;
+        // Scale: centered = 1, off-screen = slightly smaller
+        const scale = 1 - distance * 0.04;
+        // Blur: only when far off center
+        const blur = distance > 0.5 ? (distance - 0.5) * 3 : 0;
+        content.style.transform = `translateZ(${z}px) scale(${clamp(scale, 0.94, 1)})`;
+        content.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none';
       }
     });
 
