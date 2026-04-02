@@ -3,757 +3,1962 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Liatrio AI Enablement - Enterprise Claude Adoption at Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Liatrio × Anthropic — A Story of AI Transformation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* =============================================
+   RESET & VARIABLES
+   ============================================= */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --green: #24ae1d;
-  --lime: #89df00;
-  --dark: #1a1a2e;
-  --darker: #111122;
-  --white: #fff;
-  --light: #f4f7f4;
-  --text: #2d2d3a;
-  --med: #5a5a6e;
-  --border: #d4ddd4;
-  --font: 'DM Sans', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+  --green: #89DF00;
+  --green-dark: #24AE1D;
+  --green-glow: rgba(137,223,0,0.15);
+  --bg-deep: #080b10;
+  --bg-section: #0c1018;
+  --bg-alt: #0f1420;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.07);
+  --border-green: rgba(137,223,0,0.2);
+  --text: #f0efe8;
+  --text-muted: #8c8c85;
+  --text-faint: #505048;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
 body {
-  font-family: var(--font);
-  color: var(--dark);
-  background: #fafbfc;
-  line-height: 1.6;
+  font-family: var(--sans);
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* NAVIGATION */
+/* =============================================
+   PROGRESS BAR
+   ============================================= */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green));
+  z-index: 1000;
+  box-shadow: 0 0 12px rgba(137,223,0,0.6);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* =============================================
+   NAVIGATION
+   ============================================= */
 nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--darker);
-  padding: 0 2rem;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 20px 52px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  height: 48px;
-  border-top: 3px solid var(--green);
+  align-items: center;
+  transition: all 0.4s ease;
 }
 
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+nav.scrolled {
+  background: rgba(8,11,16,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 52px;
 }
 
 .nav-logo {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, var(--lime), var(--green));
-  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.nav-logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
   font-size: 14px;
-  color: var(--darker);
-}
-
-.nav-title {
-  color: var(--lime);
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.nav-links a {
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--lime);
-}
-
-.nav-cta {
-  background: #000;
-  color: var(--lime);
-  padding: 0.35rem 0.85rem;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: 1px solid var(--green);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.nav-cta:hover {
-  background: var(--green);
-  color: #000;
-}
-
-/* HERO SECTION */
-.hero {
-  background: linear-gradient(135deg, #0d0d1a 0%, #1a2a1a 50%, #0d1a0d 100%);
-  color: #fff;
-  padding: 5rem 2rem 4rem;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
-}
-
-.hero .subtitle {
-  color: var(--lime);
-  font-size: 1.15rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.hero .meta {
-  color: rgba(255,255,255,0.5);
-  font-size: 0.95rem;
-  margin-top: 0.5rem;
-}
-
-/* LAYOUT */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-section {
-  padding: 3rem 0;
-}
-
-section + section {
-  border-top: 1px solid var(--border);
-}
-
-/* HEADINGS */
-h2 {
-  font-size: 1.6rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.01em;
-}
-
-h3 {
-  font-size: 1.1rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin: 1.5rem 0 0.75rem;
-}
-
-.note {
-  font-size: 0.85rem;
-  color: var(--med);
-  margin-bottom: 1.25rem;
-}
-
-/* STAT BOXES */
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.stat-box {
-  background: var(--light);
-  border-radius: 8px;
-  padding: 1.25rem 0.75rem;
-  text-align: center;
-  border-left: 3px solid var(--green);
-  transition: all 0.2s;
-}
-
-.stat-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(36, 174, 29, 0.15);
-}
-
-.stat-box .num {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--dark);
-}
-
-.stat-box .label {
-  font-size: 0.75rem;
-  color: var(--med);
-  margin-top: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* CARDS */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border-left: 4px solid var(--green);
-  transition: all 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
+  color: #0a0a0a;
   flex-shrink: 0;
 }
 
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 0.25rem;
-}
-
-.card-subtitle {
-  font-size: 0.8rem;
-  color: var(--green);
+.nav-logo-text {
+  font-size: 17px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.card-content {
-  font-size: 0.9rem;
   color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  letter-spacing: -0.3px;
 }
 
-.card-highlight {
-  background: rgba(137, 223, 0, 0.1);
-  border-left: 3px solid var(--lime);
-  border-radius: 0 4px 4px 0;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  color: var(--dark);
-  font-weight: 500;
-  margin-bottom: 1rem;
+.nav-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  border: 1px solid var(--border-green);
+  border-radius: 20px;
+  padding: 5px 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(137,223,0,0.06);
 }
 
-/* CALLOUT */
-.callout {
-  background: var(--light);
-  border-left: 4px solid var(--green);
-  border-radius: 0 6px 6px 0;
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
-}
-
-.callout strong {
-  color: var(--dark);
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.callout p {
-  font-size: 0.88rem;
-  color: var(--med);
-  margin: 0;
-}
-
-/* FLYWHEEL */
-.flywheel-section {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 2rem 0;
-  text-align: center;
-}
-
-.flywheel {
+/* =============================================
+   CHAPTER NAV (sidebar dots)
+   ============================================= */
+.chapter-nav {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin: 1.5rem 0;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 200;
 }
 
-.flywheel-step {
-  background: var(--light);
-  border: 2px solid var(--green);
-  border-radius: 8px;
-  padding: 1rem;
-  min-width: 140px;
-  text-align: center;
+.chapter-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(137,223,0,0.35);
+  cursor: pointer;
+  transition: all 0.35s var(--ease-out);
   position: relative;
 }
 
-.flywheel-step:not(:last-child)::after {
-  content: "→";
+.chapter-dot::after {
+  content: attr(data-label);
   position: absolute;
-  right: -1.5rem;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.chapter-dot:hover::after { opacity: 1; }
+
+.chapter-dot.active {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 8px rgba(137,223,0,0.5);
+  transform: scale(1.6);
+}
+
+/* =============================================
+   SCROLL REVEAL
+   ============================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+
+/* =============================================
+   SECTIONS
+   ============================================= */
+section {
+  min-height: 100vh;
+  padding: 120px 52px 80px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-inner {
+  max-width: 1060px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Chapter label */
+.chapter-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   color: var(--green);
-  font-size: 1.5rem;
-  font-weight: bold;
 }
 
-.flywheel-step .step-title {
-  font-weight: 700;
-  color: var(--dark);
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+.chapter-label-line {
+  display: block;
+  width: 36px;
+  height: 1px;
+  background: var(--green);
+  flex-shrink: 0;
+  opacity: 0.6;
 }
 
-.flywheel-step .step-desc {
-  font-size: 0.8rem;
-  color: var(--med);
+/* =============================================
+   SECTION 1: HERO
+   ============================================= */
+#hero {
+  background: var(--bg-deep);
+  min-height: 100vh;
+  padding: 0 52px;
 }
 
-/* SPEED STATS */
-.speed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
+#hero .section-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 80px 0;
+  max-width: 760px;
 }
 
-.speed-stat {
-  text-align: center;
-  padding: 1.5rem 1rem;
-  background: var(--light);
-  border-radius: 8px;
-  border-top: 3px solid var(--lime);
-}
-
-.speed-stat .speed-num {
-  font-size: 2.5rem;
-  font-weight: 700;
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
   color: var(--green);
-  line-height: 1;
-  margin-bottom: 0.5rem;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.speed-stat .speed-label {
-  font-size: 0.9rem;
-  color: var(--med);
+.hero-eyebrow-dot {
+  width: 5px; height: 5px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+  50% { opacity: 0.6; box-shadow: 0 0 12px var(--green); }
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(42px, 5vw, 64px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  margin-bottom: 28px;
+  color: var(--text);
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.hero-body {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 44px;
+  font-weight: 400;
+}
+
+.hero-body strong {
+  color: var(--text);
   font-weight: 500;
 }
 
-/* FOOTER CTA */
-.footer-cta {
-  background: var(--darker);
-  color: rgba(255,255,255,0.8);
-  padding: 3rem 0;
-  text-align: center;
-  border-top: 2px solid var(--green);
+.hero-cta-group {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.footer-cta h3 {
-  color: #fff;
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
+.btn-primary {
+  background: var(--green);
+  color: #080b10;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 26px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.footer-cta p {
-  font-size: 1rem;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+.btn-primary:hover {
+  background: #9cee10;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(137,223,0,0.3);
 }
 
-.contact-grid {
+.btn-secondary {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 0;
+  transition: color 0.2s ease;
+}
+
+.btn-secondary:hover { color: var(--text); }
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: fade-bounce 2s ease-in-out infinite;
+}
+
+@keyframes fade-bounce {
+  0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 0.8; transform: translateX(-50%) translateY(-4px); }
+}
+
+.scroll-arrow {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--text-faint));
+}
+
+/* Hero background ornament */
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(137,223,0,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+#hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: 10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(36,174,29,0.03) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* =============================================
+   SECTION DIVIDER
+   ============================================= */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-green), transparent);
+  margin: 0;
+}
+
+/* =============================================
+   SECTION 2: THE CONTEXT
+   ============================================= */
+#context {
+  background: var(--bg-section);
+}
+
+.context-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.context-heading {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.context-heading em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.context-body {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+.context-body p + p {
+  margin-top: 16px;
+}
+
+.context-body strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.context-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.context-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.context-stat-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-green);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+
+.context-stat-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.stat-big {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 400;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+
+.stat-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.stat-desc strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* =============================================
+   SECTION 3: BOEING
+   ============================================= */
+#boeing {
+  background: var(--bg-alt);
+}
+
+.story-section-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.story-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.story-client-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.client-industry-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+.story-client-name {
+  font-family: var(--serif);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.story-client-tagline {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.story-client-tagline strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.story-highlight-quote {
+  background: linear-gradient(135deg, rgba(137,223,0,0.06) 0%, transparent 70%);
+  border-left: 3px solid var(--green);
+  border-radius: 0 12px 12px 0;
+  padding: 24px 28px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text);
+  margin-top: 8px;
+}
+
+/* Impact stats row */
+.impact-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.impact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  transition: all 0.35s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.impact-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.impact-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-green);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+}
+
+.impact-card:hover::before { opacity: 1; }
+
+.impact-value {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.impact-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.impact-detail {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Story narrative */
+.story-narrative {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.narrative-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 32px;
+}
+
+.narrative-block h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.narrative-block h4 .icon {
+  width: 28px; height: 28px;
+  background: rgba(137,223,0,0.1);
+  border: 1px solid var(--border-green);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.narrative-block p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.narrative-block p strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Transformation timeline */
+.transformation-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(137,223,0,0.03) 100%);
+  border: 1px solid var(--border-green);
+  border-radius: 14px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.transform-before, .transform-after {
+  text-align: center;
+  flex: 1;
+}
+
+.transform-value {
+  font-family: var(--serif);
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.transform-before .transform-value { color: var(--text-muted); }
+.transform-after .transform-value { color: var(--green); }
+
+.transform-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.transform-arrow {
+  font-size: 28px;
+  color: var(--border-green);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.transform-arrow-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+/* =============================================
+   SECTION 4: NATERA
+   ============================================= */
+#natera {
+  background: var(--bg-section);
+}
+
+.natera-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.adoption-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 28px;
+  position: relative;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px; top: 32px;
+  bottom: 0; width: 1px;
+  background: var(--border);
+}
+
+.timeline-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-green);
+  background: rgba(137,223,0,0.08);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-content {}
+
+.timeline-heading {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.timeline-body {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.fluency-framework {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-top: 28px;
+}
+
+.fluency-framework h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.fluency-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fluency-level {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(137,223,0,0.08);
+  border: 1px solid var(--border-green);
+  border-radius: 6px;
+  padding: 3px 8px;
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.level-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.level-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green));
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease-out);
+}
+
+.level-bar.animated { transform: scaleX(1); }
+
+.level-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 120px;
+}
+
+.natera-right {}
+
+.natera-big-claim {
+  font-family: var(--serif);
+  font-size: clamp(30px, 3.5vw, 44px);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 24px;
+  letter-spacing: -0.3px;
+}
+
+.natera-big-claim em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.natera-quote-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.natera-quote-block::before {
+  content: '"';
+  font-family: var(--serif);
+  font-size: 64px;
+  color: var(--green);
+  opacity: 0.2;
+  position: absolute;
+  top: 8px; left: 20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.quote-text {
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text);
+  padding-top: 24px;
+  padding-left: 8px;
+}
+
+.quote-attribution {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  padding-left: 8px;
+}
+
+.natera-scale-card {
+  background: linear-gradient(135deg, rgba(137,223,0,0.05) 0%, transparent 70%);
+  border: 1px solid var(--border-green);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.scale-num {
+  font-family: var(--serif);
+  font-size: 56px;
+  font-weight: 400;
+  color: var(--green);
+  line-height: 1;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+.scale-context {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.scale-context strong {
+  color: var(--text);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+/* =============================================
+   SECTION 5: THE METHOD
+   ============================================= */
+#method {
+  background: var(--bg-alt);
+}
+
+.method-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.method-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.method-heading {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.method-heading em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.method-body {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+.method-body p + p { margin-top: 14px; }
+.method-body strong { color: var(--text); font-weight: 500; }
+
+.method-speed-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+}
+
+.speed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.speed-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-green);
+  transform: translateX(6px);
+}
+
+.speed-card-num {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 400;
+  color: var(--green);
+  line-height: 1;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.speed-card-desc {}
+
+.speed-card-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.speed-card-detail {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Flywheel visual */
+.flywheel-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px;
+  text-align: center;
+}
+
+.flywheel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+}
+
+.flywheel-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.fw-step {
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 20px;
+  width: 180px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.fw-step:hover {
+  border-color: var(--border-green);
+  background: rgba(137,223,0,0.04);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.fw-step-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.fw-step-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.fw-step-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.fw-arrow {
+  color: var(--border-green);
+  font-size: 24px;
+  flex-shrink: 0;
+  align-self: center;
+  padding: 0 8px;
+}
+
+/* =============================================
+   SECTION 6: CTA
+   ============================================= */
+#cta {
+  background: var(--bg-deep);
+  position: relative;
+}
+
+#cta::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(137,223,0,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.cta-layout {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-heading {
+  font-family: var(--serif);
+  font-size: clamp(38px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.cta-heading em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.cta-body {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-muted);
+  margin-bottom: 52px;
+}
+
+.cta-body strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.cta-contacts {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 48px;
+  flex-wrap: wrap;
 }
 
 .contact-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 1.5rem;
-  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 32px;
+  text-align: left;
+  transition: all 0.3s ease;
+  min-width: 220px;
+}
+
+.contact-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-green);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
 }
 
 .contact-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.25rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
 }
 
 .contact-role {
-  font-size: 0.9rem;
-  color: var(--lime);
-  margin-bottom: 0.5rem;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
 }
 
 .contact-email {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  color: var(--green);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
 }
 
-.contact-email a {
-  color: var(--lime);
+.contact-email:hover { color: #a8ef20; }
+
+.cta-divider {
+  width: 60px; height: 1px;
+  background: var(--border);
+  margin: 40px auto;
+}
+
+.cta-footnote {
+  font-size: 13px;
+  color: var(--text-faint);
+  line-height: 1.6;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+footer {
+  padding: 32px 52px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-deep);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
 }
 
-.contact-email a:hover {
-  text-decoration: underline;
+.footer-brand-mark {
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 11px;
+  color: #0a0a0a;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  nav {
-    padding: 0 1rem;
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 48px;
-  }
+.footer-brand-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
 
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    padding: 0.5rem 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    margin-top: 0.5rem;
-  }
+.footer-note {
+  font-size: 12px;
+  color: var(--text-faint);
+}
 
-  .container {
-    padding: 0 1rem;
-  }
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 900px) {
+  section { padding: 100px 28px 60px; }
+  nav { padding: 18px 28px; }
+  nav.scrolled { padding: 12px 28px; }
+  .chapter-nav { display: none; }
 
-  section {
-    padding: 2rem 0;
-  }
+  .context-layout { grid-template-columns: 1fr; gap: 40px; }
+  .context-stats { grid-template-columns: 1fr 1fr; }
 
-  .hero {
-    padding: 3rem 1rem 2rem;
-  }
+  .story-header { grid-template-columns: 1fr; gap: 32px; }
+  .impact-row { grid-template-columns: 1fr 1fr; }
+  .story-narrative { grid-template-columns: 1fr; }
 
-  .stat-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .natera-layout { grid-template-columns: 1fr; gap: 40px; }
 
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
+  .method-intro { grid-template-columns: 1fr; gap: 40px; }
+  .flywheel-diagram { flex-direction: column; }
+  .fw-arrow { transform: rotate(90deg); }
 
-  .flywheel {
-    flex-direction: column;
-    gap: 1rem;
-  }
+  .cta-contacts { flex-direction: column; align-items: center; }
 
-  .flywheel-step:not(:last-child)::after {
-    content: "↓";
-    right: 50%;
-    transform: translateX(50%);
-    top: 100%;
-    bottom: -1.5rem;
-  }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+}
 
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 600px) {
+  .impact-row { grid-template-columns: 1fr; }
+  .context-stats { grid-template-columns: 1fr; }
+  .transformation-card { flex-direction: column; gap: 20px; }
+  .transform-arrow { transform: rotate(90deg); }
+}
+
+/* =============================================
+   SELECTION COLOR
+   ============================================= */
+::selection {
+  background: rgba(137,223,0,0.25);
+  color: var(--text);
 }
 </style>
 </head>
 <body>
 
-<!-- NAVIGATION -->
-<nav>
-  <div class="nav-brand">
-    <div class="nav-logo">L</div>
-    <div class="nav-title">liatrio</div>
-  </div>
-  <div class="nav-links">
-    <a href="#overview">Overview</a>
-    <a href="#clients">Clients</a>
-    <a href="#enablement">Enablement</a>
-    <a href="#contact" class="nav-cta">Partner with Us</a>
-  </div>
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo" style="text-decoration:none;">
+    <div class="nav-logo-mark">L</div>
+    <div class="nav-logo-text">liatrio</div>
+  </a>
+  <div class="nav-badge">AI Enablement</div>
 </nav>
 
-<!-- HERO SECTION -->
-<div class="hero">
-  <h1>Enterprise AI Adoption at Scale</h1>
-  <div class="subtitle">Powered by Claude</div>
-  <div class="meta">Enabling 200-500+ engineers across FDA-regulated clinical software to aerospace engineering</div>
-</div>
+<!-- Chapter navigation dots -->
+<nav class="chapter-nav" aria-label="Chapter navigation">
+  <div class="chapter-dot" data-target="hero" data-label="Opening"></div>
+  <div class="chapter-dot" data-target="context" data-label="The Scale"></div>
+  <div class="chapter-dot" data-target="boeing" data-label="Boeing"></div>
+  <div class="chapter-dot" data-target="natera" data-label="Natera"></div>
+  <div class="chapter-dot" data-target="method" data-label="The Method"></div>
+  <div class="chapter-dot" data-target="cta" data-label="Let's Talk"></div>
+</nav>
 
-<!-- MAIN CONTENT -->
-<div class="container">
 
-  <!-- OVERVIEW SECTION -->
-  <section id="overview">
-    <h2>Scaling Claude Across Enterprise Engineering Organizations</h2>
-    <p class="note">Liatrio is deploying Claude-embedded workflows, building AI fluency programs, and scaling adoption with our proprietary certification program built in just 3 days.</p>
-
-    <div class="stat-row">
-      <div class="stat-box">
-        <div class="num">200-500+</div>
-        <div class="label">Engineers Enabled</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">3 Days</div>
-        <div class="label">To Build CCA Program</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">2</div>
-        <div class="label">Major Enterprises</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">80+</div>
-        <div class="label">Teams in Pipeline</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CLIENT STORIES SECTION -->
-  <section id="clients">
-    <h2>Client Success Stories</h2>
-    <p class="note">Real transformations happening right now across aerospace and healthcare industries.</p>
-
-    <div class="card-grid">
-      <!-- Boeing Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">✈️</div>
-          <div>
-            <div class="card-title">Boeing Digital Services</div>
-            <div class="card-subtitle">Enterprise Aerospace & Defense</div>
-          </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services, with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams.</p>
-
-          <p>The flagship result: a legacy Azure provisioning workflow that took 5 business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in 15 minutes with zero handoffs.</p>
-        </div>
-
-        <div class="card-highlight">
-          Claude Code approval in progress as the team's preferred harness for H2 2026
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">5d→15m</div>
-            <div class="label">Provisioning Time</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">3</div>
-            <div class="label">Product Teams</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">8x</div>
-            <div class="label">Faster Delivery</div>
-          </div>
-        </div>
+<!-- ===================================================
+     SECTION 1: HERO
+     =================================================== -->
+<section id="hero">
+  <div class="section-inner">
+    <!-- Left -->
+    <div class="hero-left">
+      <div class="hero-eyebrow reveal">
+        <span class="hero-eyebrow-dot"></span>
+        A Story of Enterprise AI Transformation
       </div>
 
-      <!-- Natera Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">🧬</div>
-          <div>
-            <div class="card-title">Natera</div>
-            <div class="card-subtitle">Healthcare & Life Sciences</div>
-          </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Engineers are running Spec-Driven Development workflows and automated MR review pipelines across core regulated repos.</p>
+      <h1 class="hero-title reveal reveal-delay-1">
+        We're shipping&nbsp;AI<br>
+        at enterprise scale.<br>
+        <em>Powered by Claude.</em>
+      </h1>
 
-          <p>Adoption is organic and accelerating. Engineers are self-directing Claude usage beyond what Liatrio prescribed: one ran a 14-step clinical workflow dry-test unprompted, another extended our MR review pipeline to her own HCLS project within days.</p>
-        </div>
+      <p class="hero-body reveal reveal-delay-2">
+        Liatrio is enabling <strong>large enterprises of 200–500+ engineers</strong> to adopt Claude
+        across their entire engineering organization. From aerospace to FDA-regulated clinical software,
+        we're not waiting for a playbook — we're writing it.
+      </p>
 
-        <div class="card-highlight">
-          Scaling from QCI to 80+ engineering teams across genomics and diagnostics
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">80+</div>
-            <div class="label">Teams in Scope</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">L1-L5</div>
-            <div class="label">AI Fluency</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">4</div>
-            <div class="label">Regulated Repos</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ENABLEMENT SECTION -->
-  <section id="enablement">
-    <h2>Our Claude Certification Academy (CCA)</h2>
-    <p class="note">Built for speed: taking engineers from zero to productive in days, not months.</p>
-
-    <div class="callout">
-      <strong>The Differentiator</strong>
-      <p>We're seeing massive demand for Anthropic Claude services across large enterprises. Rather than wait, we built our own answer. Other partners deploy LLMs on Bedrock - we teach organizations how to actually transform.</p>
-    </div>
-
-    <div class="flywheel-section">
-      <h3>Liatrio Enablement Flywheel</h3>
-      <div class="flywheel">
-        <div class="flywheel-step">
-          <div class="step-title">CCA Program</div>
-          <div class="step-desc">Claude Certification Academy</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Forge Training</div>
-          <div class="step-desc">Internal Cohorts</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Certified Engineers</div>
-          <div class="step-desc">Production Ready</div>
-        </div>
-        <div class="flywheel-step">
-          <div class="step-title">Enterprise Delivery</div>
-          <div class="step-desc">Scaled Adoption</div>
-        </div>
+      <div class="hero-cta-group reveal reveal-delay-3">
+        <a href="#boeing" class="btn-primary">Read the stories ↓</a>
+        <a href="#cta" class="btn-secondary">Get in touch →</a>
       </div>
     </div>
 
-    <h3>Speed to Value</h3>
-    <p>Liatrio developed a proprietary Claude Certification Academy (CCA) that takes engineers from zero to productive in days, not months. Built on top of Anthropic's open source materials, tailored to enterprise delivery needs, and deployed internally through our Forge training program.</p>
+  </div>
 
-    <div class="speed-grid">
-      <div class="speed-stat">
-        <div class="speed-num">3</div>
-        <div class="speed-label">Days to Build Program</div>
+  <div class="scroll-indicator">
+    <div class="scroll-arrow"></div>
+    Scroll to read
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===================================================
+     SECTION 2: CONTEXT
+     =================================================== -->
+<section id="context">
+  <div class="section-inner">
+    <div class="context-layout">
+      <!-- Left -->
+      <div>
+        <div class="chapter-label reveal">
+          <span class="chapter-label-line"></span>
+          Chapter One
+        </div>
+        <h2 class="context-heading reveal reveal-delay-1">
+          The scale is real.<br>
+          The results are <em>already in.</em>
+        </h2>
+        <div class="context-body reveal reveal-delay-2">
+          <p>
+            Most companies are still writing blog posts about AI strategy. Liatrio is
+            <strong>already running Claude across regulated enterprise engineering teams</strong> —
+            in aerospace, in clinical genomics, in industries where "move fast" normally means
+            "move carefully."
+          </p>
+          <p>
+            We've compressed months of adoption into days. We've built certification programs
+            from scratch in a long weekend. Engineers who said they "don't do AI" are telling
+            us they didn't write a single line of code on their last feature.
+          </p>
+          <p>
+            This is what enterprise AI enablement looks like when it actually works.
+          </p>
+        </div>
       </div>
-      <div class="speed-stat">
-        <div class="speed-num">50+</div>
-        <div class="speed-label">Engineers Upskilled in Month 1</div>
-      </div>
-    </div>
-  </section>
 
-</div>
-
-<!-- FOOTER CTA -->
-<div class="footer-cta" id="contact">
-  <div class="container">
-    <h3>We're doing this. Come along for the ride.</h3>
-    <p>Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to partner with Anthropic on this journey, but either way, we're moving fast.</p>
-
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-name">Daniel Helbling</div>
-        <div class="contact-role">Partnerships</div>
-        <div class="contact-email"><a href="mailto:daniel@liatrio.com">daniel@liatrio.com</a></div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-name">Chris Blackburn</div>
-        <div class="contact-role">CEO</div>
-        <div class="contact-email"><a href="mailto:chris@liatrio.com">chris@liatrio.com</a></div>
+      <!-- Right: stats grid -->
+      <div class="context-stats">
+        <div class="context-stat-card reveal reveal-delay-1">
+          <div class="stat-big" data-count="200">200<span>+</span></div>
+          <div class="stat-desc"><strong>Engineers per engagement</strong><br>on Claude-powered workflows</div>
+        </div>
+        <div class="context-stat-card reveal reveal-delay-2">
+          <div class="stat-big" data-count="3">3</div>
+          <div class="stat-desc"><strong>Days</strong><br>to build our Claude Certification Academy from scratch</div>
+        </div>
+        <div class="context-stat-card reveal reveal-delay-3">
+          <div class="stat-big" data-count="8">8×</div>
+          <div class="stat-desc"><strong>Faster delivery</strong><br>measured across Boeing's first Claude-native sprint</div>
+        </div>
+        <div class="context-stat-card reveal reveal-delay-4">
+          <div class="stat-big" data-count="80">80<span>+</span></div>
+          <div class="stat-desc"><strong>Engineering teams</strong><br>in scope for Natera expansion</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- SMOOTH SCROLL SCRIPT -->
+<div class="section-divider"></div>
+
+<!-- ===================================================
+     SECTION 3: BOEING
+     =================================================== -->
+<section id="boeing">
+  <div class="section-inner">
+    <div class="story-section-layout">
+
+      <!-- Header row -->
+      <div class="story-header">
+        <div>
+          <div class="chapter-label reveal">
+            <span class="chapter-label-line"></span>
+            Chapter Two — Aerospace & Defense
+          </div>
+          <div class="story-client-label reveal reveal-delay-1">
+            <span class="client-industry-tag">Enterprise Transformation</span>
+          </div>
+          <div class="story-client-name reveal reveal-delay-1">Boeing</div>
+          <p class="story-client-tagline reveal reveal-delay-2">
+            Liatrio is driving an <strong>AI-native engineering transformation</strong> at Boeing Digital Services,
+            with Claude as the primary model powering the effort. Three product teams. One platform team.
+            An entire delivery model rebuilt from the ground up.
+          </p>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <blockquote class="story-highlight-quote">
+            "A workflow that took 5 business days and multiple team handoffs was rebuilt in under a week.
+            The same process now runs in 15 minutes with zero handoffs."
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- Transformation callout -->
+      <div class="reveal">
+        <div class="transformation-card">
+          <div class="transform-before">
+            <div class="transform-value">5 days</div>
+            <div class="transform-desc">Azure account provisioning<br>via manual team handoffs</div>
+          </div>
+          <div class="transform-arrow">
+            <span>→</span>
+            <span class="transform-arrow-label">with Claude</span>
+          </div>
+          <div class="transform-after">
+            <div class="transform-value">15 min</div>
+            <div class="transform-desc">Fully automated<br>zero human handoffs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impact stats row -->
+      <div class="impact-row">
+        <div class="impact-card reveal reveal-delay-1">
+          <div class="impact-value">8×</div>
+          <div class="impact-label">Faster delivery</div>
+          <div class="impact-detail">Estimated 2+ months without AI tooling → under one week with Claude and the Liatrio SDD framework</div>
+        </div>
+        <div class="impact-card reveal reveal-delay-2">
+          <div class="impact-value">3</div>
+          <div class="impact-label">Product teams on Claude</div>
+          <div class="impact-detail">Two product teams + platform team through a multi-day Flashbuild, all Claude-driven</div>
+        </div>
+        <div class="impact-card reveal reveal-delay-3">
+          <div class="impact-value">H2 '26</div>
+          <div class="impact-label">Claude Code adoption</div>
+          <div class="impact-detail">Approval in progress for Claude Code as the team's preferred harness for H2 2026</div>
+        </div>
+      </div>
+
+      <!-- Narrative blocks -->
+      <div class="story-narrative">
+        <div class="narrative-block reveal reveal-delay-1">
+          <h4>
+            <span class="icon">⚡</span>
+            The Flashbuild
+          </h4>
+          <p>
+            A multi-day intensive across two product teams and a platform team,
+            entirely driven by Claude models and the Liatrio Spec-Driven Development framework.
+            <strong>Production features delivered in two days.</strong>
+          </p>
+        </div>
+        <div class="narrative-block reveal reveal-delay-2">
+          <h4>
+            <span class="icon">🔭</span>
+            What's Next at Boeing
+          </h4>
+          <p>
+            Three big plays in conversation: an <strong>AI developer onboarding agent</strong>
+            that could eliminate ~40 ServiceNow tickets per project, an
+            <strong>FFU/TMR compliance evidence generator</strong> cutting 47-day ATO prep to hours,
+            and an <strong>SRE reasoning agent</strong> for platform stabilization.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===================================================
+     SECTION 4: NATERA
+     =================================================== -->
+<section id="natera">
+  <div class="section-inner">
+    <div class="natera-layout">
+
+      <!-- Left: timeline -->
+      <div>
+        <div class="chapter-label reveal">
+          <span class="chapter-label-line"></span>
+          Chapter Three — Healthcare & Life Sciences
+        </div>
+
+        <div class="adoption-timeline reveal reveal-delay-1">
+          <div class="timeline-item">
+            <div class="timeline-dot">🧬</div>
+            <div class="timeline-content">
+              <div class="timeline-heading">Starting point: QCI engineering team</div>
+              <div class="timeline-body">Liatrio embedded Claude Code directly into Natera's QCI team with full OpenTelemetry instrumentation — giving leadership real-time visibility into AI adoption rates.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">📋</div>
+            <div class="timeline-content">
+              <div class="timeline-heading">Spec-Driven Development goes live</div>
+              <div class="timeline-body">Engineers running SDD workflows and automated MR review pipelines across <strong>4 core regulated repos</strong>. FDA-regulated clinical software, handled with care and speed.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">🚀</div>
+            <div class="timeline-content">
+              <div class="timeline-heading">Organic adoption accelerates</div>
+              <div class="timeline-body">Engineers extended Claude usage far beyond what Liatrio prescribed. One ran a 14-step clinical workflow dry-test <em>unprompted</em>. Another extended the MR review pipeline to her own HCLS project within days.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">📈</div>
+            <div class="timeline-content">
+              <div class="timeline-heading">Scaling to 80+ teams</div>
+              <div class="timeline-body">The expansion roadmap goes from QCI to engineering teams across all of Natera's genomics and diagnostics divisions.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fluency-framework reveal reveal-delay-2">
+          <h4>AI Fluency Framework</h4>
+          <div class="fluency-levels">
+            <div class="fluency-level">
+              <span class="level-badge">L1</span>
+              <div class="level-bar-wrap"><div class="level-bar" data-width="1"></div></div>
+              <span class="level-desc">Aware</span>
+            </div>
+            <div class="fluency-level">
+              <span class="level-badge">L2</span>
+              <div class="level-bar-wrap"><div class="level-bar" data-width="0.75"></div></div>
+              <span class="level-desc">Enabled</span>
+            </div>
+            <div class="fluency-level">
+              <span class="level-badge">L3</span>
+              <div class="level-bar-wrap"><div class="level-bar" data-width="0.55"></div></div>
+              <span class="level-desc">Proficient</span>
+            </div>
+            <div class="fluency-level">
+              <span class="level-badge">L4</span>
+              <div class="level-bar-wrap"><div class="level-bar" data-width="0.3"></div></div>
+              <span class="level-desc">Advanced</span>
+            </div>
+            <div class="fluency-level">
+              <span class="level-badge">L5</span>
+              <div class="level-bar-wrap"><div class="level-bar" data-width="0.12"></div></div>
+              <span class="level-desc">Expert</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="natera-right">
+        <h2 class="natera-big-claim reveal">
+          Natera engineers said they <em>"didn't write a single line of code"</em> on certain tasks.
+        </h2>
+
+        <div class="natera-quote-block reveal reveal-delay-1">
+          <p class="quote-text">
+            One engineer ran a 14-step clinical workflow dry-test unprompted.
+            Another extended our MR review pipeline to her own HCLS project within days of seeing it.
+            Adoption is organic and accelerating.
+          </p>
+          <p class="quote-attribution">— Liatrio engagement lead, Natera QCI deployment</p>
+        </div>
+
+        <div class="natera-scale-card reveal reveal-delay-2">
+          <div class="scale-num">80+</div>
+          <div class="scale-context">
+            <strong>Engineering teams in scope</strong>
+            Scaling from one team to all of Natera's genomics and diagnostics engineering org.
+            Five big plays: FDA/MasterControl compliance, enterprise release intelligence,
+            a genomics co-pilot, company-wide AI fluency, and agentic SDLC orchestration.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===================================================
+     SECTION 5: THE METHOD
+     =================================================== -->
+<section id="method">
+  <div class="section-inner">
+    <div class="method-layout">
+
+      <div class="method-intro">
+        <div>
+          <div class="chapter-label reveal">
+            <span class="chapter-label-line"></span>
+            Chapter Four — The Enablement Method
+          </div>
+          <h2 class="method-heading reveal reveal-delay-1">
+            We built our own<br>
+            <em>Claude Certification<br>Academy</em> in 3 days.
+          </h2>
+          <div class="method-body reveal reveal-delay-2">
+            <p>
+              We saw massive demand for Anthropic Claude services across large enterprises
+              and rather than wait for someone else to build a training program, we built ours.
+            </p>
+            <p>
+              The <strong>Claude Certification Academy (CCA)</strong> takes engineers from zero to
+              productive in days, not months. Built on top of Anthropic's open source materials,
+              tailored to enterprise delivery needs, and deployed internally through
+              our Forge training program.
+            </p>
+            <p>
+              Liatrio's differentiation isn't just deploying LLMs — it's teaching organizations
+              <strong>how to actually transform.</strong> Other partners will set up Bedrock.
+              We build the flywheel.
+            </p>
+          </div>
+        </div>
+
+        <div class="method-speed-stats">
+          <div class="speed-card reveal reveal-delay-1">
+            <div class="speed-card-num">3</div>
+            <div class="speed-card-desc">
+              <div class="speed-card-label">Days to build the program</div>
+              <div class="speed-card-detail">From blank doc to working certification curriculum, built on Anthropic's open source materials</div>
+            </div>
+          </div>
+          <div class="speed-card reveal reveal-delay-2">
+            <div class="speed-card-num">50+</div>
+            <div class="speed-card-desc">
+              <div class="speed-card-label">Engineers upskilling</div>
+              <div class="speed-card-detail">Within the first month of the internal Forge training cohort going live</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flywheel diagram -->
+      <div class="flywheel-section reveal">
+        <div class="flywheel-title">Liatrio Enablement Flywheel</div>
+        <div class="flywheel-diagram">
+          <div class="fw-step">
+            <span class="fw-step-icon">🔧</span>
+            <div class="fw-step-name">Forge Cohort</div>
+            <div class="fw-step-desc">Internal training program using the CCA curriculum</div>
+          </div>
+          <div class="fw-arrow">→</div>
+          <div class="fw-step">
+            <span class="fw-step-icon">🎓</span>
+            <div class="fw-step-name">CCA Certified</div>
+            <div class="fw-step-desc">Engineers certified on Claude workflows and SDD</div>
+          </div>
+          <div class="fw-arrow">→</div>
+          <div class="fw-step">
+            <span class="fw-step-icon">🏢</span>
+            <div class="fw-step-name">Enterprise Delivery</div>
+            <div class="fw-step-desc">Certified engineers embedded at Boeing, Natera, and beyond</div>
+          </div>
+          <div class="fw-arrow">→</div>
+          <div class="fw-step">
+            <span class="fw-step-icon">📈</span>
+            <div class="fw-step-name">Scaled Adoption</div>
+            <div class="fw-step-desc">Client orgs running Claude across 200–500+ engineers</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===================================================
+     SECTION 6: CTA
+     =================================================== -->
+<section id="cta">
+  <div class="section-inner">
+    <div class="cta-layout">
+
+      <div class="chapter-label reveal" style="justify-content:center;">
+        <span class="chapter-label-line"></span>
+        Chapter Five — The Invitation
+        <span class="chapter-label-line"></span>
+      </div>
+
+      <h2 class="cta-heading reveal reveal-delay-1">
+        We're doing this.<br>
+        <em>Come along for the ride.</em>
+      </h2>
+
+      <p class="cta-body reveal reveal-delay-2">
+        Liatrio is actively deploying Claude across enterprise engineering teams at scale.
+        We'd love to partner with Anthropic on this journey — early access to pre-release features,
+        a deeper GTM relationship, joint case studies. <strong>But either way, we're moving fast.</strong>
+      </p>
+
+      <div class="reveal reveal-delay-3">
+        <a href="#cta" class="btn-primary" style="font-size:15px; padding:15px 32px;">Start a conversation →</a>
+      </div>
+
+      <div class="cta-divider reveal reveal-delay-4"></div>
+
+      <div class="cta-contacts reveal reveal-delay-4">
+        <div class="contact-card">
+          <div class="contact-name">Daniel Helbling</div>
+          <div class="contact-role">Partnerships</div>
+          <a href="mailto:daniel@liatrio.com" class="contact-email">
+            <span>✉</span> daniel@liatrio.com
+          </a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-name">Chris Blackburn</div>
+          <div class="contact-role">CEO</div>
+          <a href="mailto:chris@liatrio.com" class="contact-email">
+            <span>✉</span> chris@liatrio.com
+          </a>
+        </div>
+      </div>
+
+      <p class="cta-footnote reveal reveal-delay-5" style="margin-top: 40px;">
+        Liatrio · AI Enablement · Enterprise Engineering Transformation · Powered by Claude
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <a href="#hero" class="footer-brand">
+    <div class="footer-brand-mark">L</div>
+    <div class="footer-brand-text">liatrio</div>
+  </a>
+  <div class="footer-note">Enterprise AI Enablement · Powered by Claude</div>
+</footer>
+
+
+<!-- ===================================================
+     JAVASCRIPT
+     =================================================== -->
 <script>
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+(function() {
+  'use strict';
+
+  // ── Progress bar ──────────────────────────────────────
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+  }
+
+  // ── Navbar scroll effect ──────────────────────────────
+  const navbar = document.getElementById('navbar');
+  function updateNav() {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
     }
-  });
-});
+  }
 
-// Add subtle hover animations
-document.addEventListener('DOMContentLoaded', () => {
-  // Animate stats on scroll
-  const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px 0px -50px 0px'
-  };
-
-  const observer = new IntersectionObserver((entries) => {
+  // ── Scroll reveal ─────────────────────────────────────
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.animation = 'countUp 1s ease-out';
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, observerOptions);
-
-  document.querySelectorAll('.stat-box .num, .speed-num').forEach(stat => {
-    observer.observe(stat);
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
   });
-});
+  revealEls.forEach(el => revealObserver.observe(el));
 
-// CSS Animation for count up
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes countUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+  // ── Chapter dots ──────────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const dots = document.querySelectorAll('.chapter-dot');
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const target = document.getElementById(dot.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  function updateDots() {
+    let current = '';
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 0.5 && rect.bottom >= window.innerHeight * 0.5) {
+        current = section.id;
+      }
+    });
+    dots.forEach(dot => {
+      dot.classList.toggle('active', dot.dataset.target === current);
+    });
   }
-`;
-document.head.appendChild(style);
 
-console.log('🚀 Professional Liatrio AI Enablement Site Loaded');
+  // ── Level bars animation ──────────────────────────────
+  const levelBars = document.querySelectorAll('.level-bar');
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bar = entry.target;
+        const width = parseFloat(bar.dataset.width);
+        // Stagger based on index
+        const index = Array.from(levelBars).indexOf(bar);
+        setTimeout(() => {
+          bar.style.transform = `scaleX(${width})`;
+        }, index * 80);
+        barObserver.unobserve(bar);
+      }
+    });
+  }, { threshold: 0.5 });
+  levelBars.forEach(bar => barObserver.observe(bar));
+
+  // ── Stat counter animation ────────────────────────────
+  function animateCount(el, target, duration, suffix) {
+    const start = performance.now();
+    const update = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      // Ease out
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(eased * target);
+      el.querySelector('span')
+        ? (el.childNodes[0].textContent = current)
+        : (el.textContent = current + suffix);
+      if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+
+  const statEls = document.querySelectorAll('.stat-big[data-count]');
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count);
+        const hasPlus = el.innerHTML.includes('+');
+        const hasTimes = el.innerHTML.includes('×');
+        const suffix = hasTimes ? '×' : (hasPlus ? '' : '');
+        const span = el.querySelector('span');
+
+        const start = performance.now();
+        const duration = 1600;
+        const update = (now) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = Math.floor(eased * target);
+          if (span) {
+            el.childNodes[0].textContent = current;
+          } else {
+            el.textContent = current + suffix;
+          }
+          if (progress < 1) requestAnimationFrame(update);
+        };
+        requestAnimationFrame(update);
+        countObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.6 });
+  statEls.forEach(el => countObserver.observe(el));
+
+  // ── Smooth scroll for anchor links ───────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', (e) => {
+      const target = document.querySelector(anchor.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ── Scroll handler ────────────────────────────────────
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        updateProgress();
+        updateNav();
+        updateDots();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Initial calls
+  updateProgress();
+  updateNav();
+  updateDots();
+
+})();
 </script>
 
 </body>
