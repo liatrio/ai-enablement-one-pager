@@ -8,3 +8,10 @@ cloudflare-api/node_modules/
 __pycache__/
 *.pyc
 mcp-server/.venv/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
