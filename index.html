@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The AI Deploy - Enterprise Claude Adoption Special Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -21,12 +24,60 @@
   --mono: 'JetBrains Mono', monospace;
 }
 
+/* LOADING SCREEN */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--ink-black);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loading-logo {
+  font-family: var(--serif);
+  font-size: 4rem;
+  color: var(--paper-white);
+  font-weight: 900;
+  margin-bottom: 2rem;
+  opacity: 0;
+}
+
+.loading-text {
+  font-family: var(--body);
+  color: var(--accent-lime);
+  font-size: 1.2rem;
+  opacity: 0;
+}
+
+.loading-bar {
+  width: 300px;
+  height: 2px;
+  background: rgba(255,255,255,0.2);
+  margin-top: 2rem;
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-lime));
+  width: 0%;
+  transform-origin: left;
+}
+
+/* MAIN STYLES */
 body {
   font-family: var(--body);
   background: var(--newspaper-bg);
   color: var(--ink-black);
   line-height: 1.6;
   font-size: 14px;
+  overflow-x: hidden;
 }
 
 .newspaper {
@@ -36,6 +87,8 @@ body {
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
   padding: 2rem;
   position: relative;
+  transform: scale(0.9);
+  opacity: 0;
 }
 
 .newspaper::before {
@@ -52,6 +105,18 @@ body {
       transparent 24px,
       rgba(0,0,0,0.02) 25px
     );
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Floating ink drops */
+.ink-drop {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -72,6 +137,8 @@ body {
   text-transform: uppercase;
   color: var(--ink-light);
   margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 .masthead-title {
@@ -81,6 +148,8 @@ body {
   letter-spacing: -2px;
   margin-bottom: 0.25rem;
   text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+  opacity: 0;
+  transform: scale(0.8);
 }
 
 .masthead-subtitle {
@@ -88,6 +157,8 @@ body {
   font-size: 16px;
   color: var(--ink-light);
   margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateX(-30px);
 }
 
 .masthead-edition {
@@ -99,6 +170,8 @@ body {
   padding: 4px 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  opacity: 0;
+  transform: translateX(30px);
 }
 
 /* NEWSPAPER LAYOUT */
@@ -121,6 +194,13 @@ body {
   margin-bottom: 0.5rem;
   text-align: center;
   letter-spacing: -0.5px;
+  opacity: 0;
+}
+
+.headline-word {
+  display: inline-block;
+  transform: translateY(100%);
+  opacity: 0;
 }
 
 .subheadline {
@@ -130,6 +210,8 @@ body {
   color: var(--ink-light);
   margin-bottom: 1.5rem;
   line-height: 1.3;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .byline {
@@ -140,6 +222,8 @@ body {
   letter-spacing: 1px;
   color: var(--accent-green);
   margin-bottom: 1rem;
+  opacity: 0;
+  transform: scale(0.8);
 }
 
 .story-columns {
@@ -148,12 +232,15 @@ body {
   column-rule: 1px solid var(--border-color);
   text-align: justify;
   margin-bottom: 1.5rem;
+  opacity: 0;
 }
 
 .story-columns p {
   margin-bottom: 0.8rem;
   font-size: 14px;
   line-height: 1.6;
+  transform: translateY(20px);
+  opacity: 0;
 }
 
 .story-columns p:first-child::first-letter {
@@ -164,6 +251,7 @@ body {
   float: left;
   margin: 0.1em 0.1em 0 0;
   color: var(--accent-green);
+  transform: scale(0);
 }
 
 /* STATS BOX */
@@ -173,6 +261,8 @@ body {
   padding: 1rem;
   margin: 1.5rem 0;
   text-align: center;
+  transform: translateY(50px);
+  opacity: 0;
 }
 
 .stats-title {
@@ -192,6 +282,8 @@ body {
 
 .stat-item {
   text-align: center;
+  transform: scale(0.8);
+  opacity: 0;
 }
 
 .stat-number {
@@ -200,6 +292,13 @@ body {
   font-weight: 900;
   line-height: 1;
   color: var(--accent-green);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stat-number:hover {
+  transform: scale(1.1);
+  text-shadow: 0 0 20px rgba(36, 174, 29, 0.4);
 }
 
 .stat-label {
@@ -221,6 +320,8 @@ body {
 .story {
   border-top: 2px solid var(--ink-black);
   padding-top: 1rem;
+  transform: translateY(50px);
+  opacity: 0;
 }
 
 .story-headline {
@@ -229,6 +330,13 @@ body {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.story-headline:hover {
+  color: var(--accent-green);
+  transform: translateX(10px);
 }
 
 .story-byline {
@@ -249,6 +357,8 @@ body {
 
 .story-text p {
   margin-bottom: 0.75rem;
+  transform: translateY(20px);
+  opacity: 0;
 }
 
 /* CHART PLACEHOLDER */
@@ -260,6 +370,15 @@ body {
   text-align: center;
   font-style: italic;
   color: var(--ink-light);
+  transform: scale(0.95);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-placeholder:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .chart-title {
@@ -277,6 +396,9 @@ body {
   padding: 1.5rem;
   margin: 2rem 0;
   text-align: center;
+  transform: rotateX(10deg);
+  opacity: 0;
+  transform-style: preserve-3d;
 }
 
 .feature-title {
@@ -294,79 +416,9 @@ body {
   text-align: justify;
 }
 
-/* FOOTER */
-.newspaper-footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 2px double var(--ink-black);
-  text-align: center;
-  font-size: 12px;
-  color: var(--ink-light);
-}
-
-.contact-info {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.contact-item {
-  font-weight: 600;
-}
-
-.contact-item .name {
-  color: var(--ink-black);
-  font-weight: 700;
-}
-
-.contact-item .email {
-  color: var(--accent-green);
-  text-decoration: none;
-}
-
-.contact-item .email:hover {
-  text-decoration: underline;
-}
-
-/* MOBILE RESPONSIVENESS */
-@media (max-width: 768px) {
-  .newspaper {
-    margin: 1rem;
-    padding: 1rem;
-  }
-
-  .story-columns {
-    columns: 1;
-  }
-
-  .secondary-stories {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contact-info {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-/* PRINT STYLES */
-@media print {
-  .newspaper {
-    box-shadow: none;
-    margin: 0;
-    max-width: none;
-  }
-
-  body {
-    background: white;
-  }
+.feature-content p {
+  transform: translateY(20px);
+  opacity: 0;
 }
 
 /* FLYWHEEL DIAGRAM */
@@ -376,6 +428,8 @@ body {
   padding: 1rem;
   border: 1px solid var(--border-color);
   background: var(--paper-white);
+  transform: translateY(50px);
+  opacity: 0;
 }
 
 .flywheel-title {
@@ -405,6 +459,15 @@ body {
   text-align: center;
   position: relative;
   font-size: 12px;
+  transform: scale(0.8) rotate(-5deg);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.flywheel-step:hover {
+  transform: scale(1.05) rotate(0deg);
+  box-shadow: 0 8px 25px rgba(36, 174, 29, 0.2);
 }
 
 .flywheel-step:not(:last-child)::after {
@@ -416,6 +479,7 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--accent-green);
+  opacity: 0;
 }
 
 .step-title {
@@ -432,7 +496,114 @@ body {
   margin-top: 0.25rem;
 }
 
+/* FOOTER */
+.newspaper-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px double var(--ink-black);
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-light);
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.contact-item {
+  font-weight: 600;
+  transform: scale(0.9);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+  transform: scale(1.05);
+}
+
+.contact-item .name {
+  color: var(--ink-black);
+  font-weight: 700;
+}
+
+.contact-item .email {
+  color: var(--accent-green);
+  text-decoration: none;
+  position: relative;
+}
+
+.contact-item .email::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent-green);
+  transition: width 0.3s ease;
+}
+
+.contact-item .email:hover::after {
+  width: 100%;
+}
+
+/* SCROLL INDICATOR */
+.scroll-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-lime));
+  z-index: 1000;
+  transition: width 0.1s ease;
+}
+
+/* CURSOR EFFECTS */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transition: transform 0.1s ease;
+}
+
+/* MOBILE RESPONSIVENESS */
 @media (max-width: 768px) {
+  .newspaper {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .story-columns {
+    columns: 1;
+  }
+
+  .secondary-stories {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contact-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .flywheel-steps {
     flex-direction: column;
   }
@@ -444,11 +615,60 @@ body {
     transform: translateX(50%);
   }
 }
+
+/* PRINT STYLES */
+@media print {
+  .newspaper {
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+  }
+
+  body {
+    background: white;
+  }
+
+  .loading-screen,
+  .cursor-dot,
+  .scroll-indicator {
+    display: none;
+  }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div class="loading-screen">
+  <div class="loading-logo">The AI Deploy</div>
+  <div class="loading-text">Loading latest AI news...</div>
+  <div class="loading-bar">
+    <div class="loading-progress"></div>
+  </div>
+</div>
+
+<!-- SCROLL INDICATOR -->
+<div class="scroll-indicator"></div>
+
+<!-- CURSOR DOT -->
+<div class="cursor-dot"></div>
+
 <div class="newspaper">
+  <!-- FLOATING INK DROPS -->
+  <div class="ink-drop" style="top: 10%; left: 10%;"></div>
+  <div class="ink-drop" style="top: 30%; right: 15%;"></div>
+  <div class="ink-drop" style="bottom: 20%; left: 20%;"></div>
+  <div class="ink-drop" style="top: 60%; right: 30%;"></div>
+
   <!-- MASTHEAD -->
   <div class="masthead">
     <div class="masthead-date">LIATRIO, CALIFORNIA — FRIDAY, DECEMBER 13, 2024</div>
@@ -460,7 +680,18 @@ body {
   <div class="newspaper-content">
     <!-- MAIN STORY -->
     <div class="main-story">
-      <h1 class="headline">ENTERPRISE AI ADOPTION SOARS 800% AS CLAUDE POWERS DIGITAL TRANSFORMATION</h1>
+      <h1 class="headline">
+        <span class="headline-word">ENTERPRISE</span>
+        <span class="headline-word">AI</span>
+        <span class="headline-word">ADOPTION</span>
+        <span class="headline-word">SOARS</span>
+        <span class="headline-word">800%</span>
+        <span class="headline-word">AS</span>
+        <span class="headline-word">CLAUDE</span>
+        <span class="headline-word">POWERS</span>
+        <span class="headline-word">DIGITAL</span>
+        <span class="headline-word">TRANSFORMATION</span>
+      </h1>
       <div class="subheadline">Liatrio enables 200-500+ engineers across aerospace and healthcare industries in unprecedented scaling initiative</div>
       <div class="byline">By the AI Enablement Desk • December 13, 2024</div>
 
@@ -479,19 +710,19 @@ body {
         <div class="stats-title">By The Numbers</div>
         <div class="stats-grid">
           <div class="stat-item">
-            <div class="stat-number">200-500+</div>
+            <div class="stat-number" data-count="500">0</div>
             <div class="stat-label">Engineers Enabled</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number">3 Days</div>
-            <div class="stat-label">To Build Program</div>
+            <div class="stat-number" data-count="3">0</div>
+            <div class="stat-label">Days To Build</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number">2</div>
+            <div class="stat-number" data-count="2">0</div>
             <div class="stat-label">Major Enterprises</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number">80+</div>
+            <div class="stat-number" data-count="80">0</div>
             <div class="stat-label">Teams in Pipeline</div>
           </div>
         </div>
@@ -541,10 +772,10 @@ body {
           <div class="feature-box">
             <div class="feature-title">Expansion Pipeline</div>
             <div class="feature-content">
-              <strong>Current:</strong> QCI Team (Initial Deployment)<br>
-              <strong>Phase 2:</strong> 80+ engineering teams across genomics and diagnostics<br>
-              <strong>Framework:</strong> L1-L5 AI Fluency Assessment<br>
-              <strong>Scope:</strong> 4 regulated repositories currently live
+              <p><strong>Current:</strong> QCI Team (Initial Deployment)</p>
+              <p><strong>Phase 2:</strong> 80+ engineering teams across genomics and diagnostics</p>
+              <p><strong>Framework:</strong> L1-L5 AI Fluency Assessment</p>
+              <p><strong>Scope:</strong> 4 regulated repositories currently live</p>
             </div>
           </div>
         </div>
@@ -610,38 +841,343 @@ body {
 </div>
 
 <script>
-// Add some subtle newspaper-style interactions
-document.addEventListener('DOMContentLoaded', () => {
-  // Animate stats when they come into view
-  const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px 0px -100px 0px'
-  };
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.animation = 'fadeInUp 0.8s ease-out';
-      }
-    });
-  }, observerOptions);
+// Disable animations for users who prefer reduced motion
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  document.querySelectorAll('.stat-item, .flywheel-step').forEach(el => {
-    observer.observe(el);
+if (!prefersReducedMotion) {
+  // LOADING ANIMATION
+  const tl = gsap.timeline();
+
+  tl.to('.loading-logo', {
+    opacity: 1,
+    scale: 1,
+    duration: 1,
+    ease: 'back.out(1.7)'
+  })
+  .to('.loading-text', {
+    opacity: 1,
+    duration: 0.8
+  }, '-=0.3')
+  .to('.loading-progress', {
+    width: '100%',
+    duration: 2,
+    ease: 'power2.out'
+  })
+  .to('.loading-screen', {
+    opacity: 0,
+    duration: 0.8,
+    onComplete: () => {
+      document.querySelector('.loading-screen').style.display = 'none';
+      initMainAnimations();
+    }
   });
 
-  // CSS Animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-  `;
-  document.head.appendChild(style);
-});
+  function initMainAnimations() {
+    // NEWSPAPER ENTRANCE
+    gsap.to('.newspaper', {
+      scale: 1,
+      opacity: 1,
+      duration: 1.2,
+      ease: 'power3.out'
+    });
 
-console.log('📰 The AI Deploy - Special Edition Loaded');
+    // MASTHEAD ANIMATIONS
+    gsap.timeline()
+      .to('.masthead-date', { opacity: 1, y: 0, duration: 0.8, delay: 0.3 })
+      .to('.masthead-title', { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.3)' }, '-=0.4')
+      .to('.masthead-subtitle', { opacity: 1, x: 0, duration: 0.8 }, '-=0.6')
+      .to('.masthead-edition', { opacity: 1, x: 0, duration: 0.8 }, '-=0.6');
+
+    // HEADLINE WORD-BY-WORD ANIMATION
+    gsap.fromTo('.headline-word',
+      { y: '100%', opacity: 0 },
+      {
+        y: '0%',
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.headline',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+
+    // SUBHEADLINE AND BYLINE
+    gsap.to('.subheadline', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.subheadline',
+        start: 'top 80%'
+      }
+    });
+
+    gsap.to('.byline', {
+      opacity: 1,
+      scale: 1,
+      duration: 0.6,
+      scrollTrigger: {
+        trigger: '.byline',
+        start: 'top 80%'
+      }
+    });
+
+    // STORY COLUMNS WITH DROP CAP
+    gsap.to('.story-columns', {
+      opacity: 1,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.story-columns',
+        start: 'top 70%'
+      }
+    });
+
+    // Animate paragraphs
+    gsap.to('.story-columns p', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.2,
+      scrollTrigger: {
+        trigger: '.story-columns',
+        start: 'top 70%'
+      }
+    });
+
+    // Drop cap animation
+    gsap.to('.story-columns p:first-child::first-letter', {
+      scale: 1,
+      duration: 1,
+      ease: 'elastic.out(1, 0.5)',
+      scrollTrigger: {
+        trigger: '.story-columns',
+        start: 'top 60%'
+      }
+    });
+
+    // STATS BOX WITH COUNTER ANIMATION
+    gsap.to('.stats-box', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.stats-box',
+        start: 'top 70%',
+        onEnter: () => {
+          // Animate stat items
+          gsap.to('.stat-item', {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'back.out(1.5)'
+          });
+
+          // Counter animation for numbers
+          document.querySelectorAll('.stat-number').forEach(stat => {
+            const target = parseInt(stat.dataset.count);
+            gsap.fromTo(stat,
+              { textContent: 0 },
+              {
+                textContent: target,
+                duration: 2,
+                ease: 'power2.out',
+                snap: { textContent: 1 },
+                onUpdate: function() {
+                  const current = Math.ceil(this.targets()[0].textContent);
+                  if (target === 500) {
+                    stat.textContent = current + '+';
+                  } else if (target === 80) {
+                    stat.textContent = current + '+';
+                  } else {
+                    stat.textContent = current;
+                  }
+                }
+              }
+            );
+          });
+        }
+      }
+    });
+
+    // SECONDARY STORIES
+    gsap.to('.story', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      stagger: 0.3,
+      scrollTrigger: {
+        trigger: '.secondary-stories',
+        start: 'top 70%'
+      }
+    });
+
+    // Story paragraphs
+    gsap.to('.story-text p', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.1,
+      scrollTrigger: {
+        trigger: '.story-text',
+        start: 'top 80%'
+      }
+    });
+
+    // CHART PLACEHOLDER
+    gsap.to('.chart-placeholder', {
+      opacity: 1,
+      scale: 1,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.chart-placeholder',
+        start: 'top 80%'
+      }
+    });
+
+    // FEATURE BOX
+    gsap.to('.feature-box', {
+      opacity: 1,
+      rotateX: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.feature-box',
+        start: 'top 70%'
+      }
+    });
+
+    gsap.to('.feature-content p', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.2,
+      scrollTrigger: {
+        trigger: '.feature-content',
+        start: 'top 80%'
+      }
+    });
+
+    // FLYWHEEL DIAGRAM
+    gsap.to('.flywheel-diagram', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.flywheel-diagram',
+        start: 'top 70%',
+        onEnter: () => {
+          // Animate flywheel steps
+          gsap.to('.flywheel-step', {
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'back.out(1.5)'
+          });
+
+          // Animate arrows
+          gsap.to('.flywheel-step:not(:last-child)::after', {
+            opacity: 1,
+            duration: 0.5,
+            delay: 1
+          });
+        }
+      }
+    });
+
+    // FOOTER
+    gsap.to('.newspaper-footer', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      scrollTrigger: {
+        trigger: '.newspaper-footer',
+        start: 'top 80%'
+      }
+    });
+
+    gsap.to('.contact-item', {
+      opacity: 1,
+      scale: 1,
+      duration: 0.6,
+      stagger: 0.2,
+      scrollTrigger: {
+        trigger: '.contact-info',
+        start: 'top 80%'
+      }
+    });
+
+    // FLOATING INK DROPS
+    gsap.to('.ink-drop', {
+      opacity: 0.3,
+      scale: 1,
+      duration: 2,
+      stagger: 0.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
+
+    // SCROLL PROGRESS INDICATOR
+    gsap.to('.scroll-indicator', {
+      width: '100%',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true
+      }
+    });
+  }
+
+  // CURSOR FOLLOW EFFECT
+  const cursor = document.querySelector('.cursor-dot');
+  let mouse = { x: 0, y: 0 };
+  let pos = { x: 0, y: 0 };
+
+  document.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  gsap.ticker.add(() => {
+    pos.x += (mouse.x - pos.x) * 0.2;
+    pos.y += (mouse.y - pos.y) * 0.2;
+    gsap.set(cursor, { x: pos.x, y: pos.y });
+  });
+
+  // ENHANCED HOVER EFFECTS
+  document.querySelectorAll('a, button, .stat-number, .story-headline, .chart-placeholder').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      gsap.to(cursor, { scale: 2, duration: 0.3 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(cursor, { scale: 1, duration: 0.3 });
+    });
+  });
+
+  console.log('🎬 Active Theory-inspired animations loaded - Welcome to the future of newspapers!');
+} else {
+  // For users who prefer reduced motion, just show the content
+  document.querySelector('.loading-screen').style.display = 'none';
+  gsap.set('.newspaper', { scale: 1, opacity: 1 });
+  gsap.set('.masthead-date, .masthead-title, .masthead-subtitle, .masthead-edition', { opacity: 1 });
+  gsap.set('.headline-word', { y: 0, opacity: 1 });
+  gsap.set('.subheadline, .byline, .story-columns', { opacity: 1 });
+  gsap.set('.stats-box, .story, .feature-box, .flywheel-diagram, .newspaper-footer', { opacity: 1 });
+
+  console.log('📰 Reduced motion version loaded');
+}
 </script>
 
 </body>
