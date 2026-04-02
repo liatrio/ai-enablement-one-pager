@@ -6,7 +6,7 @@
 <title>Liatrio × Anthropic — A Story of AI Transformation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
 <style>
 /* =============================================
    RESET & VARIABLES
@@ -42,10 +42,10 @@ body {
   font-family: var(--sans);
   background: var(--bg-deep);
   color: var(--text);
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 /* =============================================
    PROGRESS BAR
@@ -92,14 +92,9 @@ nav.scrolled {
 }
 
 .nav-logo-mark {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800;
-  font-size: 14px;
-  color: #0a0a0a;
+  width: 22px; height: 32px;
   flex-shrink: 0;
+  display: block;
 }
 
 .nav-logo-text {
@@ -126,7 +121,7 @@ nav.scrolled {
    ============================================= */
 .chapter-nav {
   position: fixed;
-  right: 28px;
+  left: 28px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -147,7 +142,7 @@ nav.scrolled {
 .chapter-dot::after {
   content: attr(data-label);
   position: absolute;
-  right: 18px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 10px;
@@ -1245,13 +1240,9 @@ footer {
 }
 
 .footer-brand-mark {
-  width: 24px; height: 24px;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800;
-  font-size: 11px;
-  color: #0a0a0a;
+  width: 16px; height: 24px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .footer-brand-text {
@@ -1306,9 +1297,302 @@ footer {
   background: rgba(137,223,0,0.25);
   color: var(--text);
 }
+
+/* =============================================
+   EASTER EGG — PULSING LOGO
+   ============================================= */
+@keyframes egg-pulse {
+  0%,85%,100% { filter:none; transform:scale(1); }
+  90% { filter:brightness(1.4) saturate(2); transform:scale(1.18); }
+  95% { filter:brightness(1.6) saturate(3); transform:scale(1.12); }
+}
+@keyframes egg-shake {
+  0%,100% { transform:rotate(0) scale(1); }
+  10% { transform:rotate(-14deg) scale(1.2); }
+  20% { transform:rotate(12deg) scale(1.2); }
+  30% { transform:rotate(-10deg) scale(1.15); }
+  40% { transform:rotate(8deg) scale(1.15); }
+  50% { transform:rotate(-6deg) scale(1.1); }
+  60% { transform:rotate(4deg) scale(1.1); }
+  70% { transform:rotate(-2deg) scale(1.05); }
+  80% { transform:rotate(1deg); }
+}
+#egg {
+  animation: egg-pulse 8s ease-in-out infinite;
+  cursor: pointer;
+}
+#egg:hover { animation: none; transform: scale(1.1); filter: brightness(1.3); }
+#egg.shake { animation: egg-shake 0.6s ease-in-out forwards; }
+
+/* Expansion overlay */
+#egg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#egg-overlay .egg-mark {
+  width: 80px; height: 120px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.3s, transform 0.85s cubic-bezier(0.17,0.67,0.29,1.4);
+}
+#egg-overlay.expanding .egg-mark {
+  opacity: 1;
+  transform: scale(40);
+}
+#egg-overlay.fading {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+/* =============================================
+   NEWSPAPER MODE — BODY TOGGLE
+   ============================================= */
+body.newspaper-mode { background: #f4e8c1 !important; }
+body.newspaper-mode nav,
+body.newspaper-mode .chapter-nav,
+body.newspaper-mode section,
+body.newspaper-mode footer,
+body.newspaper-mode #progress-bar,
+body.newspaper-mode #egg-overlay { display: none !important; }
+body.newspaper-mode #newspaper { display: block; }
+#newspaper { display: none; }
+
+/* =============================================
+   NEWSPAPER STYLES
+   ============================================= */
+#newspaper {
+  min-height: 100vh;
+  background: #f4e8c1;
+  font-family: 'Lora', Georgia, serif;
+  color: #2a1a0a;
+}
+
+/* Masthead */
+.np-masthead {
+  text-align: center;
+  padding: 2.5rem 2rem 1.5rem;
+  border-bottom: 4px double #2a1a0a;
+  position: relative;
+  background: #ede0c0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 40px rgba(42,26,10,.12), 0 1px 3px rgba(0,0,0,.1);
+}
+.np-date {
+  font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+  color: #6b5a3e; margin-bottom: .25rem;
+  font-family: 'Inter', sans-serif;
+}
+.np-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  font-weight: 900; color: #2a1a0a;
+  letter-spacing: .02em; line-height: 1;
+}
+.np-tagline {
+  font-style: italic; color: #6b5a3e; font-size: 1rem; margin-top: .35rem;
+}
+.np-edition {
+  font-size: .7rem; color: #8b7a5e; margin-top: .25rem;
+  font-family: 'Inter', sans-serif; letter-spacing: .05em;
+}
+.np-back-btn {
+  position: fixed; top: 14px; right: 20px; z-index: 10001;
+  cursor: pointer; width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid #2a1a0a; background: #f4e8c1; padding: 4px;
+  transition: transform .2s; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #2a1a0a; font-family: serif;
+}
+.np-back-btn:hover { transform: scale(1.12); background: #2a1a0a; color: #f4e8c1; }
+
+/* Carousel */
+.np-carousel-wrap { position: relative; padding: 1.5rem 0 1rem; }
+.np-carousel {
+  display: flex; align-items: flex-start;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  gap: 3rem;
+  padding: 1.5rem calc(50vw - min(42vw, 400px)) 1rem;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.np-carousel::-webkit-scrollbar { display: none; }
+
+/* Cards */
+.np-card {
+  scroll-snap-align: center;
+  width: min(84vw, 800px);
+  flex-shrink: 0;
+  padding: 2.5rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.np-card::before {
+  content: '';
+  position: absolute; inset: -4px;
+  background: #faf3e0;
+  z-index: -1;
+  filter: url(#paper-rough);
+  box-shadow: 3px 4px 16px rgba(0,0,0,.12);
+}
+.np-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.55rem; font-weight: 900; color: #2a1a0a;
+  line-height: 1.15; margin-bottom: .5rem;
+  border-bottom: 2px solid #2a1a0a; padding-bottom: .5rem;
+}
+.np-subhead { font-size: .85rem; font-style: italic; color: #6b5a3e; margin-bottom: .75rem; }
+.np-byline {
+  font-size: .72rem; color: #8b7a5e; text-transform: uppercase;
+  letter-spacing: .08em; margin-bottom: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+.np-body {
+  column-count: 2; column-gap: 1.5rem; column-rule: 1px solid #d4c9a8;
+  font-size: .88rem; line-height: 1.75; color: #3a2f1a;
+}
+.np-body p { margin-bottom: .75rem; text-align: justify; hyphens: auto; }
+.np-body p:first-child::first-letter {
+  float: left;
+  font-family: 'Playfair Display', serif;
+  font-size: 3.2rem; line-height: .85;
+  padding: .05rem .45rem 0 0;
+  color: #2a1a0a; font-weight: 900;
+}
+.np-stat {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900; font-size: 1.05em; color: #2a1a0a;
+}
+.np-inline-stats {
+  display: flex; gap: .75rem; flex-wrap: wrap;
+  margin: .75rem 0; break-inside: avoid;
+}
+.np-inline-stat {
+  background: #f0e6c8; border: 1px solid #c9b98a;
+  border-radius: 4px; padding: .4rem .65rem; text-align: center; flex: 1; min-width: 80px;
+}
+.np-inline-stat .isn { font-family: 'Playfair Display',serif; font-weight:900; font-size:1.1rem; color:#2a1a0a; display:block; }
+.np-inline-stat .isl { font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; color:#6b5a3e; font-family:'Inter',sans-serif; }
+
+/* Stats grid card */
+.np-stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .6rem; margin-bottom: 1rem; }
+.np-stat-box {
+  background: #f0e6c8; border: 1px solid #c9b98a;
+  padding: .65rem .4rem; text-align: center;
+}
+.np-stat-box .np-stat-num {
+  font-family: 'Playfair Display',serif; font-size: clamp(1.4rem,3vw,1.9rem);
+  font-weight: 900; color: #2a1a0a; line-height: 1.1;
+}
+.np-stat-box .np-stat-label {
+  font-size: .62rem; text-transform: uppercase; letter-spacing: .1em;
+  color: #6b5a3e; margin-top: .15rem; font-family: 'Inter',sans-serif;
+}
+.np-bars { margin: .75rem 0 .4rem; }
+.np-bar-row { display:flex; align-items:center; gap:.5rem; margin-bottom:.35rem; font-size:.78rem; color:#3a2f1a; }
+.np-bar-label { width:90px; text-align:right; font-family:'Inter',sans-serif; font-weight:600; font-size:.72rem; flex-shrink:0; }
+.np-bar-track { flex:1; height:18px; background:#e8dcc0; border:1px solid #c9b98a; position:relative; overflow:hidden; }
+.np-bar-fill { height:100%; transition:width .8s ease; }
+.np-bar-val { position:absolute; right:6px; top:50%; transform:translateY(-50%); font-family:'Playfair Display',serif; font-weight:900; font-size:.72rem; color:#2a1a0a; }
+
+/* Sports card */
+.np-sports-banner {
+  background: #2a1a0a; color: #faf3e0; text-align: center;
+  padding: .25rem; font-family: 'Playfair Display',serif;
+  font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+  margin: 0 -2.5rem 1rem;
+}
+.np-box-score { width:100%; border-collapse:collapse; font-family:'JetBrains Mono','Courier New',monospace; font-size:.78rem; margin:.75rem 0; }
+.np-box-score th { border-bottom:2px solid #2a1a0a; padding:.3rem .5rem; text-align:right; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; color:#a89878; }
+.np-box-score th:first-child { text-align:left; }
+.np-box-score td { padding:.25rem .5rem; text-align:right; border-bottom:1px solid #d4c9a8; color:#2a1a0a; }
+.np-box-score td:first-child { text-align:left; font-weight:700; }
+.np-box-score tr.winner td { font-weight:700; }
+.np-box-score tr.winner td:last-child { color:#24AE1D; }
+
+/* Controls */
+.np-controls { display:flex; align-items:center; justify-content:center; gap:1rem; padding:.5rem 0 1rem; }
+.np-arrow {
+  width:40px; height:40px; border-radius:50%; border:2px solid #2a1a0a;
+  background:transparent; font-size:1.2rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:#2a1a0a; transition:background .2s,color .2s; font-family:serif;
+}
+.np-arrow:hover { background:#2a1a0a; color:#f4e8c1; }
+.np-dots { display:flex; gap:.4rem; }
+.np-dot { width:8px; height:8px; border-radius:50%; background:#c9b98a; transition:background .3s; cursor:pointer; }
+.np-dot.active { background:#2a1a0a; }
+
+/* Dog-ear corners */
+.np-dog-ear { position:absolute; top:0; cursor:pointer; z-index:10; transition:transform .15s,opacity .15s; opacity:.7; }
+.np-dog-ear:hover { transform:scale(1.2); opacity:1; }
+.np-dog-ear-next { right:0; background:linear-gradient(225deg,#d4c4a0 50%,transparent 50%); box-shadow:-1px 1px 3px rgba(0,0,0,.1); }
+.np-dog-ear-prev { left:0; background:linear-gradient(315deg,#d4c4a0 50%,transparent 50%); box-shadow:1px 1px 3px rgba(0,0,0,.1); }
+
+/* Classifieds */
+.np-classifieds-banner {
+  background: #2a1a0a; color: #faf3e0; text-align: center;
+  padding: .25rem; font-family: 'Playfair Display',serif;
+  font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+  margin: 0 -2.5rem 1rem;
+}
+.np-classifieds-grid {
+  column-count: 2; column-gap: 1.25rem;
+  column-rule: 1px solid #d4c9a8;
+  font-size: .82rem; line-height: 1.65; color: #3a2f1a;
+}
+.np-classified {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dotted #c9b98a;
+}
+.np-classified:last-child { border-bottom: none; margin-bottom: 0; }
+.np-classified-head {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900; font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: #2a1a0a; margin-bottom: .3rem;
+}
+.np-classified-contact {
+  font-size: .72rem; color: #8b4a2a; margin-top: .35rem;
+  font-family: 'Inter', sans-serif; font-style: italic;
+}
+
+/* Footer */
+.np-footer {
+  text-align:center; padding:1.5rem;
+  font-size:.75rem; color:#8b7a5e;
+  border-top:2px solid #2a1a0a;
+  font-family:'Inter',sans-serif; letter-spacing:.03em;
+  background:#ede0c0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  box-shadow:inset 0 0 40px rgba(42,26,10,.12);
+}
 </style>
 </head>
 <body>
+
+<!-- SVG filter for torn-paper newspaper effect -->
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+  <defs>
+    <filter id="paper-rough" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- Egg expansion overlay -->
+<div id="egg-overlay">
+  <svg class="egg-mark" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+    <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+  </svg>
+</div>
 
 <!-- Progress bar -->
 <div id="progress-bar"></div>
@@ -1316,7 +1600,10 @@ footer {
 <!-- Navigation -->
 <nav id="navbar">
   <a href="#hero" class="nav-logo" style="text-decoration:none;">
-    <div class="nav-logo-mark">L</div>
+    <svg id="egg" class="nav-logo-mark" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg" title="✦ something's here" aria-label="Liatrio">
+      <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+      <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+    </svg>
     <div class="nav-logo-text">liatrio</div>
   </a>
   <div class="nav-badge">AI Enablement</div>
@@ -1791,12 +2078,207 @@ footer {
 <!-- Footer -->
 <footer>
   <a href="#hero" class="footer-brand">
-    <div class="footer-brand-mark">L</div>
+    <svg class="footer-brand-mark" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+      <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+    </svg>
     <div class="footer-brand-text">liatrio</div>
   </a>
   <div class="footer-note">Enterprise AI Enablement · Powered by Claude</div>
 </footer>
 
+
+<!-- ===================================================
+     NEWSPAPER EASTER EGG: THE AI DAILY
+     =================================================== -->
+<div id="newspaper">
+
+  <button class="np-back-btn" id="npBack" title="Back to site" aria-label="Close newspaper">✕</button>
+
+  <div class="np-masthead">
+    <div class="np-date">Wednesday, April 2, 2026 &nbsp;·&nbsp; Special Edition</div>
+    <div class="np-title">The AI Daily</div>
+    <div class="np-tagline">All the Enterprise AI That's Fit to Deploy</div>
+    <div class="np-edition">Vol. 1, No. 1 &nbsp;·&nbsp; Liatrio Intelligence Bureau &nbsp;·&nbsp; Powered by Claude</div>
+  </div>
+
+  <div class="np-carousel-wrap">
+    <div class="np-carousel" id="npCarousel">
+
+      <!-- CARD 1: Boeing front page -->
+      <div class="np-card">
+        <div class="np-headline">AZURE PROVISIONING TIME PLUMMETS FROM FIVE BUSINESS DAYS TO FIFTEEN MINUTES</div>
+        <div class="np-subhead">Boeing Digital Services engineers stunned as Claude-powered workflow eliminates every manual handoff in under a week</div>
+        <div class="np-byline">By the Liatrio Data Desk &nbsp;·&nbsp; Enterprise Aerospace & Defense</div>
+        <div class="np-body">
+          <p>In what industry analysts are calling a landmark moment for enterprise AI adoption, Boeing Digital Services has completed a sweeping transformation of its Azure account provisioning workflow — reducing a process that previously consumed five full business days and required handoffs across multiple teams down to a brisk fifteen minutes with zero human intervention required.</p>
+          <p>The transformation was orchestrated by Liatrio, using Claude Sonnet and Opus through Azure AI Foundry, paired with the firm's proprietary Spec-Driven Development framework. The flagship result: a legacy provisioning workflow rebuilt in under a week now spins up a complete Azure account in <span class="np-stat">15 minutes</span> with no handoffs.</p>
+          <p>The efficiency gains are staggering. Liatrio estimates delivery is now <span class="np-stat">8× faster</span> than comparable work without AI tooling — the equivalent of compressing two-plus months of engineering effort into under a week. Three product teams and one platform team participated in a multi-day "Flashbuild" powered entirely by Claude models, delivering production features in just two days.</p>
+          <p>Sources close to the project report that Claude Code approval is currently in progress as the team's preferred development harness for the second half of 2026, signaling Boeing's intent to deepen its commitment to the Claude ecosystem across its engineering organization.</p>
+        </div>
+      </div>
+
+      <!-- CARD 2: Natera -->
+      <div class="np-card">
+        <div class="np-headline">NATERA ENGINEERS DECLARE: "I DIDN'T WRITE A SINGLE LINE OF CODE"</div>
+        <div class="np-subhead">FDA-regulated clinical software teams embrace Claude at unprecedented pace; one engineer runs 14-step workflow unprompted</div>
+        <div class="np-byline">By the Liatrio Health Sciences Correspondent &nbsp;·&nbsp; Healthcare & Life Sciences</div>
+        <div class="np-body">
+          <p>In the closely regulated halls of Natera's genomics engineering division, something remarkable is happening: engineers are reaching for Claude before they reach for their keyboards. Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption across four core regulated repositories.</p>
+          <p>What surprised even Liatrio's deployment team was the speed of organic uptake. Engineers began self-directing Claude usage far beyond prescribed workflows. One engineer ran a fourteen-step clinical workflow dry-test entirely unprompted. Another extended Liatrio's automated MR review pipeline to her own HCLS project within days of first seeing it demonstrated.</p>
+          <p>Liatrio has designed a five-level AI Fluency Framework — L1 through L5 — to track and structure this progression from awareness to expert-level autonomous deployment. The framework is now being adopted as a company-wide standard.</p>
+          <p>The expansion roadmap is ambitious: from a single QCI team to more than <span class="np-stat">80 engineering teams</span> spanning all of Natera's genomics and diagnostics divisions. Five major plays are in development, including AI-accelerated FDA and MasterControl compliance workflows and an agentic SDLC quality orchestration layer across the entire CI/CD stack.</p>
+        </div>
+      </div>
+
+      <!-- CARD 3: CCA -->
+      <div class="np-card">
+        <div class="np-headline">LIATRIO BUILDS ENTERPRISE AI CERTIFICATION PROGRAM IN 72 HOURS; EXPERTS BAFFLED</div>
+        <div class="np-subhead">The Claude Certification Academy goes from blank document to full curriculum over a long weekend — 50+ engineers upskilling within the first month</div>
+        <div class="np-byline">By the Liatrio Workforce Development Desk &nbsp;·&nbsp; The Enablement Method</div>
+        <div class="np-body">
+          <p>When demand for Anthropic Claude professional services began outpacing available talent earlier this year, most firms scheduled a planning retreat. Liatrio built a certification program. In three days.</p>
+          <p>The Claude Certification Academy — known internally as the CCA — takes engineers from zero familiarity with AI-assisted development to productive, certified practitioners in days rather than months. Built atop Anthropic's open-source learning materials and tailored to the pressures of enterprise delivery, the curriculum has become Liatrio's primary internal training vehicle, administered through its Forge cohort program.</p>
+          <p>Within the first month of the Forge program going live, more than <span class="np-stat">50 engineers</span> were actively upskilling on the platform — a figure the firm expects to grow substantially as client engagements multiply.</p>
+          <p>Liatrio's leadership is direct about its differentiation: "Other partners will stand up Bedrock," one executive told this correspondent. "We teach organizations how to actually transform. That's the flywheel — certified engineers who go into Boeing, Natera, and every client after them, and change how engineering work gets done." The CCA is, in short, the mechanism by which Liatrio scales itself.</p>
+        </div>
+      </div>
+
+      <!-- CARD 4: By The Numbers -->
+      <div class="np-card">
+        <div class="np-headline">BY THE NUMBERS</div>
+        <div class="np-subhead">A statistical portrait of Liatrio's AI enablement operations as of Q2 2026</div>
+        <div class="np-byline">Compiled by the Liatrio Data Desk</div>
+
+        <div class="np-stats-grid" style="margin-top:.75rem;">
+          <div class="np-stat-box"><div class="np-stat-num">200+</div><div class="np-stat-label">Engineers Per Engagement</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">8×</div><div class="np-stat-label">Faster Delivery</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">80+</div><div class="np-stat-label">Teams in Scope</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">3d</div><div class="np-stat-label">To Build CCA</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">50+</div><div class="np-stat-label">Certified Month 1</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">4</div><div class="np-stat-label">Regulated Repos</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">15m</div><div class="np-stat-label">Azure Provisioning</div></div>
+          <div class="np-stat-box"><div class="np-stat-num">2d</div><div class="np-stat-label">Flashbuild Delivery</div></div>
+        </div>
+
+        <div class="np-bars">
+          <div class="np-bar-row">
+            <div class="np-bar-label">Boeing</div>
+            <div class="np-bar-track">
+              <div class="np-bar-fill" style="width:0%;background:linear-gradient(90deg,#8b4a2a,#c4722a)" data-w="92%"></div>
+              <div class="np-bar-val">8× faster</div>
+            </div>
+          </div>
+          <div class="np-bar-row">
+            <div class="np-bar-label">Natera</div>
+            <div class="np-bar-track">
+              <div class="np-bar-fill" style="width:0%;background:linear-gradient(90deg,#2a5a2a,#4a8a4a)" data-w="85%"></div>
+              <div class="np-bar-val">80+ teams</div>
+            </div>
+          </div>
+          <div class="np-bar-row">
+            <div class="np-bar-label">CCA</div>
+            <div class="np-bar-track">
+              <div class="np-bar-fill" style="width:0%;background:linear-gradient(90deg,#2a2a8b,#4a4ac4)" data-w="78%"></div>
+              <div class="np-bar-val">50+ eng.</div>
+            </div>
+          </div>
+          <div class="np-bar-row">
+            <div class="np-bar-label">Provisioning</div>
+            <div class="np-bar-track">
+              <div class="np-bar-fill" style="width:0%;background:linear-gradient(90deg,#6b5a3e,#a89060)" data-w="98%"></div>
+              <div class="np-bar-val">99.8% ↓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5: Sports Final -->
+      <div class="np-card np-sports">
+        <div class="np-sports-banner">— Liatrio Sports Final · Special AI Edition —</div>
+        <div class="np-headline">LIATRIO DEFEATS STATUS QUO IN OVERTIME; LEGACY PROCESS FAILS TO SCORE</div>
+        <div class="np-subhead">Claude-powered squad dominates in back-to-back matchups; handoff count reaches historic low</div>
+        <div class="np-byline">By the AI Sports Desk &nbsp;·&nbsp; Results as of Q2 2026</div>
+
+        <p style="font-size:.82rem;color:#6b5a3e;font-style:italic;margin-bottom:.75rem;">Provisioning Bowl — Boeing Digital Services Stadium</p>
+        <table class="np-box-score">
+          <tr><th>Team</th><th>Handoffs</th><th>Time</th><th>Result</th></tr>
+          <tr class="winner"><td>Liatrio + Claude</td><td>0</td><td>15 min</td><td>WIN</td></tr>
+          <tr><td>Legacy Process</td><td>7+</td><td>5 days</td><td>—</td></tr>
+        </table>
+
+        <p style="font-size:.82rem;color:#6b5a3e;font-style:italic;margin:.75rem 0 .75rem;">Adoption Open — Natera Genomics Arena</p>
+        <table class="np-box-score">
+          <tr><th>Team</th><th>Repos</th><th>Teams</th><th>Result</th></tr>
+          <tr class="winner"><td>Organic Adoption</td><td>4 live</td><td>80+ scoped</td><td>WIN</td></tr>
+          <tr><td>Prescribed Only</td><td>1</td><td>1</td><td>—</td></tr>
+        </table>
+
+        <p style="font-size:.82rem;color:#6b5a3e;font-style:italic;margin:.75rem 0 .75rem;">Certification Sprint — Forge Training Facility</p>
+        <table class="np-box-score">
+          <tr><th>Program</th><th>Build Time</th><th>Month 1</th><th>Result</th></tr>
+          <tr class="winner"><td>Claude Cert. Academy</td><td>3 days</td><td>50+ eng.</td><td>WIN</td></tr>
+          <tr><td>Industry Average</td><td>6 months</td><td>12 eng.</td><td>—</td></tr>
+        </table>
+
+        <p style="font-size:.78rem;color:#8b7a5e;margin-top:1rem;font-style:italic;">Final standings subject to audit. Legacy Process was unavailable for comment. Claude continues undefeated at press time.</p>
+      </div>
+
+      <!-- CARD 6: Classifieds -->
+      <div class="np-card np-classifieds-card">
+        <div class="np-classifieds-banner">— Classifieds —</div>
+        <div class="np-headline" style="font-size:1.2rem;">NOTICES &amp; ANNOUNCEMENTS</div>
+        <div class="np-classifieds-grid">
+
+          <div class="np-classified">
+            <div class="np-classified-head">PARTNERSHIP SOUGHT</div>
+            Ambitious AI enablement firm — proven at scale, Claude-native from day one — seeks visionary model maker for long-term collaboration. We bring the enterprises. You bring the intelligence. Together we rewrite how the world builds software. Serious inquiries only. Ask for Daniel.
+            <div class="np-classified-contact">daniel@liatrio.com</div>
+          </div>
+
+          <div class="np-classified">
+            <div class="np-classified-head">WANTED: ONE GREAT PARTNERSHIP</div>
+            Have: 200+ enterprise engineers actively deploying Claude. Certified training program. Regulated industries saying yes. Results that speak for themselves. Seeking: Anthropic. To do something historic together. Box 001.
+            <div class="np-classified-contact">chris@liatrio.com</div>
+          </div>
+
+          <div class="np-classified">
+            <div class="np-classified-head">LOST &amp; FOUND</div>
+            LOST: One perfectly good excuse to wait on enterprise AI adoption. Last seen at a Boeing provisioning queue, circa 2025. Not missed. If found, please do not return.
+          </div>
+
+          <div class="np-classified">
+            <div class="np-classified-head">NOTICE OF INTENT</div>
+            Liatrio hereby gives public notice of its intention to transform enterprise software delivery through the responsible and ambitious deployment of Claude at scale — with Anthropic, if they'll have us; ahead of the field, regardless. This notice will not be repeated. It doesn't need to be.
+          </div>
+
+          <div class="np-classified">
+            <div class="np-classified-head">FOR SALE</div>
+            One legacy AI strategy. Never fully executed. Includes: six-month roadmap, three vendor assessments, one postponed pilot. Priced to move. Replaced by something that actually ships. —&nbsp;A Boeing Engineer
+          </div>
+
+          <div class="np-classified">
+            <div class="np-classified-head">PERSONAL</div>
+            Dear Anthropic — We've been building with Claude like you'd hope your best partner would. We're not waiting for permission to do great work. But if you wanted to do it together, we think it could be extraordinary. You know where to find us. — Liatrio
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end .np-carousel -->
+
+    <div class="np-controls">
+      <button class="np-arrow" id="npPrev">&#8592;</button>
+      <div class="np-dots" id="npDots"></div>
+      <button class="np-arrow" id="npNext">&#8594;</button>
+    </div>
+  </div><!-- end .np-carousel-wrap -->
+
+  <div class="np-footer">
+    The AI Daily is an independent publication of the Liatrio Intelligence Bureau. All statistics are real. All handoffs eliminated. &nbsp;·&nbsp; daniel@liatrio.com &nbsp;·&nbsp; chris@liatrio.com
+  </div>
+
+</div><!-- end #newspaper -->
 
 <!-- ===================================================
      JAVASCRIPT
@@ -1930,6 +2412,7 @@ footer {
 
   // ── Smooth scroll for anchor links ───────────────────
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    if (anchor.classList.contains('nav-logo')) return; // egg handles this anchor
     anchor.addEventListener('click', (e) => {
       const target = document.querySelector(anchor.getAttribute('href'));
       if (target) {
@@ -1957,6 +2440,106 @@ footer {
   updateProgress();
   updateNav();
   updateDots();
+
+  // ── Easter egg ────────────────────────────────────────
+  const egg = document.getElementById('egg');
+  const eggOverlay = document.getElementById('egg-overlay');
+  let newspaperMode = false;
+
+  function openNewspaper() {
+    egg.classList.add('shake');
+    setTimeout(() => {
+      egg.classList.remove('shake');
+      eggOverlay.classList.add('expanding');
+      setTimeout(() => {
+        document.body.classList.add('newspaper-mode');
+        eggOverlay.classList.remove('expanding');
+        newspaperMode = true;
+        // Animate bars after newspaper opens
+        document.querySelectorAll('.np-bar-fill[data-w]').forEach(bar => {
+          setTimeout(() => { bar.style.width = bar.dataset.w; }, 300);
+        });
+        // Build carousel dots
+        buildCarousel();
+      }, 900);
+    }, 600);
+  }
+
+  function closeNewspaper() {
+    document.body.classList.remove('newspaper-mode');
+    newspaperMode = false;
+    window.scrollTo(0, 0);
+  }
+
+  egg.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!newspaperMode) {
+      openNewspaper();
+    } else {
+      closeNewspaper();
+    }
+  });
+
+  document.getElementById('npBack').addEventListener('click', closeNewspaper);
+
+  document.addEventListener('keydown', (e) => {
+    if (newspaperMode && e.key === 'Escape') closeNewspaper();
+  });
+
+  // ── Newspaper carousel ────────────────────────────────
+  function buildCarousel() {
+    const carousel = document.getElementById('npCarousel');
+    const dotsContainer = document.getElementById('npDots');
+    if (!carousel || dotsContainer.children.length > 0) return;
+
+    const cards = carousel.querySelectorAll('.np-card');
+    const total = cards.length;
+
+    // Build dots
+    cards.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'np-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => scrollToCard(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    // Dog-ear corners
+    const wrap = carousel.parentElement;
+    const size = 32;
+    const prev = document.createElement('div');
+    prev.className = 'np-dog-ear np-dog-ear-prev';
+    prev.style.cssText = `width:${size}px;height:${size}px;top:20px`;
+    prev.addEventListener('click', () => scrollToCard(currentCard() - 1));
+
+    const next = document.createElement('div');
+    next.className = 'np-dog-ear np-dog-ear-next';
+    next.style.cssText = `width:${size}px;height:${size}px;top:20px`;
+    next.addEventListener('click', () => scrollToCard(currentCard() + 1));
+
+    wrap.prepend(prev);
+    wrap.prepend(next);
+
+    function currentCard() {
+      const cardW = cards[0].offsetWidth + 48; // width + gap
+      return Math.round(carousel.scrollLeft / cardW);
+    }
+
+    function scrollToCard(i) {
+      i = Math.max(0, Math.min(total - 1, i));
+      const cardW = cards[0].offsetWidth + 48;
+      carousel.scrollTo({ left: cardW * i, behavior: 'smooth' });
+    }
+
+    carousel.addEventListener('scroll', () => {
+      const i = currentCard();
+      dotsContainer.querySelectorAll('.np-dot').forEach((d, j) => {
+        d.classList.toggle('active', j === i);
+      });
+    });
+
+    document.getElementById('npPrev').addEventListener('click', () => scrollToCard(currentCard() - 1));
+    document.getElementById('npNext').addEventListener('click', () => scrollToCard(currentCard() + 1));
+  }
 
 })();
 </script>
