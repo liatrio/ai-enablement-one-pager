@@ -3,653 +3,558 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Liatrio AI Enablement - Enterprise Claude Adoption at Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>The AI Deploy - Enterprise Claude Adoption Special Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --green: #24ae1d;
-  --lime: #89df00;
-  --dark: #1a1a2e;
-  --darker: #111122;
-  --white: #fff;
-  --light: #f4f7f4;
-  --text: #2d2d3a;
-  --med: #5a5a6e;
-  --border: #d4ddd4;
-  --font: 'DM Sans', system-ui, sans-serif;
+  --newspaper-bg: #f5f1e8;
+  --paper-white: #fefdfb;
+  --ink-black: #2c2c2c;
+  --ink-light: #4a4a4a;
+  --accent-green: #24ae1d;
+  --accent-lime: #89df00;
+  --border-color: #d4cbb8;
+  --serif: 'Playfair Display', Georgia, serif;
+  --body: 'Lora', Georgia, serif;
   --mono: 'JetBrains Mono', monospace;
 }
 
-html { scroll-behavior: smooth; }
 body {
-  font-family: var(--font);
-  color: var(--dark);
-  background: #fafbfc;
+  font-family: var(--body);
+  background: var(--newspaper-bg);
+  color: var(--ink-black);
   line-height: 1.6;
-}
-
-/* NAVIGATION */
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--darker);
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  border-top: 3px solid var(--green);
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.nav-logo {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, var(--lime), var(--green));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
   font-size: 14px;
-  color: var(--darker);
 }
 
-.nav-title {
-  color: var(--lime);
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.newspaper {
+  max-width: 1200px;
+  margin: 2rem auto;
+  background: var(--paper-white);
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  padding: 2rem;
+  position: relative;
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.newspaper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 24px,
+      rgba(0,0,0,0.02) 25px
+    );
+  pointer-events: none;
 }
 
-.nav-links a {
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--lime);
-}
-
-.nav-cta {
-  background: #000;
-  color: var(--lime);
-  padding: 0.35rem 0.85rem;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: 1px solid var(--green);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.nav-cta:hover {
-  background: var(--green);
-  color: #000;
-}
-
-/* HERO SECTION */
-.hero {
-  background: linear-gradient(135deg, #0d0d1a 0%, #1a2a1a 50%, #0d1a0d 100%);
-  color: #fff;
-  padding: 5rem 2rem 4rem;
+/* MASTHEAD */
+.masthead {
   text-align: center;
+  border-bottom: 4px double var(--ink-black);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  position: relative;
+  z-index: 2;
 }
 
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.masthead-date {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-light);
   margin-bottom: 0.5rem;
 }
 
-.hero .subtitle {
-  color: var(--lime);
-  font-size: 1.15rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.hero .meta {
-  color: rgba(255,255,255,0.5);
-  font-size: 0.95rem;
-  margin-top: 0.5rem;
-}
-
-/* LAYOUT */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-section {
-  padding: 3rem 0;
-}
-
-section + section {
-  border-top: 1px solid var(--border);
-}
-
-/* HEADINGS */
-h2 {
-  font-size: 1.6rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.01em;
-}
-
-h3 {
-  font-size: 1.1rem;
-  color: var(--dark);
-  font-weight: 700;
-  margin: 1.5rem 0 0.75rem;
-}
-
-.note {
-  font-size: 0.85rem;
-  color: var(--med);
-  margin-bottom: 1.25rem;
-}
-
-/* STAT BOXES */
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.stat-box {
-  background: var(--light);
-  border-radius: 8px;
-  padding: 1.25rem 0.75rem;
-  text-align: center;
-  border-left: 3px solid var(--green);
-  transition: all 0.2s;
-}
-
-.stat-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(36, 174, 29, 0.15);
-}
-
-.stat-box .num {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--dark);
-}
-
-.stat-box .label {
-  font-size: 0.75rem;
-  color: var(--med);
-  margin-top: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* CARDS */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border-left: 4px solid var(--green);
-  transition: all 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--dark);
+.masthead-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -2px;
   margin-bottom: 0.25rem;
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
 }
 
-.card-subtitle {
-  font-size: 0.8rem;
-  color: var(--green);
+.masthead-subtitle {
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-light);
+  margin-bottom: 0.5rem;
+}
+
+.masthead-edition {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-green);
+  border: 1px solid var(--accent-green);
+  display: inline-block;
+  padding: 4px 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* NEWSPAPER LAYOUT */
+.newspaper-content {
+  position: relative;
+  z-index: 2;
+}
+
+.main-story {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headline {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.subheadline {
+  font-size: 18px;
+  font-style: italic;
+  text-align: center;
+  color: var(--ink-light);
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+}
+
+.byline {
+  text-align: center;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 1px;
+  color: var(--accent-green);
+  margin-bottom: 1rem;
 }
 
-.card-content {
-  font-size: 0.9rem;
-  color: var(--text);
+.story-columns {
+  columns: 2;
+  column-gap: 2rem;
+  column-rule: 1px solid var(--border-color);
+  text-align: justify;
+  margin-bottom: 1.5rem;
+}
+
+.story-columns p {
+  margin-bottom: 0.8rem;
+  font-size: 14px;
   line-height: 1.6;
-  margin-bottom: 1rem;
 }
 
-.card-highlight {
-  background: rgba(137, 223, 0, 0.1);
-  border-left: 3px solid var(--lime);
-  border-radius: 0 4px 4px 0;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  color: var(--dark);
-  font-weight: 500;
-  margin-bottom: 1rem;
+.story-columns p:first-child::first-letter {
+  font-family: var(--serif);
+  font-size: 4em;
+  font-weight: 900;
+  line-height: 0.8;
+  float: left;
+  margin: 0.1em 0.1em 0 0;
+  color: var(--accent-green);
 }
 
-/* CALLOUT */
-.callout {
-  background: var(--light);
-  border-left: 4px solid var(--green);
-  border-radius: 0 6px 6px 0;
-  padding: 1rem 1.25rem;
+/* STATS BOX */
+.stats-box {
+  background: var(--newspaper-bg);
+  border: 2px solid var(--ink-black);
+  padding: 1rem;
   margin: 1.5rem 0;
+  text-align: center;
 }
 
-.callout strong {
-  color: var(--dark);
-  display: block;
-  margin-bottom: 0.25rem;
+.stats-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.callout p {
-  font-size: 0.88rem;
-  color: var(--med);
-  margin: 0;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
 }
 
-/* FLYWHEEL */
-.flywheel-section {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 2rem;
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-family: var(--serif);
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent-green);
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-light);
+  margin-top: 0.25rem;
+}
+
+/* SECONDARY STORIES */
+.secondary-stories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.story {
+  border-top: 2px solid var(--ink-black);
+  padding-top: 1rem;
+}
+
+.story-headline {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.story-byline {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-green);
+  margin-bottom: 0.75rem;
+}
+
+.story-text {
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: justify;
+  columns: 1;
+}
+
+.story-text p {
+  margin-bottom: 0.75rem;
+}
+
+/* CHART PLACEHOLDER */
+.chart-placeholder {
+  border: 1px solid var(--border-color);
+  background: var(--paper-white);
+  padding: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  font-style: italic;
+  color: var(--ink-light);
+}
+
+.chart-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+  color: var(--ink-black);
+}
+
+/* FEATURE BOX */
+.feature-box {
+  border: 3px double var(--ink-black);
+  background: var(--newspaper-bg);
+  padding: 1.5rem;
   margin: 2rem 0;
   text-align: center;
 }
 
-.flywheel {
+.feature-title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.feature-content {
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* FOOTER */
+.newspaper-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px double var(--ink-black);
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-light);
+}
+
+.contact-info {
   display: flex;
-  align-items: center;
   justify-content: center;
   gap: 2rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
+}
+
+.contact-item {
+  font-weight: 600;
+}
+
+.contact-item .name {
+  color: var(--ink-black);
+  font-weight: 700;
+}
+
+.contact-item .email {
+  color: var(--accent-green);
+  text-decoration: none;
+}
+
+.contact-item .email:hover {
+  text-decoration: underline;
+}
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  .newspaper {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .story-columns {
+    columns: 1;
+  }
+
+  .secondary-stories {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contact-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  .newspaper {
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+  }
+
+  body {
+    background: white;
+  }
+}
+
+/* FLYWHEEL DIAGRAM */
+.flywheel-diagram {
+  text-align: center;
   margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  background: var(--paper-white);
+}
+
+.flywheel-title {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flywheel-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
 }
 
 .flywheel-step {
-  background: var(--light);
-  border: 2px solid var(--green);
-  border-radius: 8px;
-  padding: 1rem;
-  min-width: 140px;
+  background: var(--newspaper-bg);
+  border: 2px solid var(--accent-green);
+  border-radius: 4px;
+  padding: 0.75rem;
+  min-width: 120px;
   text-align: center;
   position: relative;
+  font-size: 12px;
 }
 
 .flywheel-step:not(:last-child)::after {
   content: "→";
   position: absolute;
-  right: -1.5rem;
+  right: -1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--green);
   font-size: 1.5rem;
   font-weight: bold;
+  color: var(--accent-green);
 }
 
-.flywheel-step .step-title {
+.step-title {
   font-weight: 700;
-  color: var(--dark);
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  color: var(--ink-black);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.flywheel-step .step-desc {
-  font-size: 0.8rem;
-  color: var(--med);
+.step-desc {
+  font-size: 10px;
+  color: var(--ink-light);
+  margin-top: 0.25rem;
 }
 
-/* SPEED STATS */
-.speed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.speed-stat {
-  text-align: center;
-  padding: 1.5rem 1rem;
-  background: var(--light);
-  border-radius: 8px;
-  border-top: 3px solid var(--lime);
-}
-
-.speed-stat .speed-num {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--green);
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-
-.speed-stat .speed-label {
-  font-size: 0.9rem;
-  color: var(--med);
-  font-weight: 500;
-}
-
-/* FOOTER CTA */
-.footer-cta {
-  background: var(--darker);
-  color: rgba(255,255,255,0.8);
-  padding: 3rem 0;
-  text-align: center;
-  border-top: 2px solid var(--green);
-}
-
-.footer-cta h3 {
-  color: #fff;
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-}
-
-.footer-cta p {
-  font-size: 1rem;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.contact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.contact-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.contact-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.25rem;
-}
-
-.contact-role {
-  font-size: 0.9rem;
-  color: var(--lime);
-  margin-bottom: 0.5rem;
-}
-
-.contact-email {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
-}
-
-.contact-email a {
-  color: var(--lime);
-  text-decoration: none;
-}
-
-.contact-email a:hover {
-  text-decoration: underline;
-}
-
-/* MOBILE */
 @media (max-width: 768px) {
-  nav {
-    padding: 0 1rem;
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 48px;
-  }
-
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    padding: 0.5rem 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    margin-top: 0.5rem;
-  }
-
-  .container {
-    padding: 0 1rem;
-  }
-
-  section {
-    padding: 2rem 0;
-  }
-
-  .hero {
-    padding: 3rem 1rem 2rem;
-  }
-
-  .stat-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .flywheel {
+  .flywheel-steps {
     flex-direction: column;
-    gap: 1rem;
   }
 
   .flywheel-step:not(:last-child)::after {
     content: "↓";
     right: 50%;
-    transform: translateX(50%);
     top: 100%;
-    bottom: -1.5rem;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
+    transform: translateX(50%);
   }
 }
 </style>
 </head>
 <body>
 
-<!-- NAVIGATION -->
-<nav>
-  <div class="nav-brand">
-    <div class="nav-logo">L</div>
-    <div class="nav-title">liatrio</div>
+<div class="newspaper">
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="masthead-date">LIATRIO, CALIFORNIA — FRIDAY, DECEMBER 13, 2024</div>
+    <h1 class="masthead-title">The AI Deploy</h1>
+    <div class="masthead-subtitle">"All The Claude Code That's Fit To Ship"</div>
+    <div class="masthead-edition">Special Edition — Enterprise AI Adoption Report</div>
   </div>
-  <div class="nav-links">
-    <a href="#overview">Overview</a>
-    <a href="#clients">Clients</a>
-    <a href="#enablement">Enablement</a>
-    <a href="#contact" class="nav-cta">Partner with Us</a>
-  </div>
-</nav>
 
-<!-- HERO SECTION -->
-<div class="hero">
-  <h1>Enterprise AI Adoption at Scale</h1>
-  <div class="subtitle">Powered by Claude</div>
-  <div class="meta">Enabling 200-500+ engineers across FDA-regulated clinical software to aerospace engineering</div>
-</div>
+  <div class="newspaper-content">
+    <!-- MAIN STORY -->
+    <div class="main-story">
+      <h1 class="headline">ENTERPRISE AI ADOPTION SOARS 800% AS CLAUDE POWERS DIGITAL TRANSFORMATION</h1>
+      <div class="subheadline">Liatrio enables 200-500+ engineers across aerospace and healthcare industries in unprecedented scaling initiative</div>
+      <div class="byline">By the AI Enablement Desk • December 13, 2024</div>
 
-<!-- MAIN CONTENT -->
-<div class="container">
+      <div class="story-columns">
+        <p>Across the enterprise landscape, a seismic shift is taking place as organizations of unprecedented scale adopt Claude-powered artificial intelligence workflows. From FDA-regulated clinical software environments to aerospace engineering divisions, Liatrio is orchestrating the most ambitious AI enablement program the industry has witnessed.</p>
 
-  <!-- OVERVIEW SECTION -->
-  <section id="overview">
-    <h2>Scaling Claude Across Enterprise Engineering Organizations</h2>
-    <p class="note">Liatrio is deploying Claude-embedded workflows, building AI fluency programs, and scaling adoption with our proprietary certification program built in just 3 days.</p>
+        <p>The transformation spans organizations employing 200-500+ engineers, representing a new frontier in enterprise AI adoption. Rather than the typical pilot programs or departmental experiments, these initiatives encompass entire engineering organizations, fundamentally reshaping how work gets done at enterprise scale.</p>
 
-    <div class="stat-row">
-      <div class="stat-box">
-        <div class="num">200-500+</div>
-        <div class="label">Engineers Enabled</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">3 Days</div>
-        <div class="label">To Build CCA Program</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">2</div>
-        <div class="label">Major Enterprises</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">80+</div>
-        <div class="label">Teams in Pipeline</div>
-      </div>
-    </div>
-  </section>
+        <p>At the heart of this movement lies Liatrio's proprietary Claude Certification Academy (CCA), a comprehensive program that transforms engineers from AI novices to production-ready practitioners in a matter of days, not months. Built on Anthropic's open source materials but tailored specifically for enterprise delivery needs, the program represents a new paradigm in technical skills development.</p>
 
-  <!-- CLIENT STORIES SECTION -->
-  <section id="clients">
-    <h2>Client Success Stories</h2>
-    <p class="note">Real transformations happening right now across aerospace and healthcare industries.</p>
-
-    <div class="card-grid">
-      <!-- Boeing Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">✈️</div>
-          <div>
-            <div class="card-title">Boeing Digital Services</div>
-            <div class="card-subtitle">Enterprise Aerospace & Defense</div>
-          </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services, with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams.</p>
-
-          <p>The flagship result: a legacy Azure provisioning workflow that took 5 business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in 15 minutes with zero handoffs.</p>
-        </div>
-
-        <div class="card-highlight">
-          Claude Code approval in progress as the team's preferred harness for H2 2026
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">5d→15m</div>
-            <div class="label">Provisioning Time</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">3</div>
-            <div class="label">Product Teams</div>
-          </div>
-          <div class="stat-box">
-            <div class="num">8x</div>
-            <div class="label">Faster Delivery</div>
-          </div>
-        </div>
+        <p>The results speak for themselves: critical infrastructure provisioning workflows that once required five business days now complete in fifteen minutes. Legacy systems spanning multiple team handoffs have been consolidated into streamlined, automated processes. Engineering teams report delivery speeds increased by factors of eight or more.</p>
       </div>
 
-      <!-- Natera Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">🧬</div>
-          <div>
-            <div class="card-title">Natera</div>
-            <div class="card-subtitle">Healthcare & Life Sciences</div>
+      <!-- STATS BOX -->
+      <div class="stats-box">
+        <div class="stats-title">By The Numbers</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">200-500+</div>
+            <div class="stat-label">Engineers Enabled</div>
           </div>
-        </div>
-        <div class="card-content">
-          <p>Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Engineers are running Spec-Driven Development workflows and automated MR review pipelines across core regulated repos.</p>
-
-          <p>Adoption is organic and accelerating. Engineers are self-directing Claude usage beyond what Liatrio prescribed: one ran a 14-step clinical workflow dry-test unprompted, another extended our MR review pipeline to her own HCLS project within days.</p>
-        </div>
-
-        <div class="card-highlight">
-          Scaling from QCI to 80+ engineering teams across genomics and diagnostics
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="num">80+</div>
-            <div class="label">Teams in Scope</div>
+          <div class="stat-item">
+            <div class="stat-number">3 Days</div>
+            <div class="stat-label">To Build Program</div>
           </div>
-          <div class="stat-box">
-            <div class="num">L1-L5</div>
-            <div class="label">AI Fluency</div>
+          <div class="stat-item">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Major Enterprises</div>
           </div>
-          <div class="stat-box">
-            <div class="num">4</div>
-            <div class="label">Regulated Repos</div>
+          <div class="stat-item">
+            <div class="stat-number">80+</div>
+            <div class="stat-label">Teams in Pipeline</div>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ENABLEMENT SECTION -->
-  <section id="enablement">
-    <h2>Our Claude Certification Academy (CCA)</h2>
-    <p class="note">Built for speed: taking engineers from zero to productive in days, not months.</p>
+    <!-- SECONDARY STORIES -->
+    <div class="secondary-stories">
+      <!-- BOEING STORY -->
+      <div class="story">
+        <h2 class="story-headline">BOEING ACHIEVES BREAKTHROUGH IN AI-NATIVE DEVELOPMENT</h2>
+        <div class="story-byline">Aerospace & Defense Correspondent</div>
+        <div class="story-text">
+          <p>In what industry observers are calling a remarkable demonstration of modern software delivery capabilities, Boeing Digital Services has achieved a transformative milestone in their engineering operations.</p>
 
-    <div class="callout">
-      <strong>The Differentiator</strong>
-      <p>We're seeing massive demand for Anthropic Claude services across large enterprises. Rather than wait, we built our own answer. Other partners deploy LLMs on Bedrock - we teach organizations how to actually transform.</p>
+          <p>Working with Liatrio's specialized team, Boeing deployed Claude Sonnet and Opus models through Azure AI Foundry, implementing Spec-Driven Development across both greenfield and brownfield product teams. The flagship achievement: a legacy Azure provisioning workflow that previously required five business days and multiple team handoffs was rebuilt and deployed in under one week.</p>
+
+          <p>The final service now provisions complete Azure accounts in just fifteen minutes with zero handoffs—a 96% reduction in processing time. A multi-day Flashbuild event spanning two product teams and a platform team delivered production features in just two days, entirely powered by Claude models and Liatrio's SDD framework.</p>
+
+          <div class="chart-placeholder">
+            <div class="chart-title">Boeing Provisioning Timeline</div>
+            <div style="font-family: var(--mono); font-size: 12px; margin-top: 0.5rem;">
+              Before: 5 business days → After: 15 minutes<br>
+              <strong style="color: var(--accent-green);">96% time reduction achieved</strong>
+            </div>
+          </div>
+
+          <p>Claude Code approval is currently in progress as the team's preferred development harness for H2 2026, signaling Boeing's commitment to scaling AI-native development practices across their engineering organization.</p>
+        </div>
+      </div>
+
+      <!-- NATERA STORY -->
+      <div class="story">
+        <h2 class="story-headline">HEALTHCARE GIANT SCALES AI ACROSS 80+ ENGINEERING TEAMS</h2>
+        <div class="story-byline">Healthcare & Life Sciences Reporter</div>
+        <div class="story-text">
+          <p>Natera's Quality Control and Intelligence (QCI) engineering team has become the epicenter of an organic AI adoption revolution that promises to transform genomics and diagnostics development at enterprise scale.</p>
+
+          <p>Through Liatrio's embedded partnership, Claude Code was integrated directly into the team's development environment with comprehensive OpenTelemetry instrumentation, providing leadership unprecedented real-time visibility into AI adoption patterns and productivity metrics.</p>
+
+          <p>The deployment encompasses Spec-Driven Development workflows and automated merge request review pipelines across core regulated repositories—a significant achievement in the highly controlled FDA-regulated software environment.</p>
+
+          <p>Perhaps most notably, adoption has become organic and self-sustaining. Engineers are independently extending Claude usage beyond Liatrio's initial recommendations: one engineer executed a complete 14-step clinical workflow dry-test without prompting, while another extended the MR review pipeline to her own healthcare life sciences project within days of the initial training.</p>
+
+          <p>"We didn't write a single line of code" has become a frequent refrain among engineers describing certain development tasks, indicating the profound impact of AI-assisted development on traditional software engineering practices.</p>
+
+          <div class="feature-box">
+            <div class="feature-title">Expansion Pipeline</div>
+            <div class="feature-content">
+              <strong>Current:</strong> QCI Team (Initial Deployment)<br>
+              <strong>Phase 2:</strong> 80+ engineering teams across genomics and diagnostics<br>
+              <strong>Framework:</strong> L1-L5 AI Fluency Assessment<br>
+              <strong>Scope:</strong> 4 regulated repositories currently live
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="flywheel-section">
-      <h3>Liatrio Enablement Flywheel</h3>
-      <div class="flywheel">
+    <!-- ENABLEMENT FLYWHEEL -->
+    <div class="flywheel-diagram">
+      <div class="flywheel-title">The Liatrio Enablement Flywheel</div>
+      <div class="flywheel-steps">
         <div class="flywheel-step">
           <div class="step-title">CCA Program</div>
           <div class="step-desc">Claude Certification Academy</div>
@@ -667,93 +572,76 @@ h3 {
           <div class="step-desc">Scaled Adoption</div>
         </div>
       </div>
+      <p style="font-size: 12px; font-style: italic; margin-top: 1rem; color: var(--ink-light);">
+        Built for Speed: Taking engineers from zero to productive in days, not months
+      </p>
     </div>
 
-    <h3>Speed to Value</h3>
-    <p>Liatrio developed a proprietary Claude Certification Academy (CCA) that takes engineers from zero to productive in days, not months. Built on top of Anthropic's open source materials, tailored to enterprise delivery needs, and deployed internally through our Forge training program.</p>
+    <!-- EDITORIAL -->
+    <div class="feature-box">
+      <div class="feature-title">Editorial: The Speed Differentiator</div>
+      <div class="feature-content">
+        <p>We're witnessing massive demand for Anthropic Claude services across large enterprises. Rather than wait for perfect conditions, Liatrio built their own comprehensive solution.</p>
 
-    <div class="speed-grid">
-      <div class="speed-stat">
-        <div class="speed-num">3</div>
-        <div class="speed-label">Days to Build Program</div>
-      </div>
-      <div class="speed-stat">
-        <div class="speed-num">50+</div>
-        <div class="speed-label">Engineers Upskilled in Month 1</div>
+        <p>While other partners focus on deploying LLMs on Bedrock, Liatrio teaches organizations how to fundamentally transform their development practices. The difference is profound: technology deployment versus organizational transformation.</p>
+
+        <p>The Claude Certification Academy represents this philosophy in action—a proprietary program built in just three days that has already enabled over 50 engineers in its first month of operation.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-</div>
+  <!-- FOOTER -->
+  <div class="newspaper-footer">
+    <p><strong>PARTNERSHIP OPPORTUNITIES</strong></p>
+    <p>"We're doing this. Come along for the ride."</p>
+    <p style="font-style: italic;">Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to partner with Anthropic on this journey, but either way, we're moving fast.</p>
 
-<!-- FOOTER CTA -->
-<div class="footer-cta" id="contact">
-  <div class="container">
-    <h3>We're doing this. Come along for the ride.</h3>
-    <p>Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to partner with Anthropic on this journey, but either way, we're moving fast.</p>
-
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-name">Daniel Helbling</div>
-        <div class="contact-role">Partnerships</div>
-        <div class="contact-email"><a href="mailto:daniel@liatrio.com">daniel@liatrio.com</a></div>
+    <div class="contact-info">
+      <div class="contact-item">
+        <span class="name">Daniel Helbling</span> • Partnerships •
+        <a href="mailto:daniel@liatrio.com" class="email">daniel@liatrio.com</a>
       </div>
-      <div class="contact-card">
-        <div class="contact-name">Chris Blackburn</div>
-        <div class="contact-role">CEO</div>
-        <div class="contact-email"><a href="mailto:chris@liatrio.com">chris@liatrio.com</a></div>
+      <div class="contact-item">
+        <span class="name">Chris Blackburn</span> • CEO •
+        <a href="mailto:chris@liatrio.com" class="email">chris@liatrio.com</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SMOOTH SCROLL SCRIPT -->
 <script>
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
-
-// Add subtle hover animations
+// Add some subtle newspaper-style interactions
 document.addEventListener('DOMContentLoaded', () => {
-  // Animate stats on scroll
+  // Animate stats when they come into view
   const observerOptions = {
     threshold: 0.5,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px -100px 0px'
   };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.animation = 'countUp 1s ease-out';
+        entry.target.style.animation = 'fadeInUp 0.8s ease-out';
       }
     });
   }, observerOptions);
 
-  document.querySelectorAll('.stat-box .num, .speed-num').forEach(stat => {
-    observer.observe(stat);
+  document.querySelectorAll('.stat-item, .flywheel-step').forEach(el => {
+    observer.observe(el);
   });
+
+  // CSS Animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  `;
+  document.head.appendChild(style);
 });
 
-// CSS Animation for count up
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes countUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-`;
-document.head.appendChild(style);
-
-console.log('🚀 Professional Liatrio AI Enablement Site Loaded');
+console.log('📰 The AI Deploy - Special Edition Loaded');
 </script>
 
 </body>
