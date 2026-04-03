@@ -1286,27 +1286,28 @@ body {
   // Active Theory-style staggered word reveal with 3D rotation
   const entranceTL = gsap.timeline({ delay: 0.3 });
 
-  // Title words fly up
+  // 0.0s - Title words fly up
   entranceTL.to('.title-word', {
     opacity: 1, y: 0, rotateX: 0,
     duration: 0.8, stagger: 0.12, ease: 'power4.out',
-  });
+  }, 0);
 
-  // Date, rules, tagline, edition overlap with end of title
-  entranceTL.to('.masthead-date', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.3');
-  entranceTL.to('.masthead-rule', { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.inOut', stagger: 0.1 }, '-=0.2');
-  entranceTL.to('.masthead-tagline', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.2');
-  entranceTL.to('.masthead-edition', { opacity: 1, duration: 0.3, ease: 'power3.out' }, '-=0.15');
+  // 0.5s - Date, rules, tagline, edition
+  entranceTL.to('.masthead-date', { opacity: 1, duration: 0.4, ease: 'power3.out' }, 0.5);
+  entranceTL.to('.masthead-rule', { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.inOut', stagger: 0.1 }, 0.6);
+  entranceTL.to('.masthead-tagline', { opacity: 1, duration: 0.4, ease: 'power3.out' }, 0.7);
+  entranceTL.to('.masthead-edition', { opacity: 1, duration: 0.3, ease: 'power3.out' }, 0.8);
 
-  // Beat, then headline draws in
+  // 1.5s - Headline draws in (clear beat after title settles)
   entranceTL.fromTo('.masthead-headline',
     { opacity: 0, y: 20 },
     { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
-    '+=0.4'
+    1.5
   );
 
-  entranceTL.to('.masthead-sub', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.1');
-  entranceTL.to('.scroll-hint', { opacity: 0.6, duration: 0.4, ease: 'power3.out' }, '+=0.2');
+  // 1.8s - Sub and scroll hint
+  entranceTL.to('.masthead-sub', { opacity: 1, duration: 0.4, ease: 'power3.out' }, 1.8);
+  entranceTL.to('.scroll-hint', { opacity: 0.6, duration: 0.4, ease: 'power3.out' }, 2.0);
 
   // ====== CURSOR INK TRAIL ======
   // Leaves a trail of ink dots that fade out (Active Theory mouse-follow aesthetic)
