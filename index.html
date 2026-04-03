@@ -707,6 +707,9 @@ body {
   perspective-origin: 50% 60%;
 }
 
+/* Cursor and trail disabled */
+.cursor-dot, .cursor-trail { display: none !important; }
+
 /* ====== MASTHEAD ENTRANCE ====== */
 .title-word {
   display: inline-block;
@@ -1571,20 +1574,12 @@ body {
       }
     });
 
-    // Section depth: blur only when approaching from below, sharp once at center or above
+    // Section depth: subtle velocity skew only, no blur
     zoomSections.forEach(section => {
-      const rect = section.getBoundingClientRect();
-      const center = rect.top + rect.height / 2;
-      const centerOffset = (center - vh / 2) / vh; // negative = above center, positive = below
       const content = section.querySelector('.story-content');
       if (content) {
-        // Only blur when below center (approaching); clear once it reaches middle
-        const blur = centerOffset > 0.3 ? (centerOffset - 0.3) * 2.5 : 0;
-        const z = centerOffset > 0 ? -centerOffset * 40 : 0;
-        const scale = centerOffset > 0 ? 1 - centerOffset * 0.03 : 1;
-        const skew = lenisVelocity * 0.015;
-        content.style.transform = `translateZ(${z}px) scale(${clamp(scale, 0.96, 1)}) skewY(${clamp(skew, -2, 2)}deg)`;
-        content.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none';
+        const skew = lenisVelocity * 0.012;
+        content.style.transform = `skewY(${clamp(skew, -1.5, 1.5)}deg)`;
       }
     });
 
