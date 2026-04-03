@@ -813,6 +813,15 @@ body {
   .footer-contact { flex-direction: column; gap: 1.5rem; }
   .pullquote p { font-size: 1.1rem; }
   .section-ornament { font-size: 30vw; }
+
+  /* Shrink envelope trigger to 2/3 on mobile, hide label */
+  #chat-trigger-wrap {
+    bottom: 12px;
+    right: 12px;
+    transform: scale(0.67);
+    transform-origin: bottom right;
+  }
+  .chat-lte-label { display: none; }
 }
 
 /* =============================================
