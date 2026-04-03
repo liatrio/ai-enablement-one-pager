@@ -1835,7 +1835,7 @@ body {
 <!-- Callout: zoom-in with border-draw -->
 <section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
-  <div class="border-draw" data-scroll data-type="border-draw" data-delay="200">
+  <div class="border-draw" data-scroll data-type="border-draw">
     <div class="callout-zoom large flying-text" style="padding: 0;">
       200 to 500 engineers.<br>No playbook.<br><em>So we wrote one.</em>
     </div>
@@ -2491,10 +2491,28 @@ body {
     const flyingEls = document.querySelectorAll('.flying-text');
 
     flyingEls.forEach(el => {
-      // SplitType splits text into words then chars, preventing mid-word breaks
-      const split = new SplitType(el, { types: 'words, chars', tagName: 'span' });
+      // Protect <em> content from being split into individual chars
+      // (italic swash glyphs like Playfair "ff" get clipped when split)
+      el.querySelectorAll('em').forEach(em => {
+        em.setAttribute('data-protected', '');
+        em.style.display = 'inline-block';
+      });
 
-      if (!split.chars || split.chars.length === 0) return;
+      const split = new SplitType(el, {
+        types: 'words, chars',
+        tagName: 'span',
+        // SplitType won't descend into elements with data-splitting="false"
+      });
+
+      // Gather animated elements: chars + protected em elements (as whole units)
+      const animTargets = [];
+      if (split.chars) split.chars.forEach(c => {
+        // Skip chars that are inside a protected em
+        if (!c.closest('em[data-protected]')) animTargets.push(c);
+      });
+      el.querySelectorAll('em[data-protected]').forEach(em => animTargets.push(em));
+
+      if (animTargets.length === 0) return;
 
       // Remove data-scroll so the old scroll engine doesn't fight GSAP
       el.removeAttribute('data-scroll');
@@ -2506,9 +2524,8 @@ body {
       el.style.letterSpacing = 'normal';
       el.style.filter = 'none';
 
-      // Create per-char random start values
+      // Create per-element random start values
       const section = el.closest('.story-section') || el.closest('section');
-      const chars = split.chars;
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -2518,9 +2535,9 @@ body {
         }
       });
 
-      // Set chars to scattered positions (smaller range so they're visible sooner)
-      chars.forEach(char => {
-        gsap.set(char, {
+      // Set elements to scattered positions
+      animTargets.forEach(target => {
+        gsap.set(target, {
           rotateY: 90 + Math.random() * 90,
           yPercent: -40 + Math.random() * 80,
           xPercent: -40 + Math.random() * 80,
@@ -2530,7 +2547,7 @@ body {
       });
 
       // Animate them to assembled position
-      tl.to(chars, {
+      tl.to(animTargets, {
         rotateY: 0,
         yPercent: 0,
         xPercent: 0,
