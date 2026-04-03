@@ -1021,6 +1021,33 @@ body {
 }
 .oracle-article { animation: article-drop-in 0.35s ease both; }
 
+/* Skeleton placeholder */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.oracle-skeleton {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 3px double var(--rule-dark);
+}
+.oracle-skeleton-bar {
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--rule) 25%, var(--parchment-dark) 50%, var(--rule) 75%);
+  background-size: 600px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  margin-bottom: 0.55rem;
+}
+.oracle-skeleton-label  { width: 12%; height: 0.6em; margin-bottom: 0.7rem; }
+.oracle-skeleton-hed    { width: 78%; height: 1.6em; margin-bottom: 0.5rem; }
+.oracle-skeleton-hed2   { width: 55%; height: 1.6em; margin-bottom: 0.8rem; }
+.oracle-skeleton-deck   { width: 90%; height: 0.8em; margin-bottom: 0.25rem; }
+.oracle-skeleton-deck2  { width: 70%; height: 0.8em; margin-bottom: 0.8rem; }
+.oracle-skeleton-meta   { width: 100%; height: 0.6em; margin-bottom: 0.8rem; }
+.oracle-skeleton-body   { width: 100%; }
+.oracle-skeleton-body-short { width: 65%; }
+
 /* Compose footer */
 .oracle-compose {
   flex-shrink: 0;
@@ -2512,6 +2539,32 @@ body {
 
   // ── Dispatch ──────────────────────────────────────────────────────────────
 
+  function showSkeleton() {
+    if (welcome) welcome.remove();
+    const sk = document.createElement('div');
+    sk.className = 'oracle-skeleton';
+    sk.id = 'oracle-skeleton';
+    sk.innerHTML = `
+      <div class="oracle-skeleton-bar oracle-skeleton-label"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-hed"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-hed2"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-deck"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-deck2"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-meta"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body-short"></div>
+    `;
+    broadsheet.appendChild(sk);
+    broadsheet.scrollTop = broadsheet.scrollHeight;
+  }
+
+  function removeSkeleton() {
+    const sk = document.getElementById('oracle-skeleton');
+    if (sk) sk.remove();
+  }
+
   async function dispatch(question) {
     question = question.trim();
     if (!question || dispatching) return;
@@ -2520,7 +2573,8 @@ body {
     oSend.disabled = true;
     oInput.value = '';
     oInput.style.height = 'auto';
-    setStatus('Setting type…', true);
+    setStatus('On the wire…', true);
+    showSkeleton();
 
     try {
       const res = await fetch(ARTICLE_API, {
@@ -2529,17 +2583,19 @@ body {
         body: JSON.stringify({ question }),
       });
 
+      removeSkeleton();
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         setStatus(err.error || 'Press failed — try again', false);
       } else {
         const { article } = await res.json();
-        setStatus('On the wire…', true);
         renderArticle(article);
         setStatus('Edition updated', true);
         setTimeout(() => setStatus('Awaiting dispatch', false), 3000);
       }
     } catch (_) {
+      removeSkeleton();
       setStatus('Connection lost — try again', false);
     }
 
