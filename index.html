@@ -802,6 +802,226 @@ body {
   .pullquote p { font-size: 1.1rem; }
   .section-ornament { font-size: 30vw; }
 }
+
+/* =============================================
+   CHAT WIDGET
+   ============================================= */
+#chat-trigger {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #080b10;
+  border: 2px solid #89DF00;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(137,223,0,0.25);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.2s ease;
+}
+#chat-trigger:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 28px rgba(137,223,0,0.45);
+  border-color: #9cee10;
+}
+#chat-trigger.open {
+  border-color: rgba(137,223,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  animation: none;
+}
+#chat-trigger svg { pointer-events: none; }
+#chat-trigger:not(.open) { animation: chat-pulse 2.8s ease-in-out infinite; }
+@keyframes chat-pulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(137,223,0,0.35), 0 0 0 0 rgba(137,223,0,0.4); }
+  50%       { box-shadow: 0 4px 24px rgba(137,223,0,0.5), 0 0 0 10px rgba(137,223,0,0); }
+}
+
+#chat-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 28px;
+  z-index: 9000;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  height: 520px;
+  max-height: calc(100vh - 120px);
+  background: #0c1018;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(137,223,0,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform-origin: bottom right;
+}
+#chat-panel.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+.chat-header {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.chat-header-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #89DF00;
+  box-shadow: 0 0 8px rgba(137,223,0,0.6);
+  flex-shrink: 0;
+}
+.chat-header-text { flex: 1; }
+.chat-header-title {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0efe8;
+  line-height: 1.2;
+}
+.chat-header-sub { font-size: 11px; color: #8c8c85; margin-top: 1px; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.chat-msg {
+  max-width: 88%;
+  font-size: 13.5px;
+  line-height: 1.55;
+  padding: 10px 13px;
+  border-radius: 12px;
+  animation: chat-msg-in 0.2s ease both;
+}
+@keyframes chat-msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: #89DF00;
+  color: #080b10;
+  font-weight: 500;
+  border-bottom-right-radius: 4px;
+  font-family: var(--sans);
+}
+.chat-msg.assistant {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.05);
+  color: #f0efe8;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-bottom-left-radius: 4px;
+  white-space: pre-wrap;
+  font-family: var(--sans);
+}
+
+.chat-typing {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  border-bottom-left-radius: 4px;
+}
+.chat-typing span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #8c8c85;
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+.chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.chat-input-area {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  background: #0c1018;
+}
+.chat-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: #f0efe8;
+  resize: none;
+  outline: none;
+  min-height: 40px;
+  max-height: 100px;
+  line-height: 1.45;
+  transition: border-color 0.2s ease;
+  overflow-y: auto;
+}
+.chat-input:focus { border-color: rgba(137,223,0,0.35); }
+.chat-input::placeholder { color: #505048; }
+.chat-send {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: #89DF00;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #080b10;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.15s ease;
+  align-self: flex-end;
+}
+.chat-send:hover { background: #9cee10; transform: scale(1.05); }
+.chat-send:disabled {
+  background: rgba(255,255,255,0.1);
+  color: #505048;
+  cursor: not-allowed;
+  transform: none;
+}
+.chat-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 4px; }
+.chat-chip {
+  font-size: 11.5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(137,223,0,0.25);
+  color: #89DF00;
+  background: rgba(137,223,0,0.06);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-family: var(--sans);
+  white-space: nowrap;
+}
+.chat-chip:hover { background: rgba(137,223,0,0.12); border-color: rgba(137,223,0,0.4); }
 </style>
 </head>
 <body>
@@ -1749,6 +1969,159 @@ body {
         },
       });
     });
+  });
+})();
+</script>
+
+<!-- Chat widget -->
+<button id="chat-trigger" aria-label="Open AI chat" aria-expanded="false">
+  <svg id="chat-icon-open" width="22" height="33" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+    <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+  </svg>
+  <svg id="chat-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c8c85" stroke-width="2.5" stroke-linecap="round" style="display:none">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+</button>
+
+<div id="chat-panel" role="dialog" aria-label="Chat with Liatrio AI" aria-hidden="true">
+  <div class="chat-header">
+    <div class="chat-header-dot"></div>
+    <div class="chat-header-text">
+      <div class="chat-header-title">Liatrio AI</div>
+      <div class="chat-header-sub">Enterprise AI transformation</div>
+    </div>
+    <button id="chat-close" aria-label="Close chat" style="background:none;border:none;cursor:pointer;color:#8c8c85;padding:4px;display:flex;align-items:center;transition:color 0.15s ease;" onmouseover="this.style.color='#f0efe8'" onmouseout="this.style.color='#8c8c85'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-msg assistant">Hey — happy to dig into anything about enterprise AI adoption. What's on your mind?</div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="chat-chip">What did you do at Boeing?</button>
+      <button class="chat-chip">Is AI really that transformational?</button>
+      <button class="chat-chip">How does Liatrio actually do this?</button>
+      <button class="chat-chip">What about regulated industries?</button>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <textarea id="chat-input" class="chat-input" placeholder="Ask anything about AI transformation…" rows="1" maxlength="2000" aria-label="Chat message"></textarea>
+    <button id="chat-send" class="chat-send" disabled aria-label="Send message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const CHAT_API = 'https://ai-enablement-api.gregk.workers.dev/api/chat';
+  const trigger  = document.getElementById('chat-trigger');
+  const panel    = document.getElementById('chat-panel');
+  const msgs     = document.getElementById('chat-messages');
+  const input    = document.getElementById('chat-input');
+  const sendBtn  = document.getElementById('chat-send');
+  const chips    = document.getElementById('chat-suggestions');
+  const iconOpen = document.getElementById('chat-icon-open');
+  const iconClose= document.getElementById('chat-icon-close');
+
+  let open = false, waiting = false, history = [];
+
+  function toggleChat() {
+    open = !open;
+    panel.classList.toggle('visible', open);
+    panel.setAttribute('aria-hidden', String(!open));
+    trigger.setAttribute('aria-expanded', String(open));
+    trigger.classList.toggle('open', open);
+    iconOpen.style.display  = open ? 'none' : '';
+    iconClose.style.display = open ? ''     : 'none';
+    if (open) { requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); input.focus(); }
+  }
+
+  function renderMarkdown(text) {
+    const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return escaped
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function addMsg(role, text) {
+    const d = document.createElement('div');
+    d.className = 'chat-msg ' + role;
+    if (role === 'assistant') d.innerHTML = renderMarkdown(text);
+    else d.textContent = text;
+    msgs.appendChild(d);
+    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'chat-typing'; el.id = 'chat-typing';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(el);
+    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+  }
+  function removeTyping() { const el = document.getElementById('chat-typing'); if (el) el.remove(); }
+
+  async function send(text) {
+    text = text.trim();
+    if (!text || waiting) return;
+    if (chips) chips.style.display = 'none';
+    input.value = ''; input.style.height = 'auto';
+    sendBtn.disabled = true; waiting = true;
+
+    history.push({ role: 'user', content: text });
+    addMsg('user', text);
+    if (history.length > 20) history = history.slice(history.length - 20);
+    if (history[0].role === 'assistant') history = history.slice(1);
+    showTyping();
+
+    try {
+      const res = await fetch(CHAT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+      });
+      removeTyping();
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        addMsg('assistant', err.error || 'Something went wrong. Try again?');
+        history.pop();
+      } else {
+        const data = await res.json();
+        const reply = data.reply || '(no response)';
+        history.push({ role: 'assistant', content: reply });
+        addMsg('assistant', reply);
+      }
+    } catch (_) {
+      removeTyping();
+      addMsg('assistant', 'Connection issue — check your network and try again.');
+      history.pop();
+    }
+    waiting = false;
+    sendBtn.disabled = input.value.trim().length === 0;
+    input.focus();
+  }
+
+  trigger.addEventListener('click', toggleChat);
+  document.getElementById('chat-close').addEventListener('click', toggleChat);
+  sendBtn.addEventListener('click', () => send(input.value));
+  input.addEventListener('input', () => {
+    sendBtn.disabled = input.value.trim().length === 0 || waiting;
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
+  });
+  chips && chips.addEventListener('click', e => {
+    const chip = e.target.closest('.chat-chip');
+    if (chip) send(chip.textContent);
+  });
+  document.addEventListener('keydown', e => {
+    if (open && e.key === 'Escape') { e.preventDefault(); toggleChat(); }
   });
 })();
 </script>
