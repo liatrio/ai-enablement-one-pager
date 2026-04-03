@@ -2301,11 +2301,11 @@ body {
   <div class="oracle-compose">
     <div class="oracle-compose-label">Letters to the Editor · The AI Daily Newsroom</div>
     <div class="oracle-prompts" id="oracle-prompts">
-      <button class="oracle-prompt-chip">What did Liatrio do at Boeing?</button>
-      <button class="oracle-prompt-chip">Is AI really as big a shift as the internet?</button>
-      <button class="oracle-prompt-chip">How does Liatrio actually do this work?</button>
-      <button class="oracle-prompt-chip">What about regulated industries?</button>
-      <button class="oracle-prompt-chip">How fast can we get started?</button>
+      <button class="oracle-prompt-chip" data-prompt="What did Liatrio do at Boeing?">What did Liatrio do at Boeing?</button>
+      <button class="oracle-prompt-chip" data-prompt="Is AI really as big a shift as the internet?">Is AI really as big a shift as the internet?</button>
+      <button class="oracle-prompt-chip" data-prompt="How does Liatrio actually do this work?">How does Liatrio actually do this work?</button>
+      <button class="oracle-prompt-chip" data-prompt="What about regulated industries?">What about regulated industries?</button>
+      <button class="oracle-prompt-chip" data-prompt="How fast can we get started?">How fast can we get started?</button>
     </div>
     <div class="oracle-compose-row">
       <textarea
@@ -2476,6 +2476,7 @@ body {
     if (article.pullquote) {
       pullEl = document.createElement('div');
       pullEl.className = 'oracle-pullquote';
+      pullEl.textContent = article.pullquote;
       pullEl.style.opacity = '0';
       pullEl.style.transition = 'opacity 0.6s ease';
     }
@@ -2567,8 +2568,13 @@ body {
 
   // Prompt chips
   document.querySelectorAll('.oracle-prompt-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      dispatch(chip.textContent);
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const prompt = chip.dataset.prompt || chip.textContent.trim();
+      oInput.value = prompt;
+      oInput.style.height = 'auto';
+      oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
+      dispatch(prompt);
     });
   });
 })();
