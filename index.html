@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The AI Daily - Liatrio x Anthropic</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Shopify Editions stack: GSAP ScrollTrigger + Lenis smooth scroll -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.3.21/dist/lenis.min.js"></script>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -28,7 +30,10 @@
   --mono: 'JetBrains Mono', monospace;
 }
 
-html { scroll-behavior: smooth; }
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 
 body {
   font-family: var(--body-serif);
@@ -234,7 +239,6 @@ body {
   color: var(--ink);
   font-weight: 900;
 }
-
 
 .article-columns {
   column-count: 2;
@@ -703,18 +707,28 @@ body {
   perspective-origin: 50% 60%;
 }
 
-/* ====== FLUID INK CANVAS ====== */
-#fluid-canvas {
+/* ====== CURSOR DOT (Active Theory) ====== */
+.cursor-dot {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: 8px;
+  height: 8px;
+  background: var(--ink);
+  border-radius: 50%;
   pointer-events: none;
-  z-index: 50;
-  opacity: 0.4;
+  z-index: 200;
+  opacity: 0.3;
   mix-blend-mode: multiply;
-  background: transparent;
+  transition: transform 0.15s ease, opacity 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot.hovering {
+  transform: translate(-50%, -50%) scale(3);
+  opacity: 0.15;
+}
+
+@media (pointer: coarse) {
+  .cursor-dot { display: none; }
 }
 
 /* ====== MOBILE ====== */
@@ -750,8 +764,8 @@ body {
   </defs>
 </svg>
 
-<!-- Fluid ink simulation canvas -->
-<canvas id="fluid-canvas"></canvas>
+<!-- Cursor follow dot (Active Theory) -->
+<div class="cursor-dot" id="cursorDot"></div>
 
 <!-- Progress bar -->
 <div class="progress-bar" id="progressBar"></div>
@@ -1184,7 +1198,7 @@ body {
   </div>
 
   <div style="margin-top: 2rem;">
-    <a href="#section-0" class="back-to-top" onclick="document.getElementById('section-0').scrollIntoView({behavior:'smooth'});return false;">&uarr; Back to Top</a>
+    <a href="#section-0" class="back-to-top" onclick="window.__lenis && window.__lenis.scrollTo('#section-0');return false;">&uarr; Back to Top</a>
   </div>
 
   <div class="footer-note">
@@ -1192,289 +1206,299 @@ body {
   </div>
 </footer>
 
-<!-- Fluid simulation library -->
-<script src="https://cdn.jsdelivr.net/npm/webgl-fluid"></script>
-
-<!-- ======== SCROLL ENGINE (GSAP + FLUID INK) ======== -->
+<!-- ======== SCROLL ENGINE ======== -->
 <script>
 (function() {
   gsap.registerPlugin(ScrollTrigger);
 
+  // ====== LENIS SMOOTH SCROLL (from Shopify Editions) ======
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // custom easing from Shopify
+    orientation: 'vertical',
+    smoothWheel: true,
+  });
+
+  window.__lenis = lenis; // expose for back-to-top button
+  // Wire Lenis into GSAP ticker (Shopify pattern)
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  // Track Lenis velocity for scroll-driven effects
+  let lenisVelocity = 0;
+  let absVelocity = 0; // normalized 0-1
+  lenis.on('scroll', ({ velocity }) => {
+    lenisVelocity = velocity;
+    absVelocity = Math.min(Math.abs(velocity) / 5, 1);
+  });
+
+  // Only named sections for dot navigation (not interstitial callouts)
+  const allSections = document.querySelectorAll('.masthead, .story-section');
   const namedSections = document.querySelectorAll('[id^="section-"]');
   const dots = document.querySelectorAll('.nav-dot');
   const progressBar = document.getElementById('progressBar');
-  let vh = window.innerHeight;
-  let vw = window.innerWidth;
+  const scrollElements = document.querySelectorAll('[data-scroll]');
+  const ornaments = document.querySelectorAll('.section-ornament');
+  const zoomSections = document.querySelectorAll('.zoom-section');
+  const vh = window.innerHeight;
 
-  // ====== WEBGL FLUID INK SIMULATION ======
-  const fluidCanvas = document.getElementById('fluid-canvas');
-  try {
-    // WebGL Navier-Stokes fluid sim; responds to mouse/touch interaction
-    // Scroll-driven splatters create ink-on-parchment effect
-    WebGLFluid(fluidCanvas, {
-      IMMEDIATE: true,
-      TRIGGER: 'hover',
-      SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: 512,
-      DENSITY_DISSIPATION: 2.5,
-      VELOCITY_DISSIPATION: 1.5,
-      PRESSURE: 0.5,
-      PRESSURE_ITERATIONS: 20,
-      CURL: 20,
-      SPLAT_RADIUS: 0.2,
-      SPLAT_FORCE: 5000,
-      SHADING: false,
-      COLORFUL: false,
-      COLOR_UPDATE_SPEED: 6,
-      PAUSED: false,
-      BACK_COLOR: { r: 0, g: 0, b: 0 },
-      TRANSPARENT: true,
-      BLOOM: false,
-      SUNRAYS: false,
-    });
-
-    // Scroll-velocity-driven ink splatters
-    let lastScrollY = window.scrollY;
-    let lastSplatTime = 0;
-
-    window.addEventListener('scroll', () => {
-      const now = Date.now();
-      const newScrollY = window.scrollY;
-      const velocity = newScrollY - lastScrollY;
-      lastScrollY = newScrollY;
-      const absV = Math.abs(velocity);
-
-      // Fast scroll triggers splat via simulated pointer events
-      if (absV > 20 && now - lastSplatTime > 200) {
-        const x = (0.15 + Math.random() * 0.7) * vw;
-        const y = Math.random() * vh;
-        const dx = (Math.random() - 0.5) * absV * 2;
-        const dy = velocity * 3;
-
-        // Simulate pointer move to trigger fluid splat
-        fluidCanvas.dispatchEvent(new PointerEvent('pointermove', {
-          clientX: x, clientY: y,
-          movementX: dx, movementY: dy,
-          isPrimary: true, pointerId: 1,
-          bubbles: true
-        }));
-
-        lastSplatTime = now;
-      }
-    }, { passive: true });
-
-  } catch(e) {
-    fluidCanvas.style.display = 'none';
-  }
-
-  // ====== GSAP SCROLL ANIMATIONS ======
-
-  // Masthead parallax
-  gsap.to('.masthead-title', {
-    yPercent: -30,
-    scale: 0.85,
-    opacity: 0,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.masthead',
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true
-    }
-  });
-
-  gsap.to('.masthead-headline', {
-    yPercent: -15,
-    opacity: 0,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.masthead',
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true
-    }
-  });
-
-  gsap.to('.scroll-hint', {
-    opacity: 0,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.masthead',
-      start: 'top top',
-      end: '15% top',
-      scrub: true
-    }
-  });
-
-  // Ink-bleed on masthead title
-  ScrollTrigger.create({
-    trigger: '.masthead',
-    start: 'top top',
-    end: 'bottom top',
-    scrub: true,
-    onUpdate: (self) => {
-      const inkDisplace = document.getElementById('inkDisplace');
-      if (inkDisplace) {
-        inkDisplace.setAttribute('scale', self.progress * 5);
-      }
-      const title = document.querySelector('.masthead-title');
-      if (title) {
-        title.style.filter = self.progress > 0.01 ? 'url(#ink-bleed)' : 'none';
-      }
-    }
-  });
-
-  // Progress bar scrub
+  // GSAP scrub: progress bar (much smoother than manual)
   gsap.to(progressBar, {
     width: '100%',
     ease: 'none',
-    scrollTrigger: {
-      trigger: 'body',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: true
-    }
+    scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: true }
   });
 
-  // ====== ELEMENT ANIMATIONS VIA SCROLLTRIGGER ======
-  // Each [data-scroll] element gets a GSAP animation based on its data-type
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
-  document.querySelectorAll('[data-scroll]').forEach(el => {
-    const type = el.dataset.type || 'fade-up';
-    const delay = (parseInt(el.dataset.delay) || 0) / 1000;
+  // Track current smooth values for interpolation
+  const smoothValues = new Map();
 
-    let fromVars = {};
-    let toVars = { duration: 0.8, delay, ease: 'power3.out' };
+  // Get element's progress through viewport: 0 = bottom edge enters, 1 = fully visible
+  // Triggers faster: element reaches 1.0 when its top hits ~45% down the viewport
+  function getProgress(el) {
+    const rect = el.getBoundingClientRect();
+    const start = vh * 0.95;  // start tracking when top is near bottom of viewport
+    const end = vh * 0.33;    // fully revealed when top hits ~33% down
+    return clamp((start - rect.top) / (start - end), 0, 1);
+  }
 
-    switch (type) {
-      case 'fade-up':
-        fromVars = { opacity: 0, y: 50 };
-        toVars = { ...toVars, opacity: 1, y: 0 };
-        break;
-      case 'slide-right':
-        fromVars = { opacity: 0, x: -60 };
-        toVars = { ...toVars, opacity: 1, x: 0 };
-        break;
-      case 'slide-left':
-        fromVars = { opacity: 0, x: 60 };
-        toVars = { ...toVars, opacity: 1, x: 0 };
-        break;
-      case 'scale-in':
-        fromVars = { opacity: 0, scale: 0.85 };
-        toVars = { ...toVars, opacity: 1, scale: 1, ease: 'back.out(1.4)' };
-        break;
-      case 'count-up':
-        fromVars = { opacity: 0, y: 20, scale: 0.9 };
-        toVars = { ...toVars, opacity: 1, y: 0, scale: 1, ease: 'back.out(1.7)' };
-        break;
-      case 'slide-up-stagger':
-        fromVars = { opacity: 0, y: 35 };
-        toVars = { ...toVars, opacity: 1, y: 0 };
-        break;
-      case 'zoom-in':
-        fromVars = { opacity: 0, scale: 1.6, filter: 'blur(6px)' };
-        toVars = { ...toVars, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1 };
-        break;
-      case 'zoom-out':
-        fromVars = { opacity: 0, scale: 0.5, filter: 'blur(5px)' };
-        toVars = { ...toVars, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1 };
-        break;
-      case 'wipe-right':
-        fromVars = { clipPath: 'inset(0 100% 0 0)' };
-        toVars = { ...toVars, clipPath: 'inset(0 0% 0 0)', duration: 1.2, ease: 'power2.inOut' };
-        break;
-      case 'spread':
-        fromVars = { opacity: 0, letterSpacing: '0.6em' };
-        toVars = { ...toVars, opacity: 1, letterSpacing: '0em', duration: 1 };
-        break;
-      case 'border-draw':
-        gsap.set(el, { '--bw': '0%', '--bh': '0%' });
-        fromVars = {};
-        toVars = { ...toVars, '--bw': '100%', '--bh': '100%', duration: 1.2 };
-        break;
-      case 'underline-draw':
-        fromVars = { backgroundSize: '0% 3px' };
-        toVars = { ...toVars, backgroundSize: '100% 3px', duration: 0.8 };
-        break;
-      case 'z-pop':
-        fromVars = { opacity: 0, z: -200, scale: 0.7 };
-        toVars = { ...toVars, opacity: 1, z: 0, scale: 1, ease: 'back.out(1.5)' };
-        break;
-      case 'tilt-in-left':
-        fromVars = { opacity: 0, x: -40, z: -80, rotateY: 35 };
-        toVars = { ...toVars, opacity: 1, x: 0, z: 0, rotateY: 0, duration: 1 };
-        break;
-      case 'tilt-in-right':
-        fromVars = { opacity: 0, x: 40, z: -80, rotateY: -35 };
-        toVars = { ...toVars, opacity: 1, x: 0, z: 0, rotateY: 0, duration: 1 };
-        break;
-      default:
-        fromVars = { opacity: 0, y: 30 };
-        toVars = { ...toVars, opacity: 1, y: 0 };
+  // Get continuous scroll factor: how far through viewport (-1 to 1)
+  function getScrollFactor(el) {
+    const rect = el.getBoundingClientRect();
+    return (vh / 2 - (rect.top + rect.height / 2)) / vh;
+  }
+
+  function applyScrollTransforms() {
+    const scrollY = window.scrollY;
+    const total = document.documentElement.scrollHeight - vh;
+
+    // Progress bar
+    progressBar.style.width = (total > 0 ? (scrollY / total) * 100 : 0) + '%';
+
+    // Masthead parallax: title moves up, headline moves up slower
+    const mastheadTitle = document.querySelector('.masthead-title');
+    const mastheadHeadline = document.querySelector('.masthead-headline');
+    if (mastheadTitle) {
+      const f = clamp(scrollY / vh, 0, 1);
+      mastheadTitle.style.transform = `translateY(${f * -80}px) scale(${1 - f * 0.15})`;
+      mastheadTitle.style.opacity = 1 - f * 0.8;
+      // Ink-bleed: text distorts slightly as you scroll away, like ink spreading on wet paper
+      const inkDisplace = document.getElementById('inkDisplace');
+      if (inkDisplace) {
+        inkDisplace.setAttribute('scale', f * 4); // 0 -> 4 displacement
+      }
+      mastheadTitle.style.filter = f > 0.01 ? 'url(#ink-bleed)' : 'none';
+    }
+    if (mastheadHeadline) {
+      const f = clamp(scrollY / vh, 0, 1);
+      mastheadHeadline.style.transform = `translateY(${f * -40}px)`;
+      mastheadHeadline.style.opacity = 1 - f * 0.6;
     }
 
-    toVars.scrollTrigger = {
-      trigger: el,
-      start: 'top 80%',
-      toggleActions: 'play none none reverse'
-    };
+    // Scroll hint fade
+    const hint = document.querySelector('.scroll-hint');
+    if (hint) {
+      hint.style.opacity = clamp(1 - scrollY / 200, 0, 1);
+    }
 
-    gsap.fromTo(el, fromVars, toVars);
-  });
+    // Floating ornaments with continuous parallax
+    ornaments.forEach(orn => {
+      const speed = parseFloat(orn.dataset.speed) || 0.05;
+      const section = orn.closest('section') || orn.closest('.masthead');
+      if (section) {
+        const factor = getScrollFactor(section);
+        const y = factor * vh * speed;
+        const x = Math.sin(factor * Math.PI) * 15 * speed;
+        // Lenis velocity adds extra drift to ornaments
+        const vDrift = lenisVelocity * speed * 0.3;
+        orn.style.transform = `translate(${x}px, ${y + vDrift}px)`;
+      }
+    });
 
-  // ====== SECTION DEPTH (SCRUB) ======
-  document.querySelectorAll('.zoom-section').forEach(section => {
-    const content = section.querySelector('.story-content');
-    if (!content) return;
+    // Scroll-driven element animations
+    scrollElements.forEach(el => {
+      const progress = getProgress(el);
+      const type = el.dataset.type || 'fade-up';
+      const delay = parseInt(el.dataset.delay) || 0;
+      const easedProgress = easeOut(clamp((progress - delay / 1000) * 1.5, 0, 1));
 
-    // Approach from below: start pushed back, come forward
-    gsap.fromTo(content,
-      { z: -60, scale: 0.94, filter: 'blur(2px)' },
-      {
-        z: 0, scale: 1, filter: 'blur(0px)',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top bottom',
-          end: 'top center',
-          scrub: true
+      // Get or create smooth value
+      const key = el;
+      const current = smoothValues.get(key) || 0;
+      const target = easedProgress;
+      const smooth = lerp(current, target, 0.18); // faster interpolation
+      smoothValues.set(key, smooth);
+
+      switch (type) {
+        case 'fade-up':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 50}px)`;
+          break;
+
+        case 'slide-right':
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${(1 - smooth) * -60}px)`;
+          break;
+
+        case 'slide-left':
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${(1 - smooth) * 60}px)`;
+          break;
+
+        case 'scale-in': {
+          const vOver = 1 + absVelocity * 0.03;
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${(0.85 + smooth * 0.15) * vOver})`;
+          break;
+        }
+
+        case 'count-up':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 15}px) scale(${0.9 + smooth * 0.1})`;
+          break;
+
+        case 'slide-up-stagger':
+          el.style.opacity = smooth;
+          el.style.transform = `translateY(${(1 - smooth) * 35}px)`;
+          break;
+
+        case 'zoom-in': {
+          const s = 1.6 - smooth * 0.6; // 1.6 -> 1.0
+          const blur = (1 - smooth) * 6;
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${s})`;
+          el.style.filter = `blur(${blur}px)`;
+          break;
+        }
+
+        case 'zoom-out': {
+          const s = 0.5 + smooth * 0.5; // 0.5 -> 1.0
+          const blur = (1 - smooth) * 5;
+          el.style.opacity = smooth;
+          el.style.transform = `scale(${s})`;
+          el.style.filter = `blur(${blur}px)`;
+          break;
+        }
+
+        case 'wipe-right': {
+          // Clip-path reveal left to right
+          const pct = smooth * 100;
+          el.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+          el.style.opacity = 1; // no fade, just wipe
+          break;
+        }
+
+        case 'spread': {
+          // Letter-spacing from tight to natural
+          const spacing = (1 - smooth) * 0.6; // 0.6em -> 0em
+          el.style.letterSpacing = `${spacing}em`;
+          el.style.opacity = smooth;
+          break;
+        }
+
+        case 'border-draw': {
+          // Animate pseudo-element borders via CSS custom properties
+          const pct = smooth * 100;
+          el.style.setProperty('--border-pct', pct + '%');
+          // Use width/height on pseudo-elements via inline styles on the element
+          const before = el.querySelector(':scope')
+          el.style.cssText += `; --bw: ${pct}%; --bh: ${pct}%;`;
+          break;
+        }
+
+        case 'underline-draw': {
+          const pct = smooth * 100;
+          el.style.backgroundSize = `${pct}% 3px`;
+          break;
+        }
+
+        case 'z-pop': {
+          const z = (1 - smooth) * -200;
+          const vOver = 1 + absVelocity * 0.04;
+          const s = (0.7 + smooth * 0.3) * vOver;
+          el.style.opacity = smooth;
+          el.style.transform = `translateZ(${z}px) scale(${s})`;
+          break;
+        }
+
+        case 'tilt-in-left': {
+          // Rotates in from the left side like a page fold
+          const rotY = (1 - smooth) * 35; // 35deg -> 0
+          const x = (1 - smooth) * -40;
+          const z = (1 - smooth) * -80;
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg)`;
+          break;
+        }
+
+        case 'tilt-in-right': {
+          // Rotates in from the right side
+          const rotY = (1 - smooth) * -35;
+          const x = (1 - smooth) * 40;
+          const z = (1 - smooth) * -80;
+          el.style.opacity = smooth;
+          el.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg)`;
+          break;
         }
       }
-    );
-  });
 
-  // ====== ORNAMENTS PARALLAX (SCRUB) ======
-  document.querySelectorAll('.section-ornament').forEach(orn => {
-    const speed = parseFloat(orn.dataset.speed) || 0.05;
-    gsap.to(orn, {
-      yPercent: speed * 200,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: orn.closest('section') || orn.closest('.masthead'),
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true
+      // Continuous subtle parallax drift after fully visible
+      if (smooth > 0.95 && !['zoom-in','zoom-out','wipe-right','spread','border-draw','underline-draw','z-pop','tilt-in-left','tilt-in-right'].includes(type)) {
+        const factor = getScrollFactor(el);
+        const drift = factor * 6;
+        if (type === 'fade-up' || type === 'slide-up-stagger') {
+          el.style.transform = `translateY(${drift}px)`;
+        }
       }
     });
-  });
 
-  // ====== NAV DOTS ======
-  // Update active dot based on scroll position
-  namedSections.forEach((section, i) => {
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top center',
-      end: 'bottom center',
-      onEnter: () => dots.forEach((d, j) => d.classList.toggle('active', j === i)),
-      onEnterBack: () => dots.forEach((d, j) => d.classList.toggle('active', j === i)),
+    // Section 3D: smooth depth + parallax Z-shift
+    // Approaching sections push back in Z and blur slightly; centered sections are sharp and forward
+    zoomSections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const centerOffset = (center - vh / 2) / vh; // -1 to 1
+      const distance = Math.abs(centerOffset);
+      const content = section.querySelector('.story-content');
+      if (content) {
+        // Z-depth: centered = 0, off-screen = pushed back
+        const z = -distance * 60;
+        // Scale: centered = 1, off-screen = slightly smaller
+        const scale = 1 - distance * 0.04;
+        // Blur: only when far off center
+        const blur = distance > 0.5 ? (distance - 0.5) * 3 : 0;
+        // Velocity-driven skew (Active Theory technique: scroll speed warps content)
+        const skew = lenisVelocity * 0.015;
+        content.style.transform = `translateZ(${z}px) scale(${clamp(scale, 0.94, 1)}) skewY(${clamp(skew, -2, 2)}deg)`;
+        content.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none';
+      }
     });
-  });
+
+    // Active section for nav dots (only track named sections)
+    let activeIdx = 0;
+    namedSections.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      if (rect.top < vh * 0.5) activeIdx = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+  }
+
+  // RAF loop for smooth continuous animation
+  function loop() {
+    applyScrollTransforms();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 
   // Nav dot click
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
       const idx = parseInt(dot.dataset.section);
-      namedSections[idx].scrollIntoView({ behavior: 'smooth' });
+      lenis.scrollTo(namedSections[idx]);
     });
   });
 
@@ -1496,11 +1520,34 @@ body {
     }
   });
 
-  window.addEventListener('resize', () => {
-    vh = window.innerHeight;
-    vw = window.innerWidth;
+  // ====== CURSOR FOLLOW (Active Theory pattern) ======
+  const cursorDot = document.getElementById('cursorDot');
+  let mouse = { x: -100, y: -100 };
+  let pos = { x: -100, y: -100 };
+
+  document.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
+  // Smooth follow via GSAP ticker (same approach as Active Theory)
+  gsap.ticker.add(() => {
+    pos.x += (mouse.x - pos.x) * 0.15;
+    pos.y += (mouse.y - pos.y) * 0.15;
+    cursorDot.style.left = pos.x + 'px';
+    cursorDot.style.top = pos.y + 'px';
+  });
+
+  // Scale up on interactive elements
+  document.querySelectorAll('a, .nav-dot, .stat-num, .pullquote, .story-card, .back-to-top').forEach(el => {
+    el.addEventListener('mouseenter', () => cursorDot.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => cursorDot.classList.remove('hovering'));
+  });
+
+  // Recalculate on resize
+  window.addEventListener('resize', () => {
+    // vh gets captured in closure; no need to update since we read innerHeight in loop
+  });
 })();
 </script>
 
