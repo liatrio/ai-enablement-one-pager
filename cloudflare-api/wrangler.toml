@@ -1,0 +1,7 @@
+name = "ai-enablement-api"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[[kv_namespaces]]
+binding = "STORIES"
+id = "a8d0b22f10394fe28dd0d1319d52aad9"
