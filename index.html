@@ -88,8 +88,9 @@ body {
   width: 100%;
   position: relative;
   z-index: 1;
-  transform-style: preserve-3d;
-  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translate3d(0,0,0);
 }
 
 /* ====== MASTHEAD ====== */
@@ -600,7 +601,9 @@ body {
 .zoom-section {
   perspective: 1000px;
   perspective-origin: 50% 50%;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  isolation: isolate;
 }
 
 .zoom-section .story-content {
@@ -698,8 +701,9 @@ body {
 
 /* 3D tilt on story cards */
 .story-card {
-  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-transform: translate3d(0,0,0);
 }
 
 /* Masthead 3D */
