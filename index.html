@@ -970,11 +970,12 @@ body {
   color: var(--ink-faint);
   pointer-events: none;
   animation: scroll-bounce 2s ease-in-out infinite;
-  opacity: 0.6;
+  opacity: 0;
   z-index: 1;
   transition: opacity 0.3s;
 }
-.oracle-broadsheet-wrap.scrolled::after { opacity: 0; }
+.oracle-broadsheet-wrap.has-overflow::after { opacity: 0.6; }
+.oracle-broadsheet-wrap.at-bottom::after { opacity: 0; }
 @keyframes scroll-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(6px); }
@@ -2778,12 +2779,18 @@ body {
   const oInput     = document.getElementById('oracle-input');
   const oSend      = document.getElementById('oracle-send');
 
-  // Hide scroll arrow once user scrolls the broadsheet
+  // Show scroll arrow only when broadsheet has overflow, hide at bottom
   if (broadsheet && broadsheetWrap) {
-    broadsheet.addEventListener('scroll', () => {
-      if (broadsheet.scrollTop > 20) broadsheetWrap.classList.add('scrolled');
-      else broadsheetWrap.classList.remove('scrolled');
-    });
+    function checkBroadsheetOverflow() {
+      const hasOverflow = broadsheet.scrollHeight > broadsheet.clientHeight + 10;
+      const atBottom = broadsheet.scrollTop + broadsheet.clientHeight >= broadsheet.scrollHeight - 10;
+      broadsheetWrap.classList.toggle('has-overflow', hasOverflow);
+      broadsheetWrap.classList.toggle('at-bottom', atBottom);
+    }
+    broadsheet.addEventListener('scroll', checkBroadsheetOverflow);
+    // Recheck when content changes (articles load)
+    new MutationObserver(checkBroadsheetOverflow).observe(broadsheet, { childList: true, subtree: true });
+    checkBroadsheetOverflow();
   }
   const trigger    = document.getElementById('chat-trigger');
   const iconOpen   = document.getElementById('chat-icon-open');
