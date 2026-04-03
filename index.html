@@ -781,6 +781,11 @@ body {
 .flying-text .char {
   display: inline-block;
   will-change: transform, opacity;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  text-transform: inherit !important;
+  line-height: inherit !important;
+  background: none !important;
 }
 
 /* ====== MOBILE ====== */
@@ -1649,14 +1654,13 @@ body {
 <!-- Nav dots -->
 <nav class="nav-dots" id="navDots">
   <div class="nav-dot active" data-section="0"><span class="dot-label">The AI Daily</span></div>
-  <div class="nav-dot" data-section="1"><span class="dot-label">I. This Is Liatrio</span></div>
+  <div class="nav-dot" data-section="1"><span class="dot-label">I. Who Is Liatrio</span></div>
   <div class="nav-dot" data-section="2"><span class="dot-label">II. Boeing</span></div>
   <div class="nav-dot" data-section="3"><span class="dot-label">III. Natera</span></div>
   <div class="nav-dot" data-section="4"><span class="dot-label">IV. The Gap</span></div>
-  <div class="nav-dot" data-section="5"><span class="dot-label">V. The Engine</span></div>
-  <div class="nav-dot" data-section="6"><span class="dot-label">VI. Enablement</span></div>
-  <div class="nav-dot" data-section="7"><span class="dot-label">VII. Why Partner</span></div>
-  <div class="nav-dot" data-section="8"><span class="dot-label">VIII. What's Next</span></div>
+  <div class="nav-dot" data-section="5"><span class="dot-label">V. Enablement</span></div>
+  <div class="nav-dot" data-section="6"><span class="dot-label">VI. Why Partner</span></div>
+  <div class="nav-dot" data-section="7"><span class="dot-label">VII. What's Next</span></div>
 </nav>
 
 <!-- ======== SECTION 0: MASTHEAD ======== -->
@@ -1670,37 +1674,16 @@ body {
   <div class="masthead-edition">A Liatrio Publication &bull; Special Anthropic Partnership Edition</div>
   <hr class="masthead-rule">
 
-  <h2 class="masthead-headline">Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner</h2>
-  <p class="masthead-sub">How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.</p>
+  <h2 class="masthead-headline">The Missing Piece in Anthropic's Enterprise Story</h2>
+  <p class="masthead-sub">Most partners can deploy Claude. Very few can make an entire engineering organization change how they work to revolve around it. Liatrio is one of them.</p>
 
   <div class="scroll-hint">Scroll to read &darr;</div>
 </section>
 
-<!-- Callout: wipe reveal + stats bridge -->
+<!-- Callout: wipe reveal -->
 <section class="story-section" style="min-height: 0; padding: 3rem 2rem; background: var(--parchment);">
-  <div class="story-content" style="text-align: center;">
-    <div class="callout-wipe flying-text" data-scroll data-type="wipe-right">
-      Not just another technology partner.
-    </div>
-
-    <div class="stat-inset" data-scroll data-type="fade-up" data-delay="100" style="margin-top: 2rem;">
-      <div class="stat-item">
-        <div class="stat-num">200-500+</div>
-        <div class="stat-label">Engineers Enabled</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Days to Build CCA</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">2</div>
-        <div class="stat-label">Major Enterprises</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">80+</div>
-        <div class="stat-label">Teams in Pipeline</div>
-      </div>
-    </div>
+  <div class="callout-wipe flying-text" data-scroll data-type="wipe-right">
+    Not just another technology partner.
   </div>
 </section>
 
@@ -1711,22 +1694,14 @@ body {
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
       <div class="article-section-label">Chapter I</div>
-      <h2 class="article-headline">This Is Liatrio</h2>
+      <h2 class="article-headline">Who Is Liatrio</h2>
       <div class="article-subhead">AI-forward. Enablement-focused. Best in class at enterprise scale.</div>
     </div>
 
-    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="100">
-      <p>Liatrio enables enterprise organizations to transform how their people work with Claude; from engineering teams of 200-500+ to product managers, revenue leaders, and L&amp;D functions. This isn't deployment. It's behavioral transformation at scale, powered by a Claude-native enablement engine we built and run ourselves.</p>
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
+      <p>Claude is the most capable AI model on the market. Getting it deployed is easy. Getting an organization to actually change how it works around it, that's where almost everyone fails. Liatrio exists for exactly that gap.</p>
 
-      <p>We are AI-forward, focused on the agentic era, and we do this better than anyone else at enterprise scale. Our engineers don't just deploy tools; they drive behavioral transformation. They teach organizations how AI tools fit together so people can build their own solutions to their own problems.</p>
-
-      <p>We're not Accenture. We're not Deloitte. We're not your enterprise deployment partner. If you want Claude to be adopted securely, adopted the right way, with people using it the way it's intended to be used, we are the ones who make that happen.</p>
-
-      <p>You won't get genuine, confirmed enterprise adoption the way you want it without us.</p>
-    </div>
-
-    <div class="pullquote" data-scroll data-type="scale-in" data-delay="200">
-      <p>"We're not implementing Claude. We're driving true behavioral transformation."</p>
+      <p>Liatrio enables enterprise organizations to transform how their people work with Claude; from engineering teams of 200-500+ to product managers, revenue leaders, and L&amp;D functions. It's behavioral transformation at scale, powered by a Claude-native enablement engine we built and run ourselves.</p>
     </div>
   </div>
 </section>
@@ -1747,40 +1722,28 @@ body {
     <div class="article-header" data-scroll data-type="slide-right">
       <div class="article-section-label">Chapter II &mdash; Client Story</div>
       <h2 class="article-headline">Boeing Digital Services: AI-Native Engineering at Aerospace Scale</h2>
-      <div class="article-subhead">Spec-driven development, product operating model transformation, and a provisioning workflow reduced from five days to fifteen minutes.</div>
+      <div class="article-subhead">Spec-driven development, product operating model transformation, and a provisioning workflow reduced from fifteen days to fifteen minutes.</div>
     </div>
 
     <div class="stat-inset" data-scroll data-type="fade-up" data-delay="100">
       <div class="stat-item">
-        <div class="stat-num z-callout" data-scroll data-type="z-pop">5d &rarr; 15m</div>
+        <div class="stat-num z-callout" data-scroll data-type="z-pop">15d &rarr; 15m</div>
         <div class="stat-label">Provisioning Time</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">3+</div>
+        <div class="stat-num" data-scroll data-type="count-up">2</div>
         <div class="stat-label">Product Teams</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">132</div>
-        <div class="stat-label">Specs Authored</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">8x</div>
-        <div class="stat-label">Faster Delivery</div>
+        <div class="stat-num" data-scroll data-type="count-up">140</div>
+        <div class="stat-label">Specs Authored over 45 days</div>
       </div>
     </div>
 
-    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="200">
-      <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams and their platform team.</p>
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="200">
+      <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across product teams, rebuilding a legacy Azure provisioning workflow that took five business days into one that completes in fifteen minutes with zero handoffs. But that's one workflow. The broader change is in how engineering and product teams operate day to day, and increasingly, how they operate together.</p>
 
-      <p>The flagship result: a legacy Azure provisioning workflow that took five business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in fifteen minutes with zero handoffs. A multi-day Flashbuild across two product teams and a platform team was entirely driven by Claude models and the Liatrio SDD framework, delivering production features in just two days.</p>
-
-      <p>But the transformation goes deeper than speed. We brought a complete product operating model: teams are using Anthropic models to refine and decompose PRDs, engineers pick up specs and run with them, and the entire process is built on a repeatable, scalable methodology. Claude Code approval is in progress as the team's preferred harness for H2 2026.</p>
-
-      <p>The expert domain research has been equally impactful. One Boeing engineer, a ten-year veteran, built an engineering analysis document with Claude that he uses every day. The team is "really blown away" by the depth and quality. This is what happens when you pair deep domain expertise with the right AI tools and the right process.</p>
-    </div>
-
-    <div class="pullquote" data-scroll data-type="scale-in" data-delay="300">
-      <p>"They're using our prompts and processes to refine and decompose PRDs, and now the whole team is picking it up and running."</p>
+      <p>The transformation goes deeper than speed. Engineers are using Claude to refine and decompose PRDs, picking up specs and running with them independently, with less reliance on back-and-forth, fewer blockers waiting on clarification, and more ownership over the full arc of a feature. On the product side, that same decomposition process is no longer a black box. PMs can follow how a PRD breaks down, engage with it, and refine it alongside engineering rather than handing it off and waiting. The work of defining what to build and the work of figuring out how to build it are starting to happen on a shared surface, and that's changing the nature of the relationship between the two functions, not just the speed of the handoff.</p>
     </div>
   </div>
 </section>
@@ -1809,22 +1772,14 @@ body {
         <div class="stat-num" data-scroll data-type="count-up">L1-L5</div>
         <div class="stat-label">AI Fluency</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num" data-scroll data-type="count-up">4</div>
-        <div class="stat-label">Regulated Repos Live</div>
-      </div>
     </div>
 
-    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="200">
-      <p>There was a product manager at Natera running Windows, way off on an island, because nobody on her team was using Windows and all they had access to was Claude Code. She didn't know how to get it set up. She didn't even feel comfortable asking her own team. So she set up a one-on-one with a Liatrio engineer: "Can you help me? I have no idea what I'm doing."</p>
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="200">
+      <p>Natera engaged Liatrio to embed Claude Code directly into their QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption across 80+ engineering teams spanning genomics and diagnostics.</p>
 
-      <p>They worked through the whole thing together. Got Claude Code running in a terminal, in PowerShell, connected to a Jira MCP server so she could read project data. That process was then turned into a repeatable guide shared with the team managing the other Windows users across the organization.</p>
+      <p>The enablement scope extended beyond engineering. A product manager with no CLI experience was onboarded to Claude Code in PowerShell, connected to a Jira MCP server, and within days was generating project roadmaps with confidence-ranged delivery estimates; which she presented company-wide. That onboarding process was documented and distributed as a repeatable guide for all Windows users across the organization.</p>
 
-      <p>Days later, she stood up at Natera's company-wide build-and-share and presented a Jira roadmap she built with Claude. She had manipulated project data, generated estimates with confidence ranges for best and worst case delivery scenarios, and presented it to the entire organization. This is a PM who a week earlier couldn't open a terminal.</p>
-
-      <p>That's not tool deployment. That's not configuration. That's a person whose capabilities were fundamentally expanded. And it's happening organically across the organization: engineers are self-directing Claude usage beyond what Liatrio prescribed. One ran a 14-step clinical workflow dry-test unprompted. Another extended an MR review pipeline to her own regulated project within days. Engineers are reporting they "didn't write a single line of code" on certain tasks.</p>
-
-      <p>Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Now the plan is to scale from QCI to 80+ engineering teams across genomics and diagnostics.</p>
+      <p>Engineers self-directed usage beyond the prescribed scope: one ran a 14-step clinical workflow dry-test unprompted, another extended an MR review pipeline to a regulated project within days of initial setup.</p>
     </div>
 
     <div class="pullquote" data-scroll data-type="scale-in" data-delay="300">
@@ -1855,7 +1810,7 @@ body {
     </div>
 
     <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
-      <p>Across our enterprise clients, the demand for Claude enablement was overwhelming. Teams of 200 to 500 engineers trying to operationalize Claude within their organizations. But the standard path, waiting for official partner access, running through boilerplate self-paced training, wasn't going to cut it at the speed our clients needed.</p>
+      <p>Across our enterprise clients, the demand for Claude enablement was overwhelming. Teams of 200 to 500 engineers trying to operationalize Claude within their organizations. But the standard path, waiting for official partner access to certifications and running through self-paced training, wasn't going to cut it at the speed our clients needed.</p>
 
       <p>So we built our own answer.</p>
     </div>
@@ -1874,60 +1829,22 @@ body {
     <div class="article-body" data-scroll data-type="fade-up" data-delay="300">
       <p>In three days, we built the Claude Certification Academy (CCA), a proprietary training program that takes engineers from zero to productive faster than anything else on the market. Built on top of Anthropic's open-source materials but tailored to enterprise delivery needs and deployed internally through our Forge training program.</p>
 
-      <p>We saw the gap in our own capabilities. We couldn't wait to get access and have people run through boilerplate self-paced training. So we built our own thing, and we're taking it to enterprise customers today. This is not theoretical. This is happening right now.</p>
+      <p>We saw the gap in our own capabilities. We couldn't wait to get access and have people run through self-paced training and proctored exams. So we built our own thing, and we're taking it to enterprise customers today. This is not theoretical. This is happening right now.</p>
     </div>
 
     <div class="pullquote" data-scroll data-type="scale-in" data-delay="400">
-      <p>"We're doing this with or without you. But we think it only enhances both of us if we do it together."</p>
+      <p>"We're doing this alone today. But we think it only enhances both of us if we do it together."</p>
     </div>
   </div>
 </section>
 
-<!-- ======== SECTION 5: THE ENGINE BEHIND THE ENABLEMENT ======== -->
-<section class="story-section zoom-section" id="section-5">
+<!-- ======== SECTION 5: SPEED & ENABLEMENT ======== -->
+<section class="story-section" id="section-5">
   <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">V</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
       <div class="article-section-label">Chapter V</div>
-      <h2 class="article-headline">The Engine Behind the Enablement</h2>
-      <div class="article-subhead">A Claude-native L&amp;D function that powers everything. One person. Six programs. Zero blank pages.</div>
-    </div>
-
-    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="100">
-      <p>The Boeing and Natera outcomes don't happen by accident. They happen because Liatrio's people show up Claude-fluent, trained by a learning and development function that runs entirely on Claude.</p>
-
-      <p>One L&amp;D professional manages the full scope: CCA certification prep, Forge technical training, leadership development, new hire onboarding, client-specific enablement, and event facilitation. Claude is embedded across the entire lifecycle; from intake analysis and instructional design through content creation, platform delivery, and learner analytics. Custom Claude Skills encode company culture, brand standards, and platform requirements so every output starts from institutional context, not a blank page.</p>
-
-      <p>But here's what makes this story bigger than one person: Forge technical training and CCA certification prep were built by engineers on the Innovation team; people with no L&amp;D background, using Claude. They learned a brand-new learning platform, produced professional-grade course content, and delivered exam-ready material in days, not months. Claude didn't just make the L&amp;D function more efficient. It made L&amp;D accessible to people who had never done it before.</p>
-
-      <p>Leadership programs and company off-sites are designed and adapted in real time. Content development that used to take weeks now takes hours, and iteration is just as fast, with multiple refinement cycles in the time a single first draft used to take.</p>
-    </div>
-
-    <div class="stat-inset" data-scroll data-type="fade-up" data-delay="200">
-      <div class="stat-item">
-        <div class="stat-num z-callout" data-scroll data-type="z-pop">6-7</div>
-        <div class="stat-label">Concurrent Programs</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num z-callout" data-scroll data-type="z-pop">30+</div>
-        <div class="stat-label">Active Learners</div>
-      </div>
-    </div>
-
-    <div class="pullquote" data-scroll data-type="scale-in" data-delay="300">
-      <p>"This isn't an L&amp;D team that uses Claude. It's a Claude-native enablement engine."</p>
-    </div>
-  </div>
-</section>
-
-<!-- ======== SECTION 6: SPEED & TRAINING ======== -->
-<section class="story-section" id="section-6">
-  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VI</div>
-
-  <div class="story-content">
-    <div class="article-header" data-scroll data-type="slide-right">
-      <div class="article-section-label">Chapter VI</div>
       <h2 class="article-headline">Speed of Development. Depth of Enablement.</h2>
       <div class="article-subhead">What our personalized training looks like, and why it produces results that self-paced programs never will.</div>
     </div>
@@ -1961,36 +1878,33 @@ body {
     <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="300">
       <p>We don't just set things up and leave. We teach teams how the tools work and how they fit together, so they can build their own things to solve their own problems. That's where the real power comes from. That's where the scale comes from.</p>
 
-      <p>At Boeing, engineers are now independently writing specs and running Spec-Driven Development workflows that we designed with Anthropic's models. At Natera, a PM who couldn't open a terminal is now building project roadmaps with Claude Code and presenting them company-wide.</p>
+      <p>At Boeing, engineers are now independently writing specs and running Spec-Driven Development workflows that we designed with Anthropic's models. At Natera, a PMs who couldn't open a terminal are now building project roadmaps with Claude Code and presenting them company-wide.</p>
 
       <p>We pair this with full observability: OpenTelemetry instrumentation, telemetry collection feeding into Datadog and platforms like Jellyfish, so leadership gets real-time visibility into adoption patterns, usage metrics, and value realization. Rolling out AI successfully means being able to see how it's being adopted and how it's being used.</p>
 
       <p>The underlying thread in everything we do: we're not just implementing a tool. We're driving behavioral change across entire engineering organizations. People are changing how they work, not just what tools they use.</p>
     </div>
 
-    <div class="pullquote" data-scroll data-type="scale-in" data-delay="400">
-      <p>"People are changing how they work, not just what tools they use."</p>
-    </div>
   </div>
 </section>
 
-<!-- Callout: zoom-out (different from others) -->
+<!-- Callout: before Chapter VI -->
 <section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-zoom large flying-text" data-scroll data-type="zoom-out">
-    With or without you,<br>we're <em>moving</em>.
+    Let's Move <em>Together</em>.
   </div>
 </section>
 
-<!-- ======== SECTION 7: WHY PARTNER ======== -->
-<section class="story-section zoom-section" id="section-7">
-  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VII</div>
+<!-- ======== SECTION 6: WHY PARTNER ======== -->
+<section class="story-section zoom-section" id="section-6">
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VI</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
-      <div class="article-section-label">Chapter VII</div>
+      <div class="article-section-label">Chapter VI</div>
       <h2 class="article-headline">Why You Should Care</h2>
-      <div class="article-subhead">We're doing this today. We believe Claude and Liatrio together is the most compelling story in enterprise AI enablement.</div>
+      <div class="article-subhead">We're managing this without a formal partnership. We believe Claude and Liatrio together is the most compelling story in enterprise AI enablement.</div>
     </div>
 
     <div class="article-body" data-scroll data-type="fade-up" data-delay="100">
@@ -2001,8 +1915,8 @@ body {
 
     <div class="story-card" data-scroll data-type="tilt-in-left" data-delay="150">
       <div class="story-card-label">Differentiation</div>
-      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">Not Deployment. Transformation.</span></h3>
-      <p>We don't install Claude and hand over documentation. We embed with teams, drive adoption from the ground up, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.</p>
+      <h3><span class="highlight-draw" data-scroll data-type="underline-draw">Not Deployment. Innovation.</span></h3>
+      <p>We don't install Claude and hand over documentation. We embed with teams, drive adoption, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.</p>
     </div>
 
     <div class="story-card" data-scroll data-type="tilt-in-right" data-delay="250">
@@ -2014,7 +1928,7 @@ body {
     <div class="story-card" data-scroll data-type="tilt-in-left" data-delay="350">
       <div class="story-card-label">Observability</div>
       <h3><span class="highlight-draw" data-scroll data-type="underline-draw">Measured, Not Hoped</span></h3>
-      <p>We instrument every engagement with OpenTelemetry. Adoption metrics flow into Datadog, Jellyfish, Honeycomb. Leadership doesn't hope AI is working. They see it. We want a partnership with Honeycomb for this exact reason, and we already use it internally.</p>
+      <p>We instrument every engagement with OpenTelemetry. Adoption metrics flow into Datadog, Jellyfish, Honeycomb, and other industry technologies. Leadership doesn't hope AI is working. They see it. We built a strategic partnership with Honeycomb for this exact reason, and we already use it internally.</p>
     </div>
 
     <div class="story-card" data-scroll data-type="tilt-in-right" data-delay="450">
@@ -2037,13 +1951,13 @@ body {
   </div>
 </section>
 
-<!-- ======== SECTION 8: WHAT'S NEXT ======== -->
-<section class="story-section zoom-section" id="section-8">
-  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VIII</div>
+<!-- ======== SECTION 7: WHAT'S NEXT ======== -->
+<section class="story-section zoom-section" id="section-7">
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VII</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
-      <div class="article-section-label">Chapter VIII</div>
+      <div class="article-section-label">Chapter VII</div>
       <h2 class="article-headline">What's Next</h2>
       <div class="article-subhead">The pipeline is real. The momentum is building. Here's where we're headed.</div>
     </div>
@@ -2067,36 +1981,33 @@ body {
       </li>
       <li data-scroll data-type="slide-right" data-delay="450">
         <span class="next-bullet">&bull;</span>
-        <div><strong>Expanded Enterprise Pipeline</strong> &mdash; Additional enterprise clients beyond Natera and Boeing are in the pipeline. We can bring Anthropic along for the ride.</div>
+        <div><strong>Expanded Enterprise Pipeline</strong> &mdash; Additional enterprise clients beyond Natera and Boeing are in the pipeline.</div>
       </li>
     </ul>
 
     <hr class="np-divider">
 
     <div class="article-body" data-scroll data-type="fade-up" data-delay="500" style="margin-top: 1rem;">
-      <p>We're already in conversations with your alliances organization and your go-to-market team. We have the relationships, the methodology, and the results. All that's missing is the official partnership to make this even bigger.</p>
+      <p>We have the relationships, the methodology, and the results. All that's missing is the official partnership to make this even bigger.</p>
 
       <p>Let's do this together.</p>
     </div>
 
-    <div class="pullquote" data-scroll data-type="scale-in" data-delay="500">
-      <p>"We're not asking you to take a chance on us. We're asking you to look at what's already in motion."</p>
-    </div>
   </div>
 </section>
 
 <!-- ======== FOOTER ======== -->
 <footer class="np-footer">
-  <div class="footer-headline" data-scroll data-type="fade-up">Let's Write the Next Chapter Together</div>
-  <p data-scroll data-type="fade-up" data-delay="100" style="font-style: italic; color: var(--ink-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
-    Liatrio is transforming how enterprise organizations adopt and use Claude; not just in engineering, but across entire businesses. We'd love to make it official.
+  <div class="footer-headline">Let's Write the Next Chapter Together</div>
+  <p style="font-style: italic; color: var(--ink-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+    Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to make it official.
   </p>
 
-  <div class="footer-contact" data-scroll data-type="fade-up" data-delay="200">
+  <div class="footer-contact">
     <div class="contact-item">
       <div class="contact-name">Daniel Helbling</div>
-      <div class="contact-role">Partnerships</div>
-      <div class="contact-email"><a href="mailto:daniel@liatrio.com">daniel@liatrio.com</a></div>
+      <div class="contact-role">Head of Alliances &amp; Partnerships</div>
+      <div class="contact-email"><a href="mailto:daniel.helbling@liatrio.com">daniel.helbling@liatrio.com</a></div>
     </div>
     <div class="contact-item">
       <div class="contact-name">Chris Blackburn</div>
