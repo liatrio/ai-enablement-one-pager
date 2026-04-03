@@ -9,9 +9,9 @@ All text content for the Anthropic partnership site. Edit here, then update `ind
 - **Date**: April 2026 Edition
 - **Title**: The AI Daily
 - **Tagline**: Enterprise Intelligence, Delivered
-- **Edition**: A Liatrio Publication . Special Anthropic Partnership Edition
-- **Headline**: Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner
-- **Subhead**: How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.
+- **Edition**: A Liatrio Publication · Special Anthropic Partnership Edition
+- **Headline**: The Missing Piece in Anthropic's Enterprise Story
+- **Subhead**: Most partners can deploy Claude. Very few can make an entire engineering organization change how they work to revolve around it. Liatrio is one of them.
 
 ---
 
@@ -19,30 +19,15 @@ All text content for the Anthropic partnership site. Edit here, then update `ind
 
 > Not just another technology partner.
 
-### Stats Bridge
-
-| Stat | Label |
-|------|-------|
-| 200-500+ | Engineers Enabled |
-| 3 | Days to Build CCA |
-| 2 | Major Enterprises |
-| 80+ | Teams in Pipeline |
-
 ---
 
-## Chapter I: This Is Liatrio
+## Chapter I: Who Is Liatrio
 
 **Subhead**: AI-forward. Enablement-focused. Best in class at enterprise scale.
 
-Liatrio enables enterprise organizations to transform how their people work with Claude; from engineering teams of 200-500+ to product managers, revenue leaders, and L&D functions. This isn't deployment. It's behavioral transformation at scale, powered by a Claude-native enablement engine we built and run ourselves.
+Claude is the most capable AI model on the market. Getting it deployed is easy. Getting an organization to actually change how it works around it — that's where almost everyone fails. Liatrio exists for exactly that gap.
 
-We are AI-forward, focused on the agentic era, and we do this better than anyone else at enterprise scale. Our engineers don't just deploy tools; they drive behavioral transformation. They teach organizations how AI tools fit together so people can build their own solutions to their own problems.
-
-We're not Accenture. We're not Deloitte. We're not your enterprise deployment partner. If you want Claude to be adopted securely, adopted the right way, with people using it the way it's intended to be used, we are the ones who make that happen.
-
-You won't get genuine, confirmed enterprise adoption the way you want it without us.
-
-**Pullquote**: "We're not implementing Claude. We're driving true behavioral transformation."
+We embed with teams — engineers, PMs, non-technical leads — and stay until the transformation sticks.
 
 ---
 
@@ -60,22 +45,16 @@ You won't get genuine, confirmed enterprise adoption the way you want it without
 
 | Stat | Label |
 |------|-------|
-| 5d -> 15m | Provisioning Time |
+| 5d → 15m | Provisioning Time |
 | 3+ | Product Teams |
 | 132 | Specs Authored |
-| 8x | Faster Delivery |
+| 7 | Engineers |
 
 ### Body
 
-Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model powering the effort. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across greenfield and brownfield product teams and their platform team.
+Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across product teams — rebuilding a legacy Azure provisioning workflow that took five business days into one that completes in fifteen minutes with zero handoffs.
 
-The flagship result: a legacy Azure provisioning workflow that took five business days and multiple team handoffs was rebuilt in under a week using Claude. The final service provisions a complete Azure account in fifteen minutes with zero handoffs. A multi-day Flashbuild across two product teams and a platform team was entirely driven by Claude models and the Liatrio SDD framework, delivering production features in just two days.
-
-But the transformation goes deeper than speed. We brought a complete product operating model: teams are using Anthropic models to refine and decompose PRDs, engineers pick up specs and run with them, and the entire process is built on a repeatable, scalable methodology. Claude Code approval is in progress as the team's preferred harness for H2 2026.
-
-The expert domain research has been equally impactful. One Boeing engineer, a ten-year veteran, built an engineering analysis document with Claude that he uses every day. The team is "really blown away" by the depth and quality. This is what happens when you pair deep domain expertise with the right AI tools and the right process.
-
-**Pullquote**: "They're using our prompts and processes to refine and decompose PRDs, and now the whole team is picking it up and running."
+The transformation goes deeper than speed. Engineers are using Claude to refine and decompose PRDs, picking up specs and running with them independently.
 
 ---
 
@@ -90,19 +69,15 @@ The expert domain research has been equally impactful. One Boeing engineer, a te
 | 80+ | Teams in Scope |
 | 200-500 | Engineers |
 | L1-L5 | AI Fluency |
-| 4 | Regulated Repos Live |
 
 ### Body
 
-There was a product manager at Natera running Windows, way off on an island, because nobody on her team was using Windows and all they had access to was Claude Code. She didn't know how to get it set up. She didn't even feel comfortable asking her own team. So she set up a one-on-one with a Liatrio engineer: "Can you help me? I have no idea what I'm doing."
+Natera engaged Liatrio to embed Claude Code directly into their QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption across 80+ engineering teams spanning genomics and diagnostics.
 
-They worked through the whole thing together. Got Claude Code running in a terminal, in PowerShell, connected to a Jira MCP server so she could read project data. That process was then turned into a repeatable guide shared with the team managing the other Windows users across the organization.
+The enablement scope extended beyond engineering. A product manager with no CLI experience was onboarded to Claude Code in PowerShell, connected to a Jira MCP server, and within days was generating project roadmaps with confidence-ranged delivery estimates — which she presented company-wide. That onboarding process was documented and distributed as a repeatable guide for all Windows users across the organization.
 
-Days later, she stood up at Natera's company-wide build-and-share and presented a Jira roadmap she built with Claude. She had manipulated project data, generated estimates with confidence ranges for best and worst case delivery scenarios, and presented it to the entire organization. This is a PM who a week earlier couldn't open a terminal.
+Engineers self-directed usage beyond the prescribed scope: one ran a 14-step clinical workflow dry-test unprompted, another extended an MR review pipeline to a regulated project within days of initial setup.
 
-That's not tool deployment. That's not configuration. That's a person whose capabilities were fundamentally expanded. And it's happening organically across the organization: engineers are self-directing Claude usage beyond what Liatrio prescribed. One ran a 14-step clinical workflow dry-test unprompted. Another extended an MR review pipeline to her own regulated project within days. Engineers are reporting they "didn't write a single line of code" on certain tasks.
-
-Liatrio embedded Claude Code directly into Natera's QCI engineering team with full OpenTelemetry instrumentation, giving leadership real-time visibility into AI adoption. Now the plan is to scale from QCI to 80+ engineering teams across genomics and diagnostics.
 
 **Pullquote**: "She didn't feel comfortable asking her own team. A week later, she was demoing a Claude-built roadmap to the entire company."
 
@@ -139,30 +114,7 @@ We saw the gap in our own capabilities. We couldn't wait to get access and have 
 
 ---
 
-## Chapter V: The Engine Behind the Enablement
-
-**Subhead**: A Claude-native L&D function that powers everything. One person. Six programs. Zero blank pages.
-
-The Boeing and Natera outcomes don't happen by accident. They happen because Liatrio's people show up Claude-fluent, trained by a learning and development function that runs entirely on Claude.
-
-One L&D professional manages the full scope: CCA certification prep, Forge technical training, leadership development, new hire onboarding, client-specific enablement, and event facilitation. Claude is embedded across the entire lifecycle; from intake analysis and instructional design through content creation, platform delivery, and learner analytics. Custom Claude Skills encode company culture, brand standards, and platform requirements so every output starts from institutional context, not a blank page.
-
-But here's what makes this story bigger than one person: Forge technical training and CCA certification prep were built by engineers on the Innovation team; people with no L&D background, using Claude. They learned a brand-new learning platform, produced professional-grade course content, and delivered exam-ready material in days, not months. Claude didn't just make the L&D function more efficient. It made L&D accessible to people who had never done it before.
-
-Leadership programs and company off-sites are designed and adapted in real time. Content development that used to take weeks now takes hours, and iteration is just as fast, with multiple refinement cycles in the time a single first draft used to take.
-
-### Stats
-
-| Stat | Label |
-|------|-------|
-| 6-7 | Concurrent Programs |
-| 30+ | Active Learners |
-
-**Pullquote**: "This isn't an L&D team that uses Claude. It's a Claude-native enablement engine."
-
----
-
-## Chapter VI: Speed of Development. Depth of Enablement.
+## Chapter V: Speed of Development. Depth of Enablement.
 
 **Subhead**: What our personalized training looks like, and why it produces results that self-paced programs never will.
 
@@ -170,7 +122,9 @@ The Liatrio enablement model is not a slide deck and a certification exam. It is
 
 ### Enablement Flywheel
 
-CCA Program (Claude Certification Academy) -> Forge Training (Internal Cohorts) -> Certified Engineers (Production Ready) -> Enterprise Delivery (Scaled Adoption)
+CCA Program → Forge Training → Certified Engineers → Enterprise Delivery
+
+### Body
 
 We don't just set things up and leave. We teach teams how the tools work and how they fit together, so they can build their own things to solve their own problems. That's where the real power comes from. That's where the scale comes from.
 
@@ -180,28 +134,26 @@ We pair this with full observability: OpenTelemetry instrumentation, telemetry c
 
 The underlying thread in everything we do: we're not just implementing a tool. We're driving behavioral change across entire engineering organizations. People are changing how they work, not just what tools they use.
 
-**Pullquote**: "People are changing how they work, not just what tools they use."
+---
+
+## Callout: Before Chapter VI
+
+> Let's Move Together.
 
 ---
 
-## Callout: Before Chapter VII
+## Chapter VI: Why You Should Care
 
-> With or without you, we're *moving*.
-
----
-
-## Chapter VII: Why You Should Care
-
-**Subhead**: We're doing this today. We believe Claude and Liatrio together is the most compelling story in enterprise AI enablement.
+**Subhead**: We're managing this without a formal partnership. We believe Claude and Liatrio together is the most compelling story in enterprise AI enablement.
 
 Other partners deploy LLMs on Bedrock. We teach organizations how to actually transform.
 
 We don't believe just in Claude and the power of AI in the abstract. We believe that Claude and Liatrio together is the most compelling combination for getting this right at enterprise scale. Here is why:
 
-### Not Deployment. Transformation.
+### Not Deployment. Innovation.
 *Differentiation*
 
-We don't install Claude and hand over documentation. We embed with teams, drive adoption from the ground up, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.
+We don't install Claude and hand over documentation. We embed with teams, drive adoption, and build repeatable processes that persist after we leave. Our origin story is built around intentionality and what's best for our end customers in the enterprise.
 
 ### The Whole Organization
 *Beyond Engineering*
@@ -222,13 +174,13 @@ The real measure of our success is when clients don't need us anymore. When engi
 
 ---
 
-## Callout: Before Chapter VIII
+## Callout: Before Chapter VII
 
 > Let's make it *official*.
 
 ---
 
-## Chapter VIII: What's Next
+## Chapter VII: What's Next
 
 **Subhead**: The pipeline is real. The momentum is building. Here's where we're headed.
 
@@ -243,19 +195,17 @@ We're already in conversations with your alliances organization and your go-to-m
 
 Let's do this together.
 
-**Pullquote**: "We're not asking you to take a chance on us. We're asking you to look at what's already in motion."
-
 ---
 
 ## Footer
 
 **Headline**: Let's Write the Next Chapter Together
 
-Liatrio is transforming how enterprise organizations adopt and use Claude; not just in engineering, but across entire businesses. We'd love to make it official.
+Liatrio is actively deploying Claude across enterprise engineering teams at scale. We'd love to make it official.
 
 ### Contacts
 
 - **Daniel Helbling** -- Partnerships -- daniel@liatrio.com
 - **Chris Blackburn** -- CEO -- chris@liatrio.com
 
-*Built with Claude Code . Powered by Anthropic . 2026 Liatrio*
+*Built with Claude Code · Powered by Anthropic · 2026 Liatrio*
