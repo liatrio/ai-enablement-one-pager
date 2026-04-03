@@ -946,39 +946,30 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 2rem;
+  -webkit-overflow-scrolling: touch;
 }
 .oracle-broadsheet::-webkit-scrollbar { width: 8px; }
 .oracle-broadsheet::-webkit-scrollbar-track { background: var(--parchment-dark); }
 .oracle-broadsheet::-webkit-scrollbar-thumb { background: var(--rule-dark); border-radius: 4px; min-height: 40px; }
 .oracle-broadsheet::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
 
-/* Scroll indicator overlay at bottom of broadsheet */
-.oracle-broadsheet-wrap {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.oracle-broadsheet-wrap::after {
-  content: '\2193';
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+/* Scroll indicator inside broadsheet */
+.oracle-scroll-arrow {
+  position: sticky;
+  bottom: 0;
+  text-align: center;
   font-size: 1.2rem;
   color: var(--ink-faint);
   pointer-events: none;
   animation: scroll-bounce 2s ease-in-out infinite;
   opacity: 0;
-  z-index: 1;
   transition: opacity 0.3s;
+  padding: 8px 0;
 }
-.oracle-broadsheet-wrap.has-overflow::after { opacity: 0.6; }
-.oracle-broadsheet-wrap.at-bottom::after { opacity: 0; }
+.oracle-scroll-arrow.visible { opacity: 0.6; }
 @keyframes scroll-bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(6px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
 /* Welcome state */
@@ -1305,15 +1296,15 @@ body {
 
 .env-letter-writing {
   position: absolute;
-  top: 8px;
-  left: 8px; right: 8px;
+  top: 12px;
+  left: 10px; right: 10px;
   text-align: center;
   font-family: 'Dancing Script', cursive;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(45, 22, 6, 0.55);
   pointer-events: none;
-  line-height: 1.2;
+  line-height: 1.25;
   word-wrap: break-word;
 }
 
@@ -2072,8 +2063,6 @@ body {
 
     <div class="article-body" data-scroll data-type="fade-up" data-delay="500" style="margin-top: 1rem;">
       <p>We have the relationships, the methodology, and the results. All that's missing is the official partnership to make this even bigger.</p>
-
-      <p>Let's do this together.</p>
     </div>
 
   </div>
@@ -2637,15 +2626,14 @@ body {
     <button id="oracle-close">← Close edition</button>
   </div>
 
-  <div class="oracle-broadsheet-wrap" id="oracle-broadsheet-wrap">
-    <div class="oracle-broadsheet" id="oracle-broadsheet">
-      <div class="oracle-welcome" id="oracle-welcome">
-        <div class="oracle-welcome-ornament">✦</div>
-        <h3>Send a dispatch to the Editor.</h3>
-        <p>Ask anything.</p>
-        <p>Your question gets routed to a Claude-powered newsroom: an Anthropic API call hits a Cloudflare Worker, spins up a live article pipeline via MCP, and typesets your front page in real time.</p>
-      </div>
+  <div class="oracle-broadsheet" id="oracle-broadsheet">
+    <div class="oracle-welcome" id="oracle-welcome">
+      <div class="oracle-welcome-ornament">✦</div>
+      <h3>Send a dispatch to the Editor.</h3>
+      <p>Ask anything.</p>
+      <p>Your question gets routed to a Claude-powered newsroom: an Anthropic API call hits a Cloudflare Worker, spins up a live article pipeline via MCP, and typesets your front page in real time.</p>
     </div>
+    <div class="oracle-scroll-arrow" id="oracle-scroll-arrow">↓</div>
   </div>
 
   <div class="oracle-compose">
@@ -2773,22 +2761,20 @@ body {
 
   const overlay    = document.getElementById('oracle-overlay');
   const broadsheet = document.getElementById('oracle-broadsheet');
-  const broadsheetWrap = document.getElementById('oracle-broadsheet-wrap');
+  const scrollArrow = document.getElementById('oracle-scroll-arrow');
   const welcome    = document.getElementById('oracle-welcome');
   const statusEl   = document.getElementById('oracle-status');
   const oInput     = document.getElementById('oracle-input');
   const oSend      = document.getElementById('oracle-send');
 
   // Show scroll arrow only when broadsheet has overflow, hide at bottom
-  if (broadsheet && broadsheetWrap) {
+  if (broadsheet && scrollArrow) {
     function checkBroadsheetOverflow() {
       const hasOverflow = broadsheet.scrollHeight > broadsheet.clientHeight + 10;
       const atBottom = broadsheet.scrollTop + broadsheet.clientHeight >= broadsheet.scrollHeight - 10;
-      broadsheetWrap.classList.toggle('has-overflow', hasOverflow);
-      broadsheetWrap.classList.toggle('at-bottom', atBottom);
+      scrollArrow.classList.toggle('visible', hasOverflow && !atBottom);
     }
     broadsheet.addEventListener('scroll', checkBroadsheetOverflow);
-    // Recheck when content changes (articles load)
     new MutationObserver(checkBroadsheetOverflow).observe(broadsheet, { childList: true, subtree: true });
     checkBroadsheetOverflow();
   }
