@@ -1365,25 +1365,23 @@ footer {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: var(--green);
-  border: none;
+  background: #080b10;
+  border: 2px solid var(--green);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(137,223,0,0.35);
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease, background 0.2s ease;
-  color: #080b10;
+  box-shadow: 0 4px 20px rgba(137,223,0,0.25);
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 #chat-trigger:hover {
   transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 28px rgba(137,223,0,0.55);
-  background: #080b10;
+  box-shadow: 0 8px 28px rgba(137,223,0,0.45);
+  border-color: #9cee10;
 }
 #chat-trigger.open {
-  background: var(--bg-section);
+  border-color: rgba(137,223,0,0.3);
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  border: 1px solid var(--border);
   animation: none;
 }
 #chat-trigger svg { pointer-events: none; }
