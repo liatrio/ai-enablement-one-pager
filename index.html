@@ -839,8 +839,17 @@ body {
   .oracle-compose-row { flex-direction: column; gap: 0.4rem; }
   .oracle-compose-input { width: 100%; min-height: 38px; font-size: 0.8rem; padding: 8px 10px; }
   .oracle-compose-send { width: 100%; height: auto; padding: 10px; font-size: 0.65rem; }
-  .oracle-prompts { gap: 0.3rem; margin-bottom: 0.4rem; }
-  .oracle-prompt-chip { font-size: 0.7rem; padding: 3px 8px; }
+  .oracle-prompts {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.3rem;
+    margin-bottom: 0.4rem;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .oracle-prompts::-webkit-scrollbar { display: none; }
+  .oracle-prompt-chip { font-size: 0.7rem; padding: 3px 8px; flex-shrink: 0; }
 }
 
 /* =============================================
