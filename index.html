@@ -75,8 +75,8 @@ body {
 .section-ornament {
   position: absolute;
   font-family: var(--serif);
-  color: rgba(42,26,10,.04);
-  font-size: 20vw;
+  color: rgba(42,26,10,.06);
+  font-size: 12vw;
   font-weight: 900;
   pointer-events: none;
   will-change: transform;
@@ -784,7 +784,7 @@ body {
   .nav-dot .dot-label { display: none; }
   .footer-contact { flex-direction: column; gap: 1.5rem; }
   .pullquote p { font-size: 1.1rem; }
-  .section-ornament { font-size: 30vw; }
+  .section-ornament { font-size: 15vw; }
 }
 </style>
 </head>
@@ -808,7 +808,7 @@ body {
 
 <!-- Nav dots -->
 <nav class="nav-dots" id="navDots">
-  <div class="nav-dot active" data-section="0"><span class="dot-label">Masthead</span></div>
+  <div class="nav-dot active" data-section="0"><span class="dot-label">The AI Daily</span></div>
   <div class="nav-dot" data-section="1"><span class="dot-label">I. This Is Liatrio</span></div>
   <div class="nav-dot" data-section="2"><span class="dot-label">II. Boeing</span></div>
   <div class="nav-dot" data-section="3"><span class="dot-label">III. Natera</span></div>
@@ -847,7 +847,7 @@ body {
 
 <!-- ======== SECTION 1: THIS IS LIATRIO ======== -->
 <section class="story-section zoom-section" id="section-1">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">I</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">I</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -882,7 +882,7 @@ body {
 
 <!-- ======== SECTION 2: BOEING ======== -->
 <section class="story-section zoom-section" id="section-2">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">II</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">II</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -928,7 +928,7 @@ body {
 
 <!-- ======== SECTION 3: NATERA ======== -->
 <section class="story-section" id="section-3">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">III</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">III</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -986,7 +986,7 @@ body {
 
 <!-- ======== SECTION 4: THE GAP WE FILLED ======== -->
 <section class="story-section zoom-section" id="section-4">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">IV</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">IV</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -1026,7 +1026,7 @@ body {
 
 <!-- ======== SECTION 5: THE ENGINE BEHIND THE ENABLEMENT ======== -->
 <section class="story-section zoom-section" id="section-5">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">V</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">V</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -1064,7 +1064,7 @@ body {
 
 <!-- ======== SECTION 6: SPEED & TRAINING ======== -->
 <section class="story-section" id="section-6">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">VI</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VI</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -1125,7 +1125,7 @@ body {
 
 <!-- ======== SECTION 7: WHY PARTNER ======== -->
 <section class="story-section zoom-section" id="section-7">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">VII</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VII</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -1180,7 +1180,7 @@ body {
 
 <!-- ======== SECTION 8: WHAT'S NEXT ======== -->
 <section class="story-section zoom-section" id="section-8">
-  <div class="section-ornament" data-speed="0.05" style="top: 5%; left: -3%;">VIII</div>
+  <div class="section-ornament" data-speed="0.05" style="top: 10%; left: 3%;">VIII</div>
 
   <div class="story-content">
     <div class="article-header" data-scroll data-type="slide-right">
@@ -1286,27 +1286,27 @@ body {
   // Active Theory-style staggered word reveal with 3D rotation
   const entranceTL = gsap.timeline({ delay: 0.3 });
 
-  // Title words fly up fast
+  // Title words fly up
   entranceTL.to('.title-word', {
     opacity: 1, y: 0, rotateX: 0,
-    duration: 0.7, stagger: 0.1, ease: 'power4.out',
+    duration: 0.8, stagger: 0.12, ease: 'power4.out',
   });
 
-  // Date, rules, tagline, edition come in quickly overlapping
-  entranceTL.to('.masthead-date', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.4');
-  entranceTL.to('.masthead-rule', { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.inOut', stagger: 0.1 }, '-=0.3');
-  entranceTL.to('.masthead-tagline', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.3');
-  entranceTL.to('.masthead-edition', { opacity: 1, duration: 0.3, ease: 'power3.out' }, '-=0.2');
+  // Date, rules, tagline, edition overlap with end of title
+  entranceTL.to('.masthead-date', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.3');
+  entranceTL.to('.masthead-rule', { opacity: 1, scaleX: 1, duration: 0.5, ease: 'power2.inOut', stagger: 0.1 }, '-=0.2');
+  entranceTL.to('.masthead-tagline', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.2');
+  entranceTL.to('.masthead-edition', { opacity: 1, duration: 0.3, ease: 'power3.out' }, '-=0.15');
 
-  // Headline comes in shortly after title (not instant, not slow)
+  // Beat, then headline draws in
   entranceTL.fromTo('.masthead-headline',
-    { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' },
-    '+=0.15'
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
+    '+=0.4'
   );
 
-  entranceTL.to('.masthead-sub', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.15');
-  entranceTL.to('.scroll-hint', { opacity: 0.6, duration: 0.4, ease: 'power3.out' }, '-=0.1');
+  entranceTL.to('.masthead-sub', { opacity: 1, duration: 0.4, ease: 'power3.out' }, '-=0.1');
+  entranceTL.to('.scroll-hint', { opacity: 0.6, duration: 0.4, ease: 'power3.out' }, '+=0.2');
 
   // ====== CURSOR INK TRAIL ======
   // Leaves a trail of ink dots that fade out (Active Theory mouse-follow aesthetic)
@@ -1340,6 +1340,25 @@ body {
       prevX = dot.x;
       prevY = dot.y;
     });
+  });
+
+  // ====== ORNAMENT SCROLL MOTION (GSAP scrub) ======
+  document.querySelectorAll('.section-ornament').forEach(orn => {
+    const parent = orn.closest('section') || orn.closest('.masthead');
+    if (!parent) return;
+    gsap.fromTo(orn,
+      { y: 60, opacity: 0.02 },
+      {
+        y: -60, opacity: 0.08,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: parent,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
   });
 
   // Only named sections for dot navigation (not interstitial callouts)
@@ -1414,19 +1433,7 @@ body {
       hint.style.opacity = clamp(1 - scrollY / 200, 0, 1);
     }
 
-    // Floating ornaments with continuous parallax
-    ornaments.forEach(orn => {
-      const speed = parseFloat(orn.dataset.speed) || 0.05;
-      const section = orn.closest('section') || orn.closest('.masthead');
-      if (section) {
-        const factor = getScrollFactor(section);
-        const y = factor * vh * speed;
-        const x = Math.sin(factor * Math.PI) * 15 * speed;
-        // Lenis velocity adds extra drift to ornaments
-        const vDrift = lenisVelocity * speed * 0.3;
-        orn.style.transform = `translate(${x}px, ${y + vDrift}px)`;
-      }
-    });
+    // Ornament motion handled by GSAP below
 
     // Scroll-driven element animations
     scrollElements.forEach(el => {
@@ -1581,6 +1588,8 @@ body {
         content.style.transform = `skewY(${clamp(skew, -1.5, 1.5)}deg)`;
       }
     });
+
+    // Ornament motion handled in GSAP setup below
 
     // Active section for nav dots (only track named sections)
     let activeIdx = 0;
