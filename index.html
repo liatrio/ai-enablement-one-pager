@@ -882,17 +882,14 @@ body {
 .oracle-broadsheet {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 2rem;
-  columns: 3 220px;
-  column-gap: 2rem;
-  column-rule: 1px solid var(--rule);
 }
 .oracle-broadsheet::-webkit-scrollbar { width: 6px; }
 .oracle-broadsheet::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
 
 /* Welcome state */
 .oracle-welcome {
-  column-span: all;
   text-align: center;
   padding: 3rem 2rem;
   color: var(--ink-faint);
@@ -921,14 +918,12 @@ body {
 
 /* Article cards */
 .oracle-article {
-  break-inside: avoid;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--rule);
 }
 .oracle-article:last-child { border-bottom: none; }
 .oracle-article.banner {
-  column-span: all;
   border-bottom: 3px double var(--rule-dark);
   margin-bottom: 2rem;
   padding-bottom: 2rem;
@@ -980,13 +975,14 @@ body {
   line-height: 1.7;
   color: var(--ink);
   min-height: 1em;
+  columns: 2 200px;
+  column-gap: 1.5rem;
+  column-rule: 1px solid var(--rule);
 }
 .oracle-article-body p { margin-bottom: 0.6rem; }
 .oracle-article-body p:last-child { margin-bottom: 0; }
 .oracle-article.banner .oracle-article-body {
-  columns: 2 180px;
-  column-gap: 1.5rem;
-  column-rule: 1px solid var(--rule);
+  columns: 3 180px;
   font-size: 0.9rem;
 }
 .oracle-pullquote {
