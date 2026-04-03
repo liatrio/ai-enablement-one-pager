@@ -250,17 +250,18 @@ body {
 .stat-inset {
   background: var(--highlight);
   border: 1px solid var(--rule);
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 1.5rem;
   margin: 1.25rem 0;
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.15rem 1rem;
+  justify-content: space-around;
+  flex-wrap: nowrap;
 }
 
 .stat-item {
   text-align: center;
-  padding: 0.3rem 0.25rem;
+  padding: 0.3rem 0.15rem;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .stat-num {
@@ -791,10 +792,12 @@ body {
   font-weight: inherit !important;
   text-transform: inherit !important;
   background: none !important;
+}
+
+.flying-text em {
   overflow: visible;
-  padding: 0.15em 0.08em;
-  margin: -0.15em -0.03em;
-  line-height: 1.3;
+  padding: 0.1em 0.15em;
+  margin: -0.1em -0.05em;
 }
 
 /* ====== TABLET ====== */
@@ -814,7 +817,7 @@ body {
 
   .article-columns { column-count: 1; }
   .masthead-title { font-size: clamp(2.5rem, 10vw, 4rem); }
-  .stat-inset { gap: 0.1rem 0.5rem; }
+  .stat-inset { gap: 0.1rem; padding: 0.4rem 0.25rem; }
   .flywheel { flex-direction: column; }
   .flywheel-arrow { transform: rotate(90deg); }
   .nav-dots { right: 0.75rem; gap: 0.5rem; }
@@ -1288,9 +1291,9 @@ body {
   pointer-events: none;
   line-height: 1;
 }
-.env-letter-writing span:nth-child(1) { font-size: 7.5px; }
-.env-letter-writing span:nth-child(2) { font-size: 6.5px; opacity: 0.8; }
-.env-letter-writing span:nth-child(3) { font-size: 5.5px; opacity: 0.6; }
+.env-letter-writing span:nth-child(1) { font-size: 9.5px; }
+.env-letter-writing span:nth-child(2) { font-size: 8px; opacity: 0.8; }
+.env-letter-writing span:nth-child(3) { font-size: 6.5px; opacity: 0.6; }
 
 /* ── Letter stack behind the envelope ── */
 /* Each peek is a slip of paper sticking out below */
@@ -1849,8 +1852,8 @@ body {
 <!-- Callout: zoom-in with border-draw -->
 <section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
-  <div class="border-draw" data-scroll data-type="border-draw">
-    <div class="callout-zoom large flying-text" style="padding: 0;">
+  <div class="border-draw" id="engineers-border">
+    <div class="callout-zoom large flying-text" data-border-sync="engineers-border" style="padding: 0;">
       200 to 500 engineers.<br>No playbook.<br><em>So we wrote one.</em>
     </div>
   </div>
@@ -2505,26 +2508,33 @@ body {
     const flyingEls = document.querySelectorAll('.flying-text');
 
     flyingEls.forEach(el => {
-      // Protect <em> content from being split into individual chars
-      // (italic swash glyphs like Playfair "ff" get clipped when split)
-      el.querySelectorAll('em').forEach(em => {
-        em.setAttribute('data-protected', '');
+      // Protect <em> from SplitType: swap with placeholder, split, then restore
+      const emElements = [];
+      el.querySelectorAll('em').forEach((em, i) => {
+        const placeholder = document.createElement('span');
+        placeholder.className = 'em-placeholder';
+        placeholder.dataset.emIdx = i;
+        placeholder.textContent = '\u200B'; // zero-width space so SplitType sees it
+        emElements.push({ em, placeholder, parent: em.parentNode, next: em.nextSibling });
+        em.parentNode.replaceChild(placeholder, em);
+      });
+
+      const split = new SplitType(el, { types: 'words, chars', tagName: 'span' });
+
+      // Restore <em> elements in place of placeholders
+      emElements.forEach(({ em, placeholder }) => {
         em.style.display = 'inline-block';
+        if (placeholder.parentNode) {
+          placeholder.parentNode.replaceChild(em, placeholder);
+        }
       });
 
-      const split = new SplitType(el, {
-        types: 'words, chars',
-        tagName: 'span',
-        // SplitType won't descend into elements with data-splitting="false"
-      });
-
-      // Gather animated elements: chars + protected em elements (as whole units)
+      // Gather animated elements: split chars + restored em elements
       const animTargets = [];
       if (split.chars) split.chars.forEach(c => {
-        // Skip chars that are inside a protected em
-        if (!c.closest('em[data-protected]')) animTargets.push(c);
+        if (!c.classList.contains('em-placeholder')) animTargets.push(c);
       });
-      el.querySelectorAll('em[data-protected]').forEach(em => animTargets.push(em));
+      emElements.forEach(({ em }) => animTargets.push(em));
 
       if (animTargets.length === 0) return;
 
@@ -2573,7 +2583,22 @@ body {
           each: 0.04,
           from: 'random',
         },
-      });
+      }, 0);
+
+      // Sync border-draw if this flying-text is inside one
+      const borderSyncId = el.dataset.borderSync;
+      if (borderSyncId) {
+        const borderEl = document.getElementById(borderSyncId);
+        if (borderEl) {
+          tl.fromTo(borderEl, {
+            '--bw': '0%', '--bh': '0%',
+          }, {
+            '--bw': '100%', '--bh': '100%',
+            duration: 1,
+            ease: 'power2.out',
+          }, 0); // start at same time as text
+        }
+      }
     });
   });
 })();
@@ -2638,7 +2663,7 @@ body {
       <div class="env-letter">
         <div class="env-letter-writing">
           <span>Dear Newsroom,</span>
-          <span>question for you...</span>
+          <span>Question for you...</span>
           <span>— a reader</span>
         </div>
       </div>
