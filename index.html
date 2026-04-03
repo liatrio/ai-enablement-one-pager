@@ -1756,8 +1756,8 @@ body {
 
 <!-- Callout: wipe reveal -->
 <section class="story-section" style="min-height: 0; padding: 0.75rem 2rem; background: var(--parchment);">
-  <div class="callout-zoom large flying-text" data-scroll data-type="zoom-in">
-    Not just another technology partner.
+  <div class="callout-zoom large flying-text" data-scroll data-type="zoom-in" data-trigger-late>
+    Not just another <em>technology partner.</em>
   </div>
 </section>
 
@@ -2561,11 +2561,12 @@ body {
 
       // Create per-element random start values
       const section = el.closest('.story-section') || el.closest('section');
+      const isLate = el.hasAttribute('data-trigger-late');
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
-          start: 'top 60%',
-          end: 'center center',
+          start: isLate ? 'top 30%' : 'top 60%',
+          end: isLate ? 'center 40%' : 'center center',
           scrub: 1.5,
         }
       });
