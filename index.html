@@ -707,6 +707,39 @@ body {
   perspective-origin: 50% 60%;
 }
 
+/* ====== MASTHEAD ENTRANCE ====== */
+.title-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(100%) rotateX(-40deg);
+  transform-origin: bottom center;
+}
+
+.masthead-date, .masthead-tagline, .masthead-edition,
+.masthead-headline, .masthead-sub, .scroll-hint {
+  opacity: 0;
+}
+
+.masthead-rule {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+/* ====== CURSOR TRAIL ====== */
+.cursor-trail {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: rgba(42, 26, 10, 0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 199;
+}
+
+@media (pointer: coarse) {
+  .cursor-trail { display: none; }
+}
+
 /* ====== CURSOR DOT (Active Theory) ====== */
 .cursor-dot {
   position: fixed;
@@ -790,7 +823,7 @@ body {
 
   <div class="masthead-date" data-scroll data-speed="0.3">April 2026 Edition</div>
   <hr class="masthead-rule">
-  <h1 class="masthead-title" data-scroll data-speed="0.15">The AI Daily</h1>
+  <h1 class="masthead-title" data-scroll data-speed="0.15"><span class="title-word">The</span> <span class="title-word">AI</span> <span class="title-word">Daily</span></h1>
   <div class="masthead-tagline" data-scroll data-speed="0.2">Enterprise Intelligence, Delivered</div>
   <div class="masthead-edition" data-scroll data-speed="0.25">A Liatrio Publication &bull; Special Anthropic Partnership Edition</div>
   <hr class="masthead-rule">
@@ -1233,6 +1266,88 @@ body {
     absVelocity = Math.min(Math.abs(velocity) / 5, 1);
   });
 
+  // ====== MASTHEAD ENTRANCE SEQUENCE ======
+  // Active Theory-style staggered word reveal with 3D rotation
+  const entranceTL = gsap.timeline({ delay: 0.3 });
+
+  // Title words fly up and rotate into place
+  entranceTL.to('.title-word', {
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    duration: 1.2,
+    stagger: 0.15,
+    ease: 'power4.out',
+  });
+
+  // Date fades in from above
+  entranceTL.to('.masthead-date', {
+    opacity: 1, y: 0, duration: 0.6, ease: 'power3.out'
+  }, '-=0.8');
+
+  // Rules draw in
+  entranceTL.to('.masthead-rule', {
+    opacity: 1, scaleX: 1, duration: 0.8, ease: 'power2.inOut',
+    stagger: 0.2
+  }, '-=0.6');
+
+  // Tagline and edition
+  entranceTL.to('.masthead-tagline', {
+    opacity: 1, duration: 0.6, ease: 'power3.out'
+  }, '-=0.4');
+  entranceTL.to('.masthead-edition', {
+    opacity: 1, duration: 0.5, ease: 'power3.out'
+  }, '-=0.3');
+
+  // Headline types in from below
+  entranceTL.fromTo('.masthead-headline',
+    { opacity: 0, y: 30, clipPath: 'inset(0 0 100% 0)' },
+    { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 1, ease: 'power3.out' },
+    '-=0.2'
+  );
+
+  // Sub and scroll hint
+  entranceTL.to('.masthead-sub', {
+    opacity: 1, duration: 0.6, ease: 'power3.out'
+  }, '-=0.4');
+  entranceTL.to('.scroll-hint', {
+    opacity: 0.6, duration: 0.8, ease: 'power3.out'
+  }, '-=0.2');
+
+  // ====== CURSOR INK TRAIL ======
+  // Leaves a trail of ink dots that fade out (Active Theory mouse-follow aesthetic)
+  const trailDots = [];
+  const TRAIL_LENGTH = 12;
+  for (let i = 0; i < TRAIL_LENGTH; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'cursor-trail';
+    dot.style.opacity = '0';
+    document.body.appendChild(dot);
+    trailDots.push({ el: dot, x: -100, y: -100 });
+  }
+
+  let trailMouse = { x: -100, y: -100 };
+  document.addEventListener('mousemove', (e) => {
+    trailMouse.x = e.clientX;
+    trailMouse.y = e.clientY;
+  });
+
+  gsap.ticker.add(() => {
+    let prevX = trailMouse.x;
+    let prevY = trailMouse.y;
+    trailDots.forEach((dot, i) => {
+      const speed = 0.25 - (i * 0.015);
+      dot.x += (prevX - dot.x) * speed;
+      dot.y += (prevY - dot.y) * speed;
+      dot.el.style.left = dot.x + 'px';
+      dot.el.style.top = dot.y + 'px';
+      dot.el.style.opacity = (1 - i / TRAIL_LENGTH) * 0.2;
+      dot.el.style.transform = `translate(-50%, -50%) scale(${1 - i * 0.06})`;
+      prevX = dot.x;
+      prevY = dot.y;
+    });
+  });
+
   // Only named sections for dot navigation (not interstitial callouts)
   const allSections = document.querySelectorAll('.masthead, .story-section');
   const namedSections = document.querySelectorAll('[id^="section-"]');
@@ -1456,24 +1571,19 @@ body {
       }
     });
 
-    // Section 3D: smooth depth + parallax Z-shift
-    // Approaching sections push back in Z and blur slightly; centered sections are sharp and forward
+    // Section depth: blur only when approaching from below, sharp once at center or above
     zoomSections.forEach(section => {
       const rect = section.getBoundingClientRect();
       const center = rect.top + rect.height / 2;
-      const centerOffset = (center - vh / 2) / vh; // -1 to 1
-      const distance = Math.abs(centerOffset);
+      const centerOffset = (center - vh / 2) / vh; // negative = above center, positive = below
       const content = section.querySelector('.story-content');
       if (content) {
-        // Z-depth: centered = 0, off-screen = pushed back
-        const z = -distance * 60;
-        // Scale: centered = 1, off-screen = slightly smaller
-        const scale = 1 - distance * 0.04;
-        // Blur: only when far off center
-        const blur = distance > 0.5 ? (distance - 0.5) * 3 : 0;
-        // Velocity-driven skew (Active Theory technique: scroll speed warps content)
+        // Only blur when below center (approaching); clear once it reaches middle
+        const blur = centerOffset > 0.3 ? (centerOffset - 0.3) * 2.5 : 0;
+        const z = centerOffset > 0 ? -centerOffset * 40 : 0;
+        const scale = centerOffset > 0 ? 1 - centerOffset * 0.03 : 1;
         const skew = lenisVelocity * 0.015;
-        content.style.transform = `translateZ(${z}px) scale(${clamp(scale, 0.94, 1)}) skewY(${clamp(skew, -2, 2)}deg)`;
+        content.style.transform = `translateZ(${z}px) scale(${clamp(scale, 0.96, 1)}) skewY(${clamp(skew, -2, 2)}deg)`;
         content.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none';
       }
     });
