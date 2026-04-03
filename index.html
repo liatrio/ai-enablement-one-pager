@@ -791,6 +791,8 @@ body {
   text-transform: inherit !important;
   line-height: inherit !important;
   background: none !important;
+  overflow: visible;
+  padding: 0 0.05em;
 }
 
 /* ====== TABLET ====== */
@@ -1175,7 +1177,7 @@ body {
 /* "Letters to the Editor" label */
 .chat-lte-label {
   font-family: var(--serif, 'Playfair Display'), serif;
-  font-size: 13.5px;
+  font-size: 0.75rem;
   font-style: italic;
   letter-spacing: 0.08em;
   color: #f0e6cc;
@@ -1511,12 +1513,12 @@ body {
 .chat-header-text { flex: 1; }
 .chat-header-title {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #f0efe8;
   line-height: 1.2;
 }
-.chat-header-sub { font-size: 11px; color: #8c8c85; margin-top: 1px; }
+.chat-header-sub { font-size: 0.65rem; color: #8c8c85; margin-top: 1px; }
 
 .chat-messages {
   flex: 1;
@@ -1533,7 +1535,7 @@ body {
 
 .chat-msg {
   max-width: 88%;
-  font-size: 13.5px;
+  font-size: 0.8rem;
   line-height: 1.55;
   padding: 10px 13px;
   border-radius: 12px;
@@ -1601,7 +1603,7 @@ body {
   border-radius: 10px;
   padding: 10px 12px;
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 0.8rem;
   color: #f0efe8;
   resize: none;
   outline: none;
@@ -1636,7 +1638,7 @@ body {
 }
 .chat-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 4px; }
 .chat-chip {
-  font-size: 11.5px;
+  font-size: 0.7rem;
   padding: 5px 10px;
   border-radius: 20px;
   border: 1px solid rgba(137,223,0,0.25);
@@ -1878,24 +1880,24 @@ body {
         <div class="step-title">CCA Program</div>
         <div class="step-desc">Claude Certification Academy</div>
       </div>
-      <div class="flywheel-arrow" data-scroll data-type="fade-up" data-delay="300">&rarr;</div>
+      <div class="flywheel-arrow" data-delay="300">&rarr;</div>
       <div class="flywheel-step" data-scroll data-type="slide-left" data-delay="350">
         <div class="step-title">Forge Training</div>
         <div class="step-desc">Internal Cohorts</div>
       </div>
-      <div class="flywheel-arrow" data-scroll data-type="fade-up" data-delay="450">&rarr;</div>
+      <div class="flywheel-arrow" data-delay="450">&rarr;</div>
       <div class="flywheel-step" data-scroll data-type="slide-left" data-delay="500">
         <div class="step-title">Certified Engineers</div>
         <div class="step-desc">Production Ready</div>
       </div>
-      <div class="flywheel-arrow" data-scroll data-type="fade-up" data-delay="600">&rarr;</div>
+      <div class="flywheel-arrow" data-delay="600">&rarr;</div>
       <div class="flywheel-step" data-scroll data-type="slide-left" data-delay="650">
         <div class="step-title">Enterprise Delivery</div>
         <div class="step-desc">Scaled Adoption</div>
       </div>
     </div>
 
-    <div class="article-body article-columns" data-scroll data-type="fade-up" data-delay="300">
+    <div class="article-body" data-scroll data-type="fade-up" data-delay="300">
       <p>We don't just set things up and leave. We teach teams how the tools work and how they fit together, so they can build their own things to solve their own problems. That's where the real power comes from. That's where the scale comes from.</p>
 
       <p>At Boeing, engineers are now independently writing specs and running Spec-Driven Development workflows that we designed with Anthropic's models. At Natera, a PMs who couldn't open a terminal are now building project roadmaps with Claude Code and presenting them company-wide.</p>
@@ -2693,7 +2695,8 @@ body {
     iconOpen.style.display  = 'none';
     iconClose.style.display = '';
     document.body.style.overflow = 'hidden';
-    oInput.focus();
+    // Don't autofocus on mobile - triggers on-screen keyboard
+    if (window.innerWidth > 700) oInput.focus();
   }
 
   function closeOracle() {
@@ -2880,7 +2883,7 @@ body {
 
     dispatching = false;
     oSend.disabled = oInput.value.trim().length === 0;
-    oInput.focus();
+    if (window.innerWidth > 700) oInput.focus();
   }
 
   function setStatus(text, active) {
@@ -2907,7 +2910,7 @@ body {
       oInput.style.height = 'auto';
       oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
       oSend.disabled = false;
-      oInput.focus();
+      if (window.innerWidth > 700) oInput.focus();
     });
   });
 })();
