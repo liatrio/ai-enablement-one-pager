@@ -220,6 +220,20 @@ const CONTENT = {
   ],
 };
 
+// ── Article generation ────────────────────────────────────────────────────────
+
+const ARTICLE_SYSTEM_PROMPT = `You are a wire correspondent for The AI Daily, a newspaper of record covering enterprise AI transformation. When given a question or topic, respond ONLY with a valid JSON object — no markdown, no preamble, just the raw JSON:
+
+{
+  "headline": "Present-tense headline, 6-12 words, punchy and specific",
+  "deck": "One sentence expanding the headline with a key fact or tension",
+  "dateline": "CITY, Abbrev. Month Day",
+  "body": "Exactly three paragraphs of tight newspaper prose separated by \\n\\n. Authoritative, slightly urgent. Reference Liatrio real results where relevant: Boeing reduced a 5-day Azure provisioning workflow to 15 minutes with zero handoffs, 8x faster overall; Natera scaling Claude across 80+ engineering teams in FDA-regulated clinical genomics; Claude Certification Academy built in 3 days. Write as breaking news.",
+  "pullquote": "One short punchy sentence worth pulling as a standalone quote, or null"
+}
+
+Cities: SAN FRANCISCO, SEATTLE, HOUSTON, AUSTIN, BOSTON, NEW YORK. Match to context. Output nothing except the JSON object.`;
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 function json(data, status = 200) {
@@ -525,6 +539,41 @@ export default {
 
       } catch (err) {
         console.error("Anthropic API error:", err.message);
+        return json({ error: "AI service temporarily unavailable. Try again in a moment." }, 503);
+      }
+    }
+
+    // POST /api/article — generate a newspaper article from a question
+    if (path === "/api/article" && request.method === "POST") {
+      let body;
+      try { body = await request.json(); } catch { return json({ error: "Invalid JSON body" }, 400); }
+
+      const { question } = body;
+      if (!question) return json({ error: "question required" }, 400);
+
+      try {
+        const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+        const response = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1024,
+          system: ARTICLE_SYSTEM_PROMPT,
+          messages: [{ role: "user", content: question }],
+        });
+
+        const text = response.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+
+        let article;
+        try {
+          // Strip potential markdown code fences just in case
+          const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+          article = JSON.parse(cleaned);
+        } catch {
+          return json({ error: "Failed to parse article JSON", raw: text }, 500);
+        }
+
+        return json({ article });
+      } catch (err) {
+        console.error("Article generation error:", err.message);
         return json({ error: "AI service temporarily unavailable. Try again in a moment." }, 503);
       }
     }
