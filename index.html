@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The AI Daily - Liatrio x Anthropic</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 <!-- Shopify Editions stack: GSAP ScrollTrigger + Lenis smooth scroll -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -1132,45 +1132,318 @@ body {
 }
 
 /* =============================================
-   CHAT WIDGET
+   CHAT WIDGET — LETTERS TO THE EDITOR ENVELOPE
    ============================================= */
-#chat-trigger {
+
+/* Fixed wrapper: label sits above the envelope */
+#chat-trigger-wrap {
   position: fixed;
-  bottom: 28px;
+  bottom: 24px;
   right: 28px;
   z-index: 9000;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #080b10;
-  border: 2px solid #89DF00;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* "Letters to the Editor" label */
+.chat-lte-label {
+  font-family: var(--serif, 'Playfair Display'), serif;
+  font-size: 13.5px;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #f0e6cc;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(26, 16, 6, 0.82);
+  padding: 3px 8px 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(196,168,100,0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* The envelope button — 65% larger than original */
+#chat-trigger {
+  position: relative;
+  width: 139px;
+  height: 96px;
+  border: none;
+  background: transparent;
   cursor: pointer;
+  padding: 0;
+  perspective: 800px;
+  /* natural worn-letter tilt */
+  transform: rotate(-1.8deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#chat-trigger:hover     { transform: rotate(0deg) translateY(-5px) scale(1.04); }
+#chat-trigger.open      { transform: rotate(0deg); animation: none; }
+#chat-trigger * { pointer-events: none; }
+
+/* Idle glow/float pulse — transform only, no filter (keeps 3D clean) */
+#chat-trigger:not(.open) { animation: env-idle 3.6s ease-in-out infinite; }
+@keyframes env-idle {
+  0%, 100% { transform: rotate(-1.8deg) translateY(0); }
+  50%       { transform: rotate(-1.3deg) translateY(-5px); }
+}
+
+/* Envelope outer container fills the button */
+.env-outer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Letter paper — clipped to the exact flap triangle */
+.env-letter {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(4% 0%, 96% 0%, 50.5% 55%);
+  background: #fdf7e8;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      transparent, transparent 9px,
+      rgba(0,0,0,0.06) 9px, rgba(0,0,0,0.06) 10px
+    );
+  z-index: 2;
+  overflow: hidden;
+}
+
+.env-letter-writing {
+  position: absolute;
+  top: 5px;
+  left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+  color: rgba(45, 22, 6, 0.55);
+  pointer-events: none;
+  line-height: 1;
+}
+.env-letter-writing span:nth-child(1) { font-size: 7.5px; }
+.env-letter-writing span:nth-child(2) { font-size: 6.5px; opacity: 0.8; }
+.env-letter-writing span:nth-child(3) { font-size: 5.5px; opacity: 0.6; }
+
+/* ── Letter stack behind the envelope ── */
+/* Each peek is a slip of paper sticking out below */
+.env-stack {
+  position: absolute;
+  left: 0; right: 0;
+  border-radius: 2px 2px 0 0;
+  z-index: 0;
+}
+.env-stack-3 {
+  bottom: -9px;
+  height: 18px;
+  background: linear-gradient(180deg, #e8d8b0, #ddc898);
+  transform: rotate(3.5deg) translateX(3px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+}
+.env-stack-2 {
+  bottom: -6px;
+  height: 14px;
+  background: linear-gradient(180deg, #eedfc0, #e4d0a4);
+  transform: rotate(-2.2deg) translateX(-2px);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.2);
+}
+.env-stack-1 {
+  bottom: -3px;
+  height: 10px;
+  background: linear-gradient(180deg, #f2e8d0, #e8d9b8);
+  transform: rotate(1deg);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.16);
+}
+
+/* Envelope body */
+.env-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: linear-gradient(160deg, #e0c08a 0%, #ccaa6a 55%, #b89050 100%);
+  box-shadow:
+    0 6px 28px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(0,0,0,0.2),
+    inset 0 0 36px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+/* Paper grain overlay */
+.env-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.018) 2px, rgba(0,0,0,0.018) 3px),
+    repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(0,0,0,0.01) 6px, rgba(0,0,0,0.01) 7px);
+}
+
+/* Postage stamp box (top-right corner detail) */
+.env-stamp {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 24px; height: 20px;
+  border: 1.5px dashed rgba(0,0,0,0.28);
+  border-radius: 1px;
+  z-index: 1;
+}
+.env-stamp::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 0.5px solid rgba(0,0,0,0.12);
+}
+
+/* Address lines (worn text lines) */
+.env-addr {
+  position: absolute;
+  left: 11px;
+  background: rgba(0,0,0,0.13);
+  border-radius: 0.5px;
+  height: 2px;
+}
+.env-addr-1 { top: 60%; width: 38px; }
+.env-addr-2 { top: 70%; width: 30px; }
+.env-addr-3 { top: 80%; width: 34px; }
+
+/* Coffee/age stain marks */
+.env-stain {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+.env-stain-1 {
+  width: 36px; height: 26px;
+  top: 58%; left: 8%;
+  background: radial-gradient(ellipse, rgba(90,50,10,0.1) 0%, transparent 70%);
+}
+.env-stain-2 {
+  width: 20px; height: 20px;
+  top: 18%; right: 22%;
+  background: radial-gradient(circle, rgba(70,40,8,0.09) 0%, transparent 70%);
+}
+
+/* Diagonal fold crease lines from centre to lower corners */
+.env-crease { position: absolute; pointer-events: none; z-index: 1; }
+.env-crease-h {
+  left: 0; right: 0;
+  top: 52%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 15%, rgba(0,0,0,0.12) 85%, transparent);
+}
+.env-crease-dl {
+  bottom: 0; left: 0;
+  width: 1px; height: 130%;
+  transform-origin: bottom left;
+  transform: rotate(-35deg);
+  background: linear-gradient(to top, transparent, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, transparent);
+}
+.env-crease-dr {
+  bottom: 0; right: 0;
+  width: 1px; height: 130%;
+  transform-origin: bottom right;
+  transform: rotate(35deg);
+  background: linear-gradient(to top, transparent, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, transparent);
+}
+
+/* Lower-left triangular fold — semi-transparent so it reads as a crease shadow */
+.env-fold-l {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 48px 70px;
+  border-color: transparent transparent rgba(0,0,0,0.13) transparent;
+  z-index: 2;
+}
+
+/* Lower-right triangular fold */
+.env-fold-r {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 70px 48px 0;
+  border-color: transparent rgba(0,0,0,0.13) transparent transparent;
+  z-index: 2;
+}
+
+/* ── Flap: two-layer trick ──────────────────────────────────────────────
+   .env-flap-wrap  → does the 3D rotation (no clip-path, so children aren't clipped)
+   .env-flap-shape → clip-path triangle lives here (only clips itself)
+   .env-seal       → sibling inside wrap; rotates WITH the flap but isn't clipped
+   ────────────────────────────────────────────────────────────────────── */
+.env-flap-wrap {
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 3;
+}
+
+#chat-trigger:not(.open):hover .env-flap-wrap {
+  transform: rotateX(-82deg);
+}
+
+/* Visual triangle shape */
+.env-flap-shape {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50.5% 57%);
+  background: linear-gradient(168deg, #d8b06e 0%, #bc9048 100%);
+}
+
+/* Shared seal geometry — applied to both halves */
+.env-seal-top,
+.env-seal-bottom {
+  position: absolute;
+  top: 57%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px; height: 48px;
+  background: radial-gradient(circle at 36% 30%, #253c18, #13220b);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(137,223,0,0.25);
-  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
-#chat-trigger:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 28px rgba(137,223,0,0.45);
-  border-color: #9cee10;
+.env-seal-top svg,
+.env-seal-bottom svg { width: 22px; height: 32px; display: block; }
+
+/* Top half — V-shape matching the flap triangle. No box-shadow (clipped rings look wrong). */
+.env-seal-top {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 10%, 50% 50%, 0% 10%);
+}
+
+/* Bottom half — inverse V, stays on envelope body. No ring shadow (same clipping issue). */
+.env-seal-bottom {
+  clip-path: polygon(0% 10%, 50% 50%, 100% 10%, 100% 100%, 0% 100%);
+  z-index: 4;
+}
+
+/* Close face — shown by JS when oracle is open */
+#chat-trigger.open #chat-icon-open  { display: none; }
+#chat-icon-close {
+  position: absolute !important;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
 }
 #chat-trigger.open {
-  border-color: rgba(137,223,0,0.3);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  animation: none;
-}
-#chat-trigger svg { pointer-events: none; }
-#chat-trigger:not(.open) { animation: chat-pulse 2.8s ease-in-out infinite; }
-@keyframes chat-pulse {
-  0%, 100% { box-shadow: 0 4px 20px rgba(137,223,0,0.35), 0 0 0 0 rgba(137,223,0,0.4); }
-  50%       { box-shadow: 0 4px 24px rgba(137,223,0,0.5), 0 0 0 10px rgba(137,223,0,0); }
+  background: rgba(8,11,16,0.88);
+  border-radius: 3px;
+  border: 1px solid rgba(137,223,0,0.25);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
 }
 
 #chat-panel {
   position: fixed;
-  bottom: 92px;
+  bottom: 136px;
   right: 28px;
   z-index: 9000;
   width: 380px;
@@ -2318,7 +2591,8 @@ body {
     <div class="oracle-welcome" id="oracle-welcome">
       <div class="oracle-welcome-ornament">✦</div>
       <h3>Send a dispatch to the Editor.</h3>
-      <p>Ask anything. Your question becomes tomorrow's front page — typeset in real time, right here.</p>
+      <p>Ask anything.</p>
+      <p>Your question gets routed to a Claude-powered newsroom: an Anthropic API call hits a Cloudflare Worker, spins up a live article pipeline via MCP, and typesets your front page in real time.</p>
     </div>
   </div>
 
@@ -2344,44 +2618,73 @@ body {
   </div>
 </div>
 
-<!-- Chat widget -->
-<button id="chat-trigger" aria-label="Open The Oracle" aria-expanded="false">
-  <!-- Newspaper "Read All About It" icon -->
-  <svg id="chat-icon-open" width="26" height="32" viewBox="0 0 52 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Paper body -->
-    <rect x="3" y="2" width="46" height="60" rx="3" fill="#f0ebe0"/>
-    <!-- Masthead black band -->
-    <rect x="3" y="2" width="46" height="16" rx="3" fill="#1a1a1a"/>
-    <rect x="3" y="12" width="46" height="6" fill="#1a1a1a"/>
-    <!-- Masthead title bar (white) -->
-    <rect x="9" y="6" width="34" height="4" rx="1" fill="white" opacity="0.95"/>
-    <!-- Thin rule below masthead text -->
-    <rect x="9" y="12" width="34" height="1" fill="white" opacity="0.25"/>
-    <!-- Heavy rule under masthead -->
-    <rect x="3" y="18" width="46" height="2" fill="#1a1a1a"/>
-    <!-- Headline line 1 — bold, full width -->
-    <rect x="7" y="23" width="38" height="7" rx="1" fill="#1a1a1a"/>
-    <!-- Headline line 2 — bold, shorter -->
-    <rect x="7" y="32" width="26" height="7" rx="1" fill="#1a1a1a"/>
-    <!-- Deck / subheadline -->
-    <rect x="7" y="42" width="38" height="2.5" rx="1" fill="#444" opacity="0.55"/>
-    <!-- Section rule -->
-    <rect x="7" y="47" width="38" height="0.75" fill="#aaa" opacity="0.5"/>
-    <!-- Column divider -->
-    <rect x="26.5" y="49" width="0.75" height="13" fill="#aaa" opacity="0.5"/>
-    <!-- Left column lines -->
-    <rect x="7"  y="50" width="16" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-    <rect x="7"  y="54.5" width="16" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-    <rect x="7"  y="59" width="11" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-    <!-- Right column lines -->
-    <rect x="30" y="50" width="15" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-    <rect x="30" y="54.5" width="15" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-    <rect x="30" y="59" width="10" height="2" rx="0.5" fill="#888" opacity="0.5"/>
-  </svg>
-  <svg id="chat-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c8c85" stroke-width="2.5" stroke-linecap="round" style="display:none">
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-</button>
+<!-- Chat widget — Letters to the Editor envelope -->
+<div id="chat-trigger-wrap">
+  <span class="chat-lte-label">Ask the Newsroom</span>
+  <button id="chat-trigger" aria-label="Write a Letter to the Editor" aria-expanded="false">
+
+    <!-- Envelope visual (id="chat-icon-open" so JS can hide it when oracle opens) -->
+    <div id="chat-icon-open" class="env-outer">
+
+      <!-- Letter stack (behind envelope) -->
+      <div class="env-stack env-stack-3"></div>
+      <div class="env-stack env-stack-2"></div>
+      <div class="env-stack env-stack-1"></div>
+
+      <!-- Letter paper — hidden inside, revealed when flap opens -->
+      <div class="env-letter">
+        <div class="env-letter-writing">
+          <span>Dear Newsroom,</span>
+          <span>I have a story for you...</span>
+          <span>— a reader</span>
+        </div>
+      </div>
+
+      <!-- Envelope body with worn details -->
+      <div class="env-body">
+        <div class="env-stamp"></div>
+        <div class="env-addr env-addr-1"></div>
+        <div class="env-addr env-addr-2"></div>
+        <div class="env-addr env-addr-3"></div>
+        <div class="env-stain env-stain-1"></div>
+        <div class="env-stain env-stain-2"></div>
+        <div class="env-crease env-crease-h"></div>
+        <div class="env-crease env-crease-dl"></div>
+        <div class="env-crease env-crease-dr"></div>
+        <!-- Lower corner folds -->
+        <div class="env-fold-l"></div>
+        <div class="env-fold-r"></div>
+      </div>
+
+      <!-- Flap wrapper: rotates in 3D, no clip-path (so seal-top isn't clipped) -->
+      <div class="env-flap-wrap">
+        <div class="env-flap-shape"></div>
+        <!-- TOP half of seal — rides up with flap, clipped below the crease -->
+        <div class="env-seal-top">
+          <svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+            <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BOTTOM half of seal — stays on body, clipped above the crease -->
+      <div class="env-seal-bottom">
+        <svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+          <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- X close icon — JS sets display:'' when oracle opens -->
+    <svg id="chat-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c8c85" stroke-width="2.5" stroke-linecap="round" style="display:none">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+
+  </button>
+</div>
 
 <div id="chat-panel" role="dialog" aria-label="Chat with Liatrio AI" aria-hidden="true">
   <div class="chat-header">
