@@ -250,16 +250,16 @@ body {
 .stat-inset {
   background: var(--highlight);
   border: 1px solid var(--rule);
-  padding: 1rem;
+  padding: 0.75rem;
   margin: 1.25rem 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.25rem;
 }
 
 .stat-item {
   text-align: center;
-  padding: 0.5rem 0.25rem;
+  padding: 0.35rem 0.15rem;
 }
 
 .stat-num {
@@ -831,13 +831,16 @@ body {
   .chat-lte-label { display: none; }
 
   /* Oracle mobile layout */
-  .oracle-welcome { padding: 2rem 1.5rem; }
-  .oracle-welcome h3 { font-size: 1.3rem; }
-  .oracle-compose { padding: 0.75rem 1rem; }
-  .oracle-compose-row { flex-direction: column; gap: 0.5rem; }
-  .oracle-compose-send { width: 100%; height: auto; padding: 10px; }
-  .oracle-prompts { justify-content: center; }
-  .oracle-prompt-chip { flex: 0 0 auto; }
+  .oracle-welcome { padding: 1.5rem 1rem; }
+  .oracle-welcome h3 { font-size: 1.2rem; }
+  .oracle-welcome p { font-size: 0.8rem; }
+  .oracle-compose { padding: 0.5rem 0.75rem; }
+  .oracle-compose-label { font-size: 0.55rem; margin-bottom: 0.3rem; }
+  .oracle-compose-row { flex-direction: column; gap: 0.4rem; }
+  .oracle-compose-input { width: 100%; min-height: 38px; font-size: 0.8rem; padding: 8px 10px; }
+  .oracle-compose-send { width: 100%; height: auto; padding: 10px; font-size: 0.65rem; }
+  .oracle-prompts { gap: 0.3rem; margin-bottom: 0.4rem; }
+  .oracle-prompt-chip { font-size: 0.7rem; padding: 3px 8px; }
 }
 
 /* =============================================
@@ -1713,7 +1716,7 @@ body {
 </section>
 
 <!-- Callout: wipe reveal -->
-<section class="story-section" style="min-height: 0; padding: 1.5rem 2rem; background: var(--parchment);">
+<section class="story-section" style="min-height: 0; padding: 0.75rem 2rem; background: var(--parchment);">
   <div class="callout-wipe flying-text" data-scroll data-type="wipe-right">
     Not just another technology partner.
   </div>
@@ -1739,7 +1742,7 @@ body {
 </section>
 
 <!-- Callout: letter-spacing spread -->
-<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-spread flying-text" data-scroll data-type="spread">
     Here's what we're <em>already</em> doing
@@ -1821,10 +1824,10 @@ body {
 </section>
 
 <!-- Callout: zoom-in with border-draw -->
-<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
-  <div class="border-draw" data-scroll data-type="border-draw">
-    <div class="callout-zoom large flying-text" data-scroll data-type="zoom-in" style="padding: 0;">
+  <div class="border-draw" data-scroll data-type="border-draw" data-delay="200">
+    <div class="callout-zoom large flying-text" style="padding: 0;">
       200 to 500 engineers.<br>No playbook.<br><em>So we wrote one.</em>
     </div>
   </div>
@@ -1921,7 +1924,7 @@ body {
 </section>
 
 <!-- Callout: before Chapter VI -->
-<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-zoom large flying-text" data-scroll data-type="zoom-out">
     Let's Move <em>Together</em>.
@@ -1976,10 +1979,10 @@ body {
 </section>
 
 <!-- Callout: wipe from left (different from first wipe) -->
-<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 0.75rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-wipe flying-text" data-scroll data-type="wipe-right" style="font-size: clamp(2rem, 6vw, 4rem);">
-    Let's make it <em>official</em>.
+    Let's make it <em>official.</em>
   </div>
 </section>
 
