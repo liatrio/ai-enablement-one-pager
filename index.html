@@ -250,16 +250,17 @@ body {
 .stat-inset {
   background: var(--highlight);
   border: 1px solid var(--rule);
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   margin: 1.25rem 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 0.25rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
 }
 
 .stat-item {
   text-align: center;
-  padding: 0.35rem 0.15rem;
+  padding: 0.3rem 0.25rem;
 }
 
 .stat-num {
@@ -813,7 +814,7 @@ body {
 
   .article-columns { column-count: 1; }
   .masthead-title { font-size: clamp(2.5rem, 10vw, 4rem); }
-  .stat-inset { grid-template-columns: repeat(2, 1fr); }
+  .stat-inset { gap: 0.1rem 0.5rem; }
   .flywheel { flex-direction: column; }
   .flywheel-arrow { transform: rotate(90deg); }
   .nav-dots { right: 0.75rem; gap: 0.5rem; }
@@ -841,9 +842,13 @@ body {
   .oracle-compose-row { flex-direction: column; gap: 0.4rem; }
   .oracle-compose-input { width: 100%; min-height: 38px; font-size: 0.8rem; padding: 8px 10px; }
   .oracle-compose-send { width: 100%; height: auto; padding: 10px; font-size: 0.65rem; }
+}
+
+/* Oracle mobile overrides (must come after oracle styles) */
+@media (max-width: 700px) {
   .oracle-prompts {
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     gap: 0.3rem;
     margin-bottom: 0.4rem;
@@ -851,7 +856,7 @@ body {
     scrollbar-width: none;
   }
   .oracle-prompts::-webkit-scrollbar { display: none; }
-  .oracle-prompt-chip { font-size: 0.7rem; padding: 3px 8px; flex-shrink: 0; }
+  .oracle-prompt-chip { font-size: 0.7rem !important; padding: 3px 8px !important; flex-shrink: 0 !important; }
 }
 
 /* =============================================
