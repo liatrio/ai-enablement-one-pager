@@ -38,7 +38,7 @@ html.lenis, html.lenis body { height: auto; }
 
 body {
   font-family: var(--body-serif);
-  font-size: 19px;
+  font-size: 21px;
   color: var(--ink);
   background: var(--parchment);
   line-height: 1.7;
@@ -828,6 +828,15 @@ body {
     transform-origin: bottom right;
   }
   .chat-lte-label { display: none; }
+
+  /* Oracle mobile layout */
+  .oracle-welcome { padding: 2rem 1.5rem; }
+  .oracle-welcome h3 { font-size: 1.3rem; }
+  .oracle-compose { padding: 0.75rem 1rem; }
+  .oracle-compose-row { flex-direction: column; gap: 0.5rem; }
+  .oracle-compose-send { width: 100%; height: auto; padding: 10px; }
+  .oracle-prompts { justify-content: center; }
+  .oracle-prompt-chip { flex: 0 0 auto; }
 }
 
 /* =============================================
@@ -2901,16 +2910,12 @@ body {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); dispatch(oInput.value); }
   });
 
-  // Prompt chips — populate input, don't auto-send
+  // Prompt chips — one-click auto-send
   document.querySelectorAll('.oracle-prompt-chip').forEach(chip => {
     chip.addEventListener('click', (e) => {
       e.stopPropagation();
       const prompt = chip.dataset.prompt || chip.textContent.trim();
-      oInput.value = prompt;
-      oInput.style.height = 'auto';
-      oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
-      oSend.disabled = false;
-      if (window.innerWidth > 700) oInput.focus();
+      dispatch(prompt);
     });
   });
 })();
