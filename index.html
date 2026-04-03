@@ -853,11 +853,12 @@ body {
     gap: 0.3rem;
     margin-bottom: 0.4rem;
     padding-bottom: 4px;
-    padding-right: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     scrollbar-width: none;
     position: relative;
-    mask-image: linear-gradient(to right, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
   }
   .oracle-prompts::-webkit-scrollbar { display: none; }
   .oracle-prompt-chip { font-size: 0.7rem !important; padding: 3px 8px !important; flex-shrink: 0 !important; }
@@ -945,6 +946,8 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 2rem;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 92%, transparent 100%);
 }
 .oracle-broadsheet::-webkit-scrollbar { width: 6px; }
 .oracle-broadsheet::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
