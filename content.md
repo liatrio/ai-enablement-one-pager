@@ -9,7 +9,7 @@ All text content for the Anthropic partnership site. Edit here, then update `ind
 - **Date**: April 2026 Edition
 - **Title**: The AI Daily
 - **Tagline**: Enterprise Intelligence, Delivered
-- **Edition**: A Liatrio Publication · Special Anthropic Partnership Edition
+- **Edition**: A Liatrio Publication . Special Anthropic Partnership Edition
 - **Headline**: Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner
 - **Subhead**: How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.
 
@@ -18,6 +18,15 @@ All text content for the Anthropic partnership site. Edit here, then update `ind
 ## Callout: Before Chapter I
 
 > Not just another technology partner.
+
+### Stats Bridge
+
+| Stat | Label |
+|------|-------|
+| 200-500+ | Engineers Enabled |
+| 3 | Days to Build CCA |
+| 2 | Major Enterprises |
+| 80+ | Teams in Pipeline |
 
 ---
 
@@ -51,7 +60,7 @@ You won't get genuine, confirmed enterprise adoption the way you want it without
 
 | Stat | Label |
 |------|-------|
-| 5d → 15m | Provisioning Time |
+| 5d -> 15m | Provisioning Time |
 | 3+ | Product Teams |
 | 132 | Specs Authored |
 | 8x | Faster Delivery |
@@ -142,8 +151,6 @@ But here's what makes this story bigger than one person: Forge technical trainin
 
 Leadership programs and company off-sites are designed and adapted in real time. Content development that used to take weeks now takes hours, and iteration is just as fast, with multiple refinement cycles in the time a single first draft used to take.
 
-This isn't an L&D team that uses Claude. It's a Claude-native enablement engine, where one person orchestrates the function and Claude makes it possible for anyone in the organization to contribute to it.
-
 ### Stats
 
 | Stat | Label |
@@ -151,9 +158,7 @@ This isn't an L&D team that uses Claude. It's a Claude-native enablement engine,
 | 6-7 | Concurrent Programs |
 | 30+ | Active Learners |
 
-### Enablement Flywheel
-
-Build Enablement (CCA, Forge, Leadership, Onboarding, Client Prep) → Claude-Fluent Consultants → Enterprise Client Transformation → Client Intel Feeds Back to L&D
+**Pullquote**: "This isn't an L&D team that uses Claude. It's a Claude-native enablement engine."
 
 ---
 
@@ -163,6 +168,10 @@ Build Enablement (CCA, Forge, Leadership, Onboarding, Client Prep) → Claude-Fl
 
 The Liatrio enablement model is not a slide deck and a certification exam. It is an embedded, hands-on transformation program that meets engineers where they are.
 
+### Enablement Flywheel
+
+CCA Program (Claude Certification Academy) -> Forge Training (Internal Cohorts) -> Certified Engineers (Production Ready) -> Enterprise Delivery (Scaled Adoption)
+
 We don't just set things up and leave. We teach teams how the tools work and how they fit together, so they can build their own things to solve their own problems. That's where the real power comes from. That's where the scale comes from.
 
 At Boeing, engineers are now independently writing specs and running Spec-Driven Development workflows that we designed with Anthropic's models. At Natera, a PM who couldn't open a terminal is now building project roadmaps with Claude Code and presenting them company-wide.
@@ -170,6 +179,8 @@ At Boeing, engineers are now independently writing specs and running Spec-Driven
 We pair this with full observability: OpenTelemetry instrumentation, telemetry collection feeding into Datadog and platforms like Jellyfish, so leadership gets real-time visibility into adoption patterns, usage metrics, and value realization. Rolling out AI successfully means being able to see how it's being adopted and how it's being used.
 
 The underlying thread in everything we do: we're not just implementing a tool. We're driving behavioral change across entire engineering organizations. People are changing how they work, not just what tools they use.
+
+**Pullquote**: "People are changing how they work, not just what tools they use."
 
 ---
 
@@ -232,6 +243,8 @@ We're already in conversations with your alliances organization and your go-to-m
 
 Let's do this together.
 
+**Pullquote**: "We're not asking you to take a chance on us. We're asking you to look at what's already in motion."
+
 ---
 
 ## Footer
@@ -245,4 +258,4 @@ Liatrio is transforming how enterprise organizations adopt and use Claude; not j
 - **Daniel Helbling** -- Partnerships -- daniel@liatrio.com
 - **Chris Blackburn** -- CEO -- chris@liatrio.com
 
-*Built with Claude Code · Powered by Anthropic · 2026 Liatrio*
+*Built with Claude Code . Powered by Anthropic . 2026 Liatrio*
