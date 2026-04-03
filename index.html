@@ -961,6 +961,31 @@ body {
 .oracle-broadsheet::-webkit-scrollbar-thumb { background: var(--rule-dark); border-radius: 4px; min-height: 40px; }
 .oracle-broadsheet::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
 
+/* Custom scrollbar track for mobile (iOS hides native scrollbars) */
+.oracle-scrollbar {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  bottom: 4px;
+  width: 5px;
+  border-radius: 3px;
+  background: rgba(42,26,10,0.08);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.oracle-scrollbar.visible { opacity: 1; }
+.oracle-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--rule-dark);
+  min-height: 30px;
+  transition: top 0.05s linear;
+}
+
 /* Scroll indicator inside broadsheet */
 .oracle-scroll-arrow {
   position: sticky;
@@ -1825,7 +1850,9 @@ body {
     <div class="article-body" data-scroll data-type="fade-up" data-delay="200">
       <p>Liatrio is driving an AI-native engineering transformation at Boeing Digital Services with Claude as the primary model. Using Claude Sonnet and Opus through Azure AI Foundry, we deployed Spec-Driven Development across product teams, rebuilding a legacy Azure provisioning workflow that took five business days into one that completes in fifteen minutes with zero handoffs. But that's one workflow. The broader change is in how engineering and product teams operate day to day, and increasingly, how they operate together.</p>
 
-      <p>The transformation goes deeper than speed. Engineers are using Claude to refine and decompose PRDs, picking up specs and running with them independently, with less reliance on back-and-forth, fewer blockers waiting on clarification, and more ownership over the full arc of a feature. On the product side, that same decomposition process is no longer a black box. PMs can follow how a PRD breaks down, engage with it, and refine it alongside engineering rather than handing it off and waiting. The work of defining what to build and the work of figuring out how to build it are starting to happen on a shared surface, and that's changing the nature of the relationship between the two functions, not just the speed of the handoff.</p>
+      <p>The transformation goes deeper than speed. Engineers are using Claude to refine and decompose PRDs, picking up specs and running with them independently, with less reliance on back-and-forth, fewer blockers waiting on clarification, and more ownership over the full arc of a feature.</p>
+
+      <p>On the product side, that same decomposition process is no longer a black box. PMs can follow how a PRD breaks down, engage with it, and refine it alongside engineering rather than handing it off and waiting. The work of defining what to build and the work of figuring out how to build it are starting to happen on a shared surface, and that's changing the nature of the relationship between the two functions, not just the speed of the handoff.</p>
     </div>
   </div>
 </section>
@@ -2637,6 +2664,8 @@ body {
     <button id="oracle-close">← Close edition</button>
   </div>
 
+  <div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column;">
+  <div class="oracle-scrollbar" id="oracle-scrollbar"><div class="oracle-scrollbar-thumb" id="oracle-scrollbar-thumb"></div></div>
   <div class="oracle-broadsheet" id="oracle-broadsheet" data-lenis-prevent>
     <div class="oracle-welcome" id="oracle-welcome">
       <div class="oracle-welcome-ornament">✦</div>
@@ -2645,6 +2674,7 @@ body {
       <p>Your question gets routed to a Claude-powered newsroom: an Anthropic API call hits a Cloudflare Worker, spins up a live article pipeline via MCP, and typesets your front page in real time.</p>
     </div>
     <div class="oracle-scroll-arrow" id="oracle-scroll-arrow">↓</div>
+  </div>
   </div>
 
   <div class="oracle-compose">
@@ -2773,21 +2803,35 @@ body {
   const overlay    = document.getElementById('oracle-overlay');
   const broadsheet = document.getElementById('oracle-broadsheet');
   const scrollArrow = document.getElementById('oracle-scroll-arrow');
+  const scrollbarEl = document.getElementById('oracle-scrollbar');
+  const scrollbarThumb = document.getElementById('oracle-scrollbar-thumb');
   const welcome    = document.getElementById('oracle-welcome');
   const statusEl   = document.getElementById('oracle-status');
   const oInput     = document.getElementById('oracle-input');
   const oSend      = document.getElementById('oracle-send');
 
-  // Show scroll arrow only when broadsheet has overflow, hide at bottom
-  if (broadsheet && scrollArrow) {
-    function checkBroadsheetOverflow() {
+  // Custom scrollbar + arrow indicator
+  if (broadsheet) {
+    function updateScrollIndicators() {
       const hasOverflow = broadsheet.scrollHeight > broadsheet.clientHeight + 10;
       const atBottom = broadsheet.scrollTop + broadsheet.clientHeight >= broadsheet.scrollHeight - 10;
-      scrollArrow.classList.toggle('visible', hasOverflow && !atBottom);
+      if (scrollArrow) scrollArrow.classList.toggle('visible', hasOverflow && !atBottom);
+      if (scrollbarEl && scrollbarThumb && hasOverflow) {
+        scrollbarEl.classList.add('visible');
+        const trackHeight = scrollbarEl.clientHeight;
+        const ratio = broadsheet.clientHeight / broadsheet.scrollHeight;
+        const thumbHeight = Math.max(30, trackHeight * ratio);
+        const scrollRange = broadsheet.scrollHeight - broadsheet.clientHeight;
+        const thumbTop = scrollRange > 0 ? (broadsheet.scrollTop / scrollRange) * (trackHeight - thumbHeight) : 0;
+        scrollbarThumb.style.height = thumbHeight + 'px';
+        scrollbarThumb.style.top = thumbTop + 'px';
+      } else if (scrollbarEl) {
+        scrollbarEl.classList.remove('visible');
+      }
     }
-    broadsheet.addEventListener('scroll', checkBroadsheetOverflow);
-    new MutationObserver(checkBroadsheetOverflow).observe(broadsheet, { childList: true, subtree: true });
-    checkBroadsheetOverflow();
+    broadsheet.addEventListener('scroll', updateScrollIndicators);
+    new MutationObserver(updateScrollIndicators).observe(broadsheet, { childList: true, subtree: true });
+    updateScrollIndicators();
   }
   const trigger    = document.getElementById('chat-trigger');
   const iconOpen   = document.getElementById('chat-icon-open');
