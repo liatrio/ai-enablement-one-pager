@@ -2562,7 +2562,7 @@ body {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); dispatch(oInput.value); }
   });
 
-  // Prompt chips
+  // Prompt chips — populate input, don't auto-send
   document.querySelectorAll('.oracle-prompt-chip').forEach(chip => {
     chip.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2570,7 +2570,8 @@ body {
       oInput.value = prompt;
       oInput.style.height = 'auto';
       oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
-      dispatch(prompt);
+      oSend.disabled = false;
+      oInput.focus();
     });
   });
 })();
