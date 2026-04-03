@@ -2034,6 +2034,23 @@ body {
 <!-- ======== SCROLL ENGINE ======== -->
 <script>
 (function() {
+  // Push data-scroll from container divs down to individual child elements
+  // so each paragraph/item animates independently
+  document.querySelectorAll('.article-body[data-scroll], .stat-inset[data-scroll]').forEach(container => {
+    const type = container.dataset.type || 'fade-up';
+    const delay = parseInt(container.dataset.delay) || 0;
+    container.removeAttribute('data-scroll');
+    container.removeAttribute('data-type');
+    container.removeAttribute('data-delay');
+    Array.from(container.children).forEach((child, i) => {
+      if (!child.hasAttribute('data-scroll')) {
+        child.setAttribute('data-scroll', '');
+        child.setAttribute('data-type', type);
+        child.setAttribute('data-delay', String(delay + i * 50));
+      }
+    });
+  });
+
   gsap.registerPlugin(ScrollTrigger);
 
   // ====== LENIS SMOOTH SCROLL (from Shopify Editions) ======
