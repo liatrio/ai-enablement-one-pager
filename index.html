@@ -1625,11 +1625,18 @@ body {
       const delay = parseInt(el.dataset.delay) || 0;
       const easedProgress = easeOut(clamp((progress - delay / 1000) * 1.5, 0, 1));
 
-      // Get or create smooth value
+      // Get or create smooth value; once fully visible, lock it
       const key = el;
       const current = smoothValues.get(key) || 0;
+      if (current >= 0.98) {
+        // Already fully revealed; keep it visible permanently
+        smoothValues.set(key, 1);
+        el.style.opacity = 1;
+        el.style.transform = 'none';
+        return;
+      }
       const target = easedProgress;
-      const smooth = lerp(current, target, 0.18); // faster interpolation
+      const smooth = lerp(current, target, 0.18);
       smoothValues.set(key, smooth);
 
       switch (type) {
