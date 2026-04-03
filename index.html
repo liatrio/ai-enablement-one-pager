@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The AI Daily - Liatrio x Anthropic</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 <!-- Shopify Editions stack: GSAP ScrollTrigger + Lenis smooth scroll -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -815,45 +815,646 @@ body {
 }
 
 /* =============================================
-   CHAT WIDGET
+   NEWSPAPER ORACLE
    ============================================= */
-#chat-trigger {
+
+/* Overlay container */
+#oracle-overlay {
   position: fixed;
-  bottom: 28px;
+  inset: 0;
+  z-index: 9500;
+  background: var(--parchment);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+#oracle-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Header bar */
+.oracle-header {
+  flex-shrink: 0;
+  padding: 12px 2rem 10px;
+  border-bottom: 3px double var(--rule-dark);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--parchment-dark);
+}
+.oracle-header-title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  flex: 1;
+}
+.oracle-header-title span {
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  display: block;
+  margin-bottom: 1px;
+}
+.oracle-header-status {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.oracle-header-status.active { color: #5a7a2a; }
+#oracle-close {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+#oracle-close:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Broadsheet area */
+.oracle-broadsheet {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem;
+}
+.oracle-broadsheet::-webkit-scrollbar { width: 6px; }
+.oracle-broadsheet::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+/* Welcome state */
+.oracle-welcome {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--ink-faint);
+}
+.oracle-welcome-ornament {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+.oracle-welcome h3 {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin-bottom: 0.5rem;
+}
+.oracle-welcome p {
+  font-family: var(--body-serif);
+  font-size: 0.9rem;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Article cards */
+.oracle-article {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--rule);
+}
+.oracle-article:last-child { border-bottom: none; }
+.oracle-article.banner {
+  border-bottom: 3px double var(--rule-dark);
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+}
+
+.oracle-article-label {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.3rem;
+}
+.oracle-article-headline {
+  font-family: var(--serif);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 0.4rem;
+}
+.oracle-article.banner .oracle-article-headline {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+.oracle-article:not(.banner) .oracle-article-headline {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+.oracle-article-deck {
+  font-family: var(--body-serif);
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.oracle-article-meta {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 4px 0;
+  margin-bottom: 0.75rem;
+}
+.oracle-article-body {
+  font-family: var(--body-serif);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--ink);
+  min-height: 1em;
+  columns: 2 200px;
+  column-gap: 1.5rem;
+  column-rule: 1px solid var(--rule);
+}
+.oracle-article-body p { margin-bottom: 0.6rem; }
+.oracle-article-body p:last-child { margin-bottom: 0; }
+.oracle-article.banner .oracle-article-body {
+  columns: 3 180px;
+  font-size: 0.9rem;
+}
+.oracle-pullquote {
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  padding: 0.75rem 0;
+  margin: 1rem 0;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* Typesetting cursor */
+.typeset-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  background: var(--ink);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: cursor-blink 0.7s step-end infinite;
+}
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; } 50% { opacity: 0; }
+}
+
+/* Article entrance animation */
+@keyframes article-drop-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.oracle-article { animation: article-drop-in 0.35s ease both; }
+
+/* Skeleton placeholder */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.oracle-skeleton {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 3px double var(--rule-dark);
+}
+.oracle-skeleton-bar {
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--rule) 25%, var(--parchment-dark) 50%, var(--rule) 75%);
+  background-size: 600px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  margin-bottom: 0.55rem;
+}
+.oracle-skeleton-label  { width: 12%; height: 0.6em; margin-bottom: 0.7rem; }
+.oracle-skeleton-hed    { width: 78%; height: 1.6em; margin-bottom: 0.5rem; }
+.oracle-skeleton-hed2   { width: 55%; height: 1.6em; margin-bottom: 0.8rem; }
+.oracle-skeleton-deck   { width: 90%; height: 0.8em; margin-bottom: 0.25rem; }
+.oracle-skeleton-deck2  { width: 70%; height: 0.8em; margin-bottom: 0.8rem; }
+.oracle-skeleton-meta   { width: 100%; height: 0.6em; margin-bottom: 0.8rem; }
+.oracle-skeleton-body   { width: 100%; }
+.oracle-skeleton-body-short { width: 65%; }
+
+/* Compose footer */
+.oracle-compose {
+  flex-shrink: 0;
+  border-top: 3px double var(--rule-dark);
+  background: var(--parchment-dark);
+  padding: 1rem 2rem;
+}
+.oracle-compose-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.5rem;
+}
+.oracle-compose-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+.oracle-compose-input {
+  flex: 1;
+  background: var(--parchment-light);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 10px 12px;
+  font-family: var(--body-serif);
+  font-size: 0.9rem;
+  color: var(--ink);
+  resize: none;
+  outline: none;
+  min-height: 42px;
+  max-height: 90px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.oracle-compose-input:focus { border-color: var(--ink-muted); }
+.oracle-compose-input::placeholder { color: var(--ink-faint); font-style: italic; }
+.oracle-compose-send {
+  background: var(--ink);
+  color: var(--parchment);
+  border: none;
+  border-radius: 2px;
+  padding: 10px 18px;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  align-self: flex-end;
+  height: 42px;
+}
+.oracle-compose-send:hover { background: var(--ink-light); }
+.oracle-compose-send:disabled {
+  background: var(--rule);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+.oracle-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+.oracle-prompt-chip {
+  background: transparent;
+  border: 1px solid var(--rule-dark);
+  border-radius: 2px;
+  padding: 4px 10px;
+  font-family: var(--body-serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.oracle-prompt-chip:hover {
+  background: var(--ink);
+  color: var(--parchment);
+}
+
+/* =============================================
+   CHAT WIDGET — LETTERS TO THE EDITOR ENVELOPE
+   ============================================= */
+
+/* Fixed wrapper: label sits above the envelope */
+#chat-trigger-wrap {
+  position: fixed;
+  bottom: 24px;
   right: 28px;
   z-index: 9000;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #080b10;
-  border: 2px solid #89DF00;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* "Letters to the Editor" label */
+.chat-lte-label {
+  font-family: var(--serif, 'Playfair Display'), serif;
+  font-size: 13.5px;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #f0e6cc;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(26, 16, 6, 0.82);
+  padding: 3px 8px 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(196,168,100,0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* The envelope button — 65% larger than original */
+#chat-trigger {
+  position: relative;
+  width: 139px;
+  height: 96px;
+  border: none;
+  background: transparent;
   cursor: pointer;
+  padding: 0;
+  perspective: 800px;
+  /* natural worn-letter tilt */
+  transform: rotate(-1.8deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#chat-trigger:hover     { transform: rotate(0deg) translateY(-5px) scale(1.04); }
+#chat-trigger.open      { transform: rotate(0deg); animation: none; }
+#chat-trigger * { pointer-events: none; }
+
+/* Idle glow/float pulse — transform only, no filter (keeps 3D clean) */
+#chat-trigger:not(.open) { animation: env-idle 3.6s ease-in-out infinite; }
+@keyframes env-idle {
+  0%, 100% { transform: rotate(-1.8deg) translateY(0); }
+  50%       { transform: rotate(-1.3deg) translateY(-5px); }
+}
+
+/* Envelope outer container fills the button */
+.env-outer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Letter paper — clipped to the exact flap triangle */
+.env-letter {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(4% 0%, 96% 0%, 50.5% 55%);
+  background: #fdf7e8;
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      transparent, transparent 9px,
+      rgba(0,0,0,0.06) 9px, rgba(0,0,0,0.06) 10px
+    );
+  z-index: 2;
+  overflow: hidden;
+}
+
+.env-letter-writing {
+  position: absolute;
+  top: 5px;
+  left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+  color: rgba(45, 22, 6, 0.55);
+  pointer-events: none;
+  line-height: 1;
+}
+.env-letter-writing span:nth-child(1) { font-size: 7.5px; }
+.env-letter-writing span:nth-child(2) { font-size: 6.5px; opacity: 0.8; }
+.env-letter-writing span:nth-child(3) { font-size: 5.5px; opacity: 0.6; }
+
+/* ── Letter stack behind the envelope ── */
+/* Each peek is a slip of paper sticking out below */
+.env-stack {
+  position: absolute;
+  left: 0; right: 0;
+  border-radius: 2px 2px 0 0;
+  z-index: 0;
+}
+.env-stack-3 {
+  bottom: -9px;
+  height: 18px;
+  background: linear-gradient(180deg, #e8d8b0, #ddc898);
+  transform: rotate(3.5deg) translateX(3px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+}
+.env-stack-2 {
+  bottom: -6px;
+  height: 14px;
+  background: linear-gradient(180deg, #eedfc0, #e4d0a4);
+  transform: rotate(-2.2deg) translateX(-2px);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.2);
+}
+.env-stack-1 {
+  bottom: -3px;
+  height: 10px;
+  background: linear-gradient(180deg, #f2e8d0, #e8d9b8);
+  transform: rotate(1deg);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.16);
+}
+
+/* Envelope body */
+.env-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: linear-gradient(160deg, #e0c08a 0%, #ccaa6a 55%, #b89050 100%);
+  box-shadow:
+    0 6px 28px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(0,0,0,0.2),
+    inset 0 0 36px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+/* Paper grain overlay */
+.env-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.018) 2px, rgba(0,0,0,0.018) 3px),
+    repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(0,0,0,0.01) 6px, rgba(0,0,0,0.01) 7px);
+}
+
+/* Postage stamp box (top-right corner detail) */
+.env-stamp {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 24px; height: 20px;
+  border: 1.5px dashed rgba(0,0,0,0.28);
+  border-radius: 1px;
+  z-index: 1;
+}
+.env-stamp::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 0.5px solid rgba(0,0,0,0.12);
+}
+
+/* Address lines (worn text lines) */
+.env-addr {
+  position: absolute;
+  left: 11px;
+  background: rgba(0,0,0,0.13);
+  border-radius: 0.5px;
+  height: 2px;
+}
+.env-addr-1 { top: 60%; width: 38px; }
+.env-addr-2 { top: 70%; width: 30px; }
+.env-addr-3 { top: 80%; width: 34px; }
+
+/* Coffee/age stain marks */
+.env-stain {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+.env-stain-1 {
+  width: 36px; height: 26px;
+  top: 58%; left: 8%;
+  background: radial-gradient(ellipse, rgba(90,50,10,0.1) 0%, transparent 70%);
+}
+.env-stain-2 {
+  width: 20px; height: 20px;
+  top: 18%; right: 22%;
+  background: radial-gradient(circle, rgba(70,40,8,0.09) 0%, transparent 70%);
+}
+
+/* Diagonal fold crease lines from centre to lower corners */
+.env-crease { position: absolute; pointer-events: none; z-index: 1; }
+.env-crease-h {
+  left: 0; right: 0;
+  top: 52%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12) 15%, rgba(0,0,0,0.12) 85%, transparent);
+}
+.env-crease-dl {
+  bottom: 0; left: 0;
+  width: 1px; height: 130%;
+  transform-origin: bottom left;
+  transform: rotate(-35deg);
+  background: linear-gradient(to top, transparent, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, transparent);
+}
+.env-crease-dr {
+  bottom: 0; right: 0;
+  width: 1px; height: 130%;
+  transform-origin: bottom right;
+  transform: rotate(35deg);
+  background: linear-gradient(to top, transparent, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, transparent);
+}
+
+/* Lower-left triangular fold — semi-transparent so it reads as a crease shadow */
+.env-fold-l {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 48px 70px;
+  border-color: transparent transparent rgba(0,0,0,0.13) transparent;
+  z-index: 2;
+}
+
+/* Lower-right triangular fold */
+.env-fold-r {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 70px 48px 0;
+  border-color: transparent rgba(0,0,0,0.13) transparent transparent;
+  z-index: 2;
+}
+
+/* ── Flap: two-layer trick ──────────────────────────────────────────────
+   .env-flap-wrap  → does the 3D rotation (no clip-path, so children aren't clipped)
+   .env-flap-shape → clip-path triangle lives here (only clips itself)
+   .env-seal       → sibling inside wrap; rotates WITH the flap but isn't clipped
+   ────────────────────────────────────────────────────────────────────── */
+.env-flap-wrap {
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  transition: transform 0.42s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 3;
+}
+
+#chat-trigger:not(.open):hover .env-flap-wrap {
+  transform: rotateX(-82deg);
+}
+
+/* Visual triangle shape */
+.env-flap-shape {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50.5% 57%);
+  background: linear-gradient(168deg, #d8b06e 0%, #bc9048 100%);
+}
+
+/* Shared seal geometry — applied to both halves */
+.env-seal-top,
+.env-seal-bottom {
+  position: absolute;
+  top: 57%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px; height: 48px;
+  background: radial-gradient(circle at 36% 30%, #253c18, #13220b);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(137,223,0,0.25);
-  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
-#chat-trigger:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 28px rgba(137,223,0,0.45);
-  border-color: #9cee10;
+.env-seal-top svg,
+.env-seal-bottom svg { width: 22px; height: 32px; display: block; }
+
+/* Top half — V-shape matching the flap triangle. No box-shadow (clipped rings look wrong). */
+.env-seal-top {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 10%, 50% 50%, 0% 10%);
+}
+
+/* Bottom half — inverse V, stays on envelope body. No ring shadow (same clipping issue). */
+.env-seal-bottom {
+  clip-path: polygon(0% 10%, 50% 50%, 100% 10%, 100% 100%, 0% 100%);
+  z-index: 4;
+}
+
+/* Close face — shown by JS when oracle is open */
+#chat-trigger.open #chat-icon-open  { display: none; }
+#chat-icon-close {
+  position: absolute !important;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
 }
 #chat-trigger.open {
-  border-color: rgba(137,223,0,0.3);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  animation: none;
-}
-#chat-trigger svg { pointer-events: none; }
-#chat-trigger:not(.open) { animation: chat-pulse 2.8s ease-in-out infinite; }
-@keyframes chat-pulse {
-  0%, 100% { box-shadow: 0 4px 20px rgba(137,223,0,0.35), 0 0 0 0 rgba(137,223,0,0.4); }
-  50%       { box-shadow: 0 4px 24px rgba(137,223,0,0.5), 0 0 0 10px rgba(137,223,0,0); }
+  background: rgba(8,11,16,0.88);
+  border-radius: 3px;
+  border: 1px solid rgba(137,223,0,0.25);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
 }
 
 #chat-panel {
   position: fixed;
-  bottom: 92px;
+  bottom: 136px;
   right: 28px;
   z-index: 9000;
   width: 380px;
@@ -1777,6 +2378,8 @@ body {
 
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
     if (e.key === 'ArrowDown' || e.key === ' ') {
       const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
       if (current < namedSections.length - 1) {
@@ -1890,16 +2493,115 @@ body {
 })();
 </script>
 
-<!-- Chat widget -->
-<button id="chat-trigger" aria-label="Open AI chat" aria-expanded="false">
-  <svg id="chat-icon-open" width="22" height="33" viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
-    <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
-  </svg>
-  <svg id="chat-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c8c85" stroke-width="2.5" stroke-linecap="round" style="display:none">
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-</button>
+<!-- Newspaper Oracle Overlay -->
+<div id="oracle-overlay" role="dialog" aria-label="The AI Daily — Live Edition" aria-hidden="true">
+  <div class="oracle-header">
+    <div class="oracle-header-title">
+      <span>The AI Daily — Live Edition</span>
+      The Oracle
+    </div>
+    <div class="oracle-header-status" id="oracle-status">Awaiting dispatch</div>
+    <button id="oracle-close">← Close edition</button>
+  </div>
+
+  <div class="oracle-broadsheet" id="oracle-broadsheet">
+    <div class="oracle-welcome" id="oracle-welcome">
+      <div class="oracle-welcome-ornament">✦</div>
+      <h3>Send a dispatch to the Editor.</h3>
+      <p>Ask anything.</p>
+      <p>Your question gets routed to a Claude-powered newsroom: an Anthropic API call hits a Cloudflare Worker, spins up a live article pipeline via MCP, and typesets your front page in real time.</p>
+    </div>
+  </div>
+
+  <div class="oracle-compose">
+    <div class="oracle-compose-label">Letters to the Editor · The AI Daily Newsroom</div>
+    <div class="oracle-prompts" id="oracle-prompts">
+      <button class="oracle-prompt-chip" data-prompt="What did Liatrio do at Boeing?">What did Liatrio do at Boeing?</button>
+      <button class="oracle-prompt-chip" data-prompt="Is AI really as big a shift as the internet?">Is AI really as big a shift as the internet?</button>
+      <button class="oracle-prompt-chip" data-prompt="How does Liatrio actually do this work?">How does Liatrio actually do this work?</button>
+      <button class="oracle-prompt-chip" data-prompt="What about regulated industries?">What about regulated industries?</button>
+      <button class="oracle-prompt-chip" data-prompt="How fast can we get started?">How fast can we get started?</button>
+    </div>
+    <div class="oracle-compose-row">
+      <textarea
+        id="oracle-input"
+        class="oracle-compose-input"
+        placeholder="Address your dispatch to the editor…"
+        rows="1"
+        maxlength="500"
+      ></textarea>
+      <button id="oracle-send" class="oracle-compose-send" disabled>Send Dispatch →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat widget — Letters to the Editor envelope -->
+<div id="chat-trigger-wrap">
+  <span class="chat-lte-label">Ask the Newsroom</span>
+  <button id="chat-trigger" aria-label="Write a Letter to the Editor" aria-expanded="false">
+
+    <!-- Envelope visual (id="chat-icon-open" so JS can hide it when oracle opens) -->
+    <div id="chat-icon-open" class="env-outer">
+
+      <!-- Letter stack (behind envelope) -->
+      <div class="env-stack env-stack-3"></div>
+      <div class="env-stack env-stack-2"></div>
+      <div class="env-stack env-stack-1"></div>
+
+      <!-- Letter paper — hidden inside, revealed when flap opens -->
+      <div class="env-letter">
+        <div class="env-letter-writing">
+          <span>Dear Newsroom,</span>
+          <span>I have a story for you...</span>
+          <span>— a reader</span>
+        </div>
+      </div>
+
+      <!-- Envelope body with worn details -->
+      <div class="env-body">
+        <div class="env-stamp"></div>
+        <div class="env-addr env-addr-1"></div>
+        <div class="env-addr env-addr-2"></div>
+        <div class="env-addr env-addr-3"></div>
+        <div class="env-stain env-stain-1"></div>
+        <div class="env-stain env-stain-2"></div>
+        <div class="env-crease env-crease-h"></div>
+        <div class="env-crease env-crease-dl"></div>
+        <div class="env-crease env-crease-dr"></div>
+        <!-- Lower corner folds -->
+        <div class="env-fold-l"></div>
+        <div class="env-fold-r"></div>
+      </div>
+
+      <!-- Flap wrapper: rotates in 3D, no clip-path (so seal-top isn't clipped) -->
+      <div class="env-flap-wrap">
+        <div class="env-flap-shape"></div>
+        <!-- TOP half of seal — rides up with flap, clipped below the crease -->
+        <div class="env-seal-top">
+          <svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+            <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BOTTOM half of seal — stays on body, clipped above the crease -->
+      <div class="env-seal-bottom">
+        <svg viewBox="0 0 31 47" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.8926 23.3401C8.19876 19.7347 6.21212 8.58629 11.2667 3.55827C13.1155 1.7129 15.4831 0.471774 18.0576 0C17.1994 0.997984 16.7241 2.26815 16.7205 3.58367C16.7205 5.89355 17.243 8.08367 23.5567 15.055C28.6748 20.7272 30.0264 23.8917 30.0083 29.9359C30.0047 30.9393 29.8831 31.9373 29.6454 32.9117C29.5547 29.8615 28.3137 26.9583 26.1711 24.7772C20.2347 18.7966 14.7066 16.1329 13.921 10.2393C12.9903 16.0966 18.5366 19.3028 24.658 25.0113C28.3246 28.4534 29.0776 33.7536 27.0782 38.0903C26.4868 39.3841 25.6667 40.5635 24.658 41.5687C20.0678 46.1413 12.6256 46.1413 8.03366 41.5687C7.86312 41.4018 7.58371 41.0952 7.44764 40.9391C5.56441 38.8361 4.33614 36.1071 3.81363 32.8881C2.8321 26.5083 0.618671 24.6956 0 24.0823C3.9624 24.0823 5.37573 29.7218 5.65876 32.1187C6.03976 34.797 6.98863 37.477 8.92992 39.6363L8.95531 39.6653L8.98434 39.6944C11.7965 42.476 16.3395 42.4597 19.1316 39.6599C20.4706 38.3171 21.2217 36.499 21.2163 34.6046C21.2652 32.7139 20.4978 30.894 19.1081 29.6056C15.3525 26.3232 14.2657 25.6609 11.8926 23.3401Z" fill="#24AE1D"/>
+          <path d="M18.1089 30.6163C19.1829 31.6651 19.7889 33.1004 19.7925 34.5974C19.8197 37.7565 17.2707 40.3385 14.0993 40.3657C12.5535 40.3784 11.0694 39.7724 9.97904 38.68C4.22594 32.2476 8.21193 20.2373 8.21193 20.2373C10.6685 26.1563 12.5844 25.1093 18.1089 30.6163Z" fill="#89DF00"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- X close icon — JS sets display:'' when oracle opens -->
+    <svg id="chat-icon-close" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c8c85" stroke-width="2.5" stroke-linecap="round" style="display:none">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+
+  </button>
+</div>
 
 <div id="chat-panel" role="dialog" aria-label="Chat with Liatrio AI" aria-hidden="true">
   <div class="chat-header">
@@ -1932,113 +2634,250 @@ body {
 </div>
 
 <script>
+// ── Newspaper Oracle ───────────────────────────────────────────────────────────
 (function() {
-  const CHAT_API = 'https://ai-enablement-api.gregk.workers.dev/api/chat';
-  const trigger  = document.getElementById('chat-trigger');
-  const panel    = document.getElementById('chat-panel');
-  const msgs     = document.getElementById('chat-messages');
-  const input    = document.getElementById('chat-input');
-  const sendBtn  = document.getElementById('chat-send');
-  const chips    = document.getElementById('chat-suggestions');
-  const iconOpen = document.getElementById('chat-icon-open');
-  const iconClose= document.getElementById('chat-icon-close');
+  const ARTICLE_API = 'https://ai-enablement-api.gregk.workers.dev/api/article';
 
-  let open = false, waiting = false, history = [];
+  const overlay    = document.getElementById('oracle-overlay');
+  const broadsheet = document.getElementById('oracle-broadsheet');
+  const welcome    = document.getElementById('oracle-welcome');
+  const statusEl   = document.getElementById('oracle-status');
+  const oInput     = document.getElementById('oracle-input');
+  const oSend      = document.getElementById('oracle-send');
+  const trigger    = document.getElementById('chat-trigger');
+  const iconOpen   = document.getElementById('chat-icon-open');
+  const iconClose  = document.getElementById('chat-icon-close');
 
-  function toggleChat() {
-    open = !open;
-    panel.classList.toggle('visible', open);
-    panel.setAttribute('aria-hidden', String(!open));
-    trigger.setAttribute('aria-expanded', String(open));
-    trigger.classList.toggle('open', open);
-    iconOpen.style.display  = open ? 'none' : '';
-    iconClose.style.display = open ? ''     : 'none';
-    if (open) { requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); input.focus(); }
+  let oracleOpen = false;
+  let dispatching = false;
+  let articleCount = 0;
+
+  // ── Open / close ──────────────────────────────────────────────────────────
+
+  function openOracle() {
+    oracleOpen = true;
+    overlay.classList.add('visible');
+    overlay.setAttribute('aria-hidden', 'false');
+    trigger.classList.add('open');
+    iconOpen.style.display  = 'none';
+    iconClose.style.display = '';
+    document.body.style.overflow = 'hidden';
+    oInput.focus();
   }
 
-  function renderMarkdown(text) {
-    const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return escaped
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>');
+  function closeOracle() {
+    oracleOpen = false;
+    overlay.classList.remove('visible');
+    overlay.setAttribute('aria-hidden', 'true');
+    trigger.classList.remove('open');
+    iconOpen.style.display  = '';
+    iconClose.style.display = 'none';
+    document.body.style.overflow = '';
   }
 
-  function addMsg(role, text) {
-    const d = document.createElement('div');
-    d.className = 'chat-msg ' + role;
-    if (role === 'assistant') d.innerHTML = renderMarkdown(text);
-    else d.textContent = text;
-    msgs.appendChild(d);
-    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+  trigger.addEventListener('click', () => oracleOpen ? closeOracle() : openOracle());
+  document.getElementById('oracle-close').addEventListener('click', closeOracle);
+  document.addEventListener('keydown', e => {
+    if (oracleOpen && e.key === 'Escape') closeOracle();
+  });
+
+  // ── Typeset animation ─────────────────────────────────────────────────────
+
+  function typeset(el, text, msPerWord, onDone) {
+    const words = text.split(' ');
+    let i = 0;
+    const cursor = document.createElement('span');
+    cursor.className = 'typeset-cursor';
+    el.appendChild(cursor);
+
+    function tick() {
+      if (i >= words.length) {
+        cursor.remove();
+        if (onDone) onDone();
+        return;
+      }
+      cursor.before(document.createTextNode((i === 0 ? '' : ' ') + words[i]));
+      i++;
+      setTimeout(tick, msPerWord);
+    }
+    tick();
   }
 
-  function showTyping() {
+  // ── Render article ────────────────────────────────────────────────────────
+
+  function renderArticle(article) {
+    const count = articleCount++;
+    const isBanner = count === 0;
+
+    if (welcome) welcome.remove();
+
     const el = document.createElement('div');
-    el.className = 'chat-typing'; el.id = 'chat-typing';
-    el.innerHTML = '<span></span><span></span><span></span>';
-    msgs.appendChild(el);
-    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+    el.className = 'oracle-article' + (isBanner ? ' banner' : '');
+
+    // Label
+    const label = document.createElement('div');
+    label.className = 'oracle-article-label';
+    label.textContent = isBanner ? 'Breaking' : `Dispatch No. ${count + 1}`;
+    el.appendChild(label);
+
+    // Headline
+    const hed = document.createElement('div');
+    hed.className = 'oracle-article-headline';
+    hed.textContent = article.headline;
+    el.appendChild(hed);
+
+    // Deck
+    const deck = document.createElement('div');
+    deck.className = 'oracle-article-deck';
+    deck.textContent = article.deck;
+    el.appendChild(deck);
+
+    // Meta (dateline + byline)
+    const meta = document.createElement('div');
+    meta.className = 'oracle-article-meta';
+    meta.textContent = `${article.dateline} · ${article.byline || 'Liatrio Intelligence Bureau'}`;
+    el.appendChild(meta);
+
+    // Body container
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'oracle-article-body';
+    el.appendChild(bodyEl);
+
+    // Pull quote placeholder (injected after body)
+    let pullEl = null;
+    if (article.pullquote) {
+      pullEl = document.createElement('div');
+      pullEl.className = 'oracle-pullquote';
+      pullEl.textContent = article.pullquote;
+      pullEl.style.opacity = '0';
+      pullEl.style.transition = 'opacity 0.6s ease';
+    }
+
+    broadsheet.appendChild(el);
+    broadsheet.scrollTop = broadsheet.scrollHeight;
+
+    // Typeset body paragraph by paragraph
+    const paragraphs = article.body.split('\n\n').filter(Boolean);
+    let pIdx = 0;
+
+    function nextParagraph(onAllDone) {
+      if (pIdx >= paragraphs.length) {
+        if (onAllDone) onAllDone();
+        return;
+      }
+      const p = document.createElement('p');
+      bodyEl.appendChild(p);
+      broadsheet.scrollTop = broadsheet.scrollHeight;
+      typeset(p, paragraphs[pIdx], 18, () => {
+        pIdx++;
+        broadsheet.scrollTop = broadsheet.scrollHeight;
+        setTimeout(() => nextParagraph(onAllDone), 80);
+      });
+    }
+
+    nextParagraph(() => {
+      // Fade in pull quote after body is done
+      if (pullEl) {
+        el.appendChild(pullEl);
+        requestAnimationFrame(() => { pullEl.style.opacity = '1'; });
+      }
+      broadsheet.scrollTop = broadsheet.scrollHeight;
+    });
   }
-  function removeTyping() { const el = document.getElementById('chat-typing'); if (el) el.remove(); }
 
-  async function send(text) {
-    text = text.trim();
-    if (!text || waiting) return;
-    if (chips) chips.style.display = 'none';
-    input.value = ''; input.style.height = 'auto';
-    sendBtn.disabled = true; waiting = true;
+  // ── Dispatch ──────────────────────────────────────────────────────────────
 
-    history.push({ role: 'user', content: text });
-    addMsg('user', text);
-    if (history.length > 20) history = history.slice(history.length - 20);
-    if (history[0].role === 'assistant') history = history.slice(1);
-    showTyping();
+  function showSkeleton() {
+    if (welcome) welcome.remove();
+    const sk = document.createElement('div');
+    sk.className = 'oracle-skeleton';
+    sk.id = 'oracle-skeleton';
+    sk.innerHTML = `
+      <div class="oracle-skeleton-bar oracle-skeleton-label"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-hed"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-hed2"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-deck"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-deck2"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-meta"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body"></div>
+      <div class="oracle-skeleton-bar oracle-skeleton-body-short"></div>
+    `;
+    broadsheet.appendChild(sk);
+    broadsheet.scrollTop = broadsheet.scrollHeight;
+  }
+
+  function removeSkeleton() {
+    const sk = document.getElementById('oracle-skeleton');
+    if (sk) sk.remove();
+  }
+
+  async function dispatch(question) {
+    question = question.trim();
+    if (!question || dispatching) return;
+
+    dispatching = true;
+    oSend.disabled = true;
+    oInput.value = '';
+    oInput.style.height = 'auto';
+    setStatus('On the wire…', true);
+    showSkeleton();
 
     try {
-      const res = await fetch(CHAT_API, {
+      const res = await fetch(ARTICLE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
+        body: JSON.stringify({ question }),
       });
-      removeTyping();
+
+      removeSkeleton();
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        addMsg('assistant', err.error || 'Something went wrong. Try again?');
-        history.pop();
+        setStatus(err.error || 'Press failed — try again', false);
       } else {
-        const data = await res.json();
-        const reply = data.reply || '(no response)';
-        history.push({ role: 'assistant', content: reply });
-        addMsg('assistant', reply);
+        const { article } = await res.json();
+        renderArticle(article);
+        setStatus('Edition updated', true);
+        setTimeout(() => setStatus('Awaiting dispatch', false), 3000);
       }
     } catch (_) {
-      removeTyping();
-      addMsg('assistant', 'Connection issue — check your network and try again.');
-      history.pop();
+      removeSkeleton();
+      setStatus('Connection lost — try again', false);
     }
-    waiting = false;
-    sendBtn.disabled = input.value.trim().length === 0;
-    input.focus();
+
+    dispatching = false;
+    oSend.disabled = oInput.value.trim().length === 0;
+    oInput.focus();
   }
 
-  trigger.addEventListener('click', toggleChat);
-  document.getElementById('chat-close').addEventListener('click', toggleChat);
-  sendBtn.addEventListener('click', () => send(input.value));
-  input.addEventListener('input', () => {
-    sendBtn.disabled = input.value.trim().length === 0 || waiting;
-    input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  function setStatus(text, active) {
+    statusEl.textContent = text;
+    statusEl.className = 'oracle-header-status' + (active ? ' active' : '');
+  }
+
+  oSend.addEventListener('click', () => dispatch(oInput.value));
+  oInput.addEventListener('input', () => {
+    oSend.disabled = oInput.value.trim().length === 0 || dispatching;
+    oInput.style.height = 'auto';
+    oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
   });
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
+  oInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); dispatch(oInput.value); }
   });
-  chips && chips.addEventListener('click', e => {
-    const chip = e.target.closest('.chat-chip');
-    if (chip) send(chip.textContent);
-  });
-  document.addEventListener('keydown', e => {
-    if (open && e.key === 'Escape') { e.preventDefault(); toggleChat(); }
+
+  // Prompt chips — populate input, don't auto-send
+  document.querySelectorAll('.oracle-prompt-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const prompt = chip.dataset.prompt || chip.textContent.trim();
+      oInput.value = prompt;
+      oInput.style.height = 'auto';
+      oInput.style.height = Math.min(oInput.scrollHeight, 90) + 'px';
+      oSend.disabled = false;
+      oInput.focus();
+    });
   });
 })();
 </script>
