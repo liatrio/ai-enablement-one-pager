@@ -38,7 +38,7 @@ html.lenis, html.lenis body { height: auto; }
 
 body {
   font-family: var(--body-serif);
-  font-size: 21px;
+  font-size: 23px;
   color: var(--ink);
   background: var(--parchment);
   line-height: 1.7;
@@ -853,7 +853,11 @@ body {
     gap: 0.3rem;
     margin-bottom: 0.4rem;
     padding-bottom: 4px;
+    padding-right: 2rem;
     scrollbar-width: none;
+    position: relative;
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
   .oracle-prompts::-webkit-scrollbar { display: none; }
   .oracle-prompt-chip { font-size: 0.7rem !important; padding: 3px 8px !important; flex-shrink: 0 !important; }
