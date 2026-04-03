@@ -880,7 +880,6 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
-  overflow: hidden;
 }
 #oracle-overlay.visible {
   opacity: 1;
@@ -2274,15 +2273,17 @@ body {
   const smoothValues = new Map();
 
   // Viewport band visibility: element center position determines opacity
-  // Bottom 12.5%: fade in (0 -> 1), Middle 75%: fully visible (1), Top 12.5%: fade out (1 -> 0)
+  const isMobileView = window.innerWidth <= 700;
   function getVisibility(el) {
     const rect = el.getBoundingClientRect();
     const center = rect.top + rect.height / 2;
-    const fadeZone = vh * 0.125; // 12.5% of viewport
+    // Mobile: wider fade zone at bottom (20%) so content appears sooner while scrolling up
+    const fadeZoneBottom = vh * (isMobileView ? 0.20 : 0.125);
+    const fadeZone = vh * 0.125;
 
-    // Fade in: element center moves from bottom edge to bottom 12.5% line
-    if (center > vh - fadeZone) {
-      return clamp((vh - center) / fadeZone, 0, 1);
+    // Fade in: element center moves from bottom edge up through fade zone
+    if (center > vh - fadeZoneBottom) {
+      return clamp((vh - center) / fadeZoneBottom, 0, 1);
     }
     // Fade out: element center moves from top 12.5% line to top edge
     if (center < fadeZone) {
