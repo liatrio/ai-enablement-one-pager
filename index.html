@@ -1084,6 +1084,28 @@ body {
   color: var(--ink-faint);
   cursor: not-allowed;
 }
+.oracle-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+.oracle-prompt-chip {
+  background: transparent;
+  border: 1px solid var(--rule-dark);
+  border-radius: 2px;
+  padding: 4px 10px;
+  font-family: var(--body-serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.oracle-prompt-chip:hover {
+  background: var(--ink);
+  color: var(--parchment);
+}
 
 /* =============================================
    CHAT WIDGET
@@ -2142,6 +2164,8 @@ body {
 
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
     if (e.key === 'ArrowDown' || e.key === ' ') {
       const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
       if (current < namedSections.length - 1) {
@@ -2276,6 +2300,13 @@ body {
 
   <div class="oracle-compose">
     <div class="oracle-compose-label">Letters to the Editor · The AI Daily Newsroom</div>
+    <div class="oracle-prompts" id="oracle-prompts">
+      <button class="oracle-prompt-chip">What did Liatrio do at Boeing?</button>
+      <button class="oracle-prompt-chip">Is AI really as big a shift as the internet?</button>
+      <button class="oracle-prompt-chip">How does Liatrio actually do this work?</button>
+      <button class="oracle-prompt-chip">What about regulated industries?</button>
+      <button class="oracle-prompt-chip">How fast can we get started?</button>
+    </div>
     <div class="oracle-compose-row">
       <textarea
         id="oracle-input"
@@ -2532,6 +2563,13 @@ body {
   });
   oInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); dispatch(oInput.value); }
+  });
+
+  // Prompt chips
+  document.querySelectorAll('.oracle-prompt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      dispatch(chip.textContent);
+    });
   });
 })();
 </script>
