@@ -53,7 +53,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6rem 2rem;
+  padding: 4rem 2rem;
   position: relative;
   overflow: hidden;
   perspective: 1000px;
@@ -824,22 +824,21 @@ body {
   <div class="section-ornament" data-speed="0.06" style="top: -5%; left: -3%;">&sect;</div>
   <div class="section-ornament" data-speed="-0.04" style="bottom: -5%; right: -3%;">&para;</div>
 
-  <div class="masthead-date" data-scroll data-speed="0.3">April 2026 Edition</div>
+  <div class="masthead-date">April 2026 Edition</div>
   <hr class="masthead-rule">
-  <h1 class="masthead-title" data-scroll data-speed="0.15"><span class="title-word">The</span> <span class="title-word">AI</span> <span class="title-word">Daily</span></h1>
-  <div class="masthead-tagline" data-scroll data-speed="0.2">Enterprise Intelligence, Delivered</div>
-  <div class="masthead-edition" data-scroll data-speed="0.25">A Liatrio Publication &bull; Special Anthropic Partnership Edition</div>
+  <h1 class="masthead-title"><span class="title-word">The</span> <span class="title-word">AI</span> <span class="title-word">Daily</span></h1>
+  <div class="masthead-tagline">Enterprise Intelligence, Delivered</div>
+  <div class="masthead-edition">A Liatrio Publication &bull; Special Anthropic Partnership Edition</div>
   <hr class="masthead-rule">
 
-  <h2 class="masthead-headline" data-scroll data-speed="0.35">Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner</h2>
-  <p class="masthead-sub" data-scroll data-speed="0.4">How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.</p>
+  <h2 class="masthead-headline">Enterprise Consultancy Stakes Claim as Anthropic's Missing Partner</h2>
+  <p class="masthead-sub">How a small, AI-forward firm is driving Claude adoption across Fortune 500 engineering organizations, with or without an official partnership.</p>
 
   <div class="scroll-hint">Scroll to read &darr;</div>
 </section>
 
 <!-- Callout: wipe reveal -->
-<section class="story-section" style="min-height: 25vh; padding: 3rem 2rem; background: var(--parchment);">
-  <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
+<section class="story-section" style="min-height: 0; padding: 2rem 2rem; background: var(--parchment);">
   <div class="callout-wipe" data-scroll data-type="wipe-right">
     Not just another technology partner.
   </div>
@@ -873,7 +872,7 @@ body {
 </section>
 
 <!-- Callout: letter-spacing spread -->
-<section class="story-section" style="min-height: 25vh; padding: 3rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-spread" data-scroll data-type="spread">
     Here's what we're <em>already</em> doing
@@ -975,7 +974,7 @@ body {
 </section>
 
 <!-- Callout: zoom-in with border-draw -->
-<section class="story-section" style="min-height: 25vh; padding: 3rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="border-draw" data-scroll data-type="border-draw">
     <div class="callout-zoom large" data-scroll data-type="zoom-in" style="padding: 0;">
@@ -1116,7 +1115,7 @@ body {
 </section>
 
 <!-- Callout: zoom-out (different from others) -->
-<section class="story-section" style="min-height: 25vh; padding: 3rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-zoom large" data-scroll data-type="zoom-out">
     With or without you,<br>we're <em>moving</em>.
@@ -1171,7 +1170,7 @@ body {
 </section>
 
 <!-- Callout: wipe from left (different from first wipe) -->
-<section class="story-section" style="min-height: 25vh; padding: 3rem 2rem;">
+<section class="story-section" style="min-height: 0; padding: 2rem 2rem;">
   <div class="section-ornament" data-speed="0.05" style="bottom: 5%; right: -3%;">&middot;</div>
   <div class="callout-wipe" data-scroll data-type="wipe-right" style="font-size: clamp(2rem, 6vw, 4rem);">
     Let's make it <em>official</em>.
@@ -1343,6 +1342,34 @@ body {
     });
   });
 
+  // ====== MASTHEAD SCROLL PARALLAX (GSAP scrub, no conflict with entrance) ======
+  gsap.to('.masthead-title', {
+    yPercent: -30, scale: 0.85, opacity: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: '.masthead', start: 'top top', end: 'bottom top', scrub: true }
+  });
+
+  // Scroll hint fades on scroll; headline and sub just scroll off naturally
+  gsap.to('.scroll-hint', {
+    opacity: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: '.masthead', start: 'top top', end: '30% top', scrub: true }
+  });
+
+  // Ink-bleed on scroll
+  ScrollTrigger.create({
+    trigger: '.masthead',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: true,
+    onUpdate: (self) => {
+      const d = document.getElementById('inkDisplace');
+      if (d) d.setAttribute('scale', self.progress * 5);
+      const t = document.querySelector('.masthead-title');
+      if (t) t.style.filter = self.progress > 0.01 ? 'url(#ink-bleed)' : 'none';
+    }
+  });
+
   // ====== ORNAMENT SCROLL MOTION (GSAP scrub) ======
   document.querySelectorAll('.section-ornament').forEach(orn => {
     const parent = orn.closest('section') || orn.closest('.masthead');
@@ -1390,8 +1417,8 @@ body {
   // Triggers faster: element reaches 1.0 when its top hits ~45% down the viewport
   function getProgress(el) {
     const rect = el.getBoundingClientRect();
-    const start = vh * 0.95;  // start tracking when top is near bottom of viewport
-    const end = vh * 0.33;    // fully revealed when top hits ~33% down
+    const start = vh * 0.9;   // start tracking near bottom of viewport
+    const end = vh * 0.5;     // fully revealed at middle of viewport
     return clamp((start - rect.top) / (start - end), 0, 1);
   }
 
@@ -1408,31 +1435,7 @@ body {
     // Progress bar
     progressBar.style.width = (total > 0 ? (scrollY / total) * 100 : 0) + '%';
 
-    // Masthead parallax: title moves up, headline moves up slower
-    const mastheadTitle = document.querySelector('.masthead-title');
-    const mastheadHeadline = document.querySelector('.masthead-headline');
-    if (mastheadTitle) {
-      const f = clamp(scrollY / vh, 0, 1);
-      mastheadTitle.style.transform = `translateY(${f * -80}px) scale(${1 - f * 0.15})`;
-      mastheadTitle.style.opacity = 1 - f * 0.8;
-      // Ink-bleed: text distorts slightly as you scroll away, like ink spreading on wet paper
-      const inkDisplace = document.getElementById('inkDisplace');
-      if (inkDisplace) {
-        inkDisplace.setAttribute('scale', f * 4); // 0 -> 4 displacement
-      }
-      mastheadTitle.style.filter = f > 0.01 ? 'url(#ink-bleed)' : 'none';
-    }
-    if (mastheadHeadline) {
-      const f = clamp(scrollY / vh, 0, 1);
-      mastheadHeadline.style.transform = `translateY(${f * -40}px)`;
-      mastheadHeadline.style.opacity = 1 - f * 0.6;
-    }
-
-    // Scroll hint fade
-    const hint = document.querySelector('.scroll-hint');
-    if (hint) {
-      hint.style.opacity = clamp(1 - scrollY / 200, 0, 1);
-    }
+    // Masthead parallax handled by GSAP ScrollTrigger below (not here)
 
     // Ornament motion handled by GSAP below
 
@@ -1563,15 +1566,15 @@ body {
         }
       }
 
-      // Fly-out: when element is above viewport, push it up and fade
+      // Fly-out: when element nears top of viewport, fade and push up
       const rect2 = el.getBoundingClientRect();
       if (rect2.bottom < 0) {
-        // Already off screen, skip
-      } else if (rect2.top < -20) {
-        // Scrolling off the top: fly out
-        const exitProgress = clamp(-rect2.top / vh, 0, 1);
-        el.style.opacity = clamp(1 - exitProgress * 2, 0, 1);
-        el.style.transform = `translateY(${-exitProgress * 40}px) scale(${1 - exitProgress * 0.1})`;
+        // Already off screen
+      } else if (rect2.top < vh * 0.1) {
+        // Top 10% of viewport: start fading out
+        const exitProgress = clamp((vh * 0.1 - rect2.top) / (vh * 0.15), 0, 1);
+        el.style.opacity = clamp(1 - exitProgress, 0, 1);
+        el.style.transform = `translateY(${-exitProgress * 30}px) scale(${1 - exitProgress * 0.05})`;
       } else if (smooth > 0.95 && !['zoom-in','zoom-out','wipe-right','spread','border-draw','underline-draw','z-pop','tilt-in-left','tilt-in-right'].includes(type)) {
         const factor = getScrollFactor(el);
         const drift = factor * 6;
